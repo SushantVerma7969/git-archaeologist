@@ -39,24 +39,40 @@ export function getTotalCommitCount(repoPath: string): number {
   return parseInt(out, 10);
 }
 
+function sanitizeFilePath(raw: string): string {
+  // git sometimes wraps paths containing special chars in double quotes
+  // e.g. "test/some file.js" — strip the surrounding quotes
+  let p = raw.trim();
+  if (p.startsWith('"') && p.endsWith('"')) {
+    p = p.slice(1, -1);
+  }
+  return p;
+}
+
 export function parseCommits(repoPath: string): CommitRecord[] {
   const DELIMITER = '||GITARCH||';
-  const RAW_SEP = '||COMMIT_END||';
+  const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
 
   const raw = execSync(
-    `git log --pretty=format:"%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at${RAW_SEP}" --name-only`,
+    `git log --pretty=format:"${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at" --name-only`,
     { cwd: repoPath, stdio: 'pipe', maxBuffer: 512 * 1024 * 1024 }
   ).toString();
 
   const commits: CommitRecord[] = [];
-  const blocks = raw.split(RAW_SEP).map((b) => b.trim()).filter(Boolean);
+
+  const blocks = raw
+    .split(BEGIN_MARKER)
+    .map((b) => b.trim())
+    .filter(Boolean);
 
   for (const block of blocks) {
     const newlineIdx = block.indexOf('\n');
-    if (newlineIdx === -1) continue;
 
-    const header = block.substring(0, newlineIdx).trim();
-    const filesRaw = block.substring(newlineIdx + 1).trim();
+    const header =
+      newlineIdx === -1 ? block.trim() : block.substring(0, newlineIdx).trim();
+
+    const filesRaw =
+      newlineIdx === -1 ? '' : block.substring(newlineIdx + 1).trim();
 
     const parts = header.split(DELIMITER);
     if (parts.length !== 4) continue;
@@ -67,8 +83,8 @@ export function parseCommits(repoPath: string): CommitRecord[] {
 
     const filesChanged = filesRaw
       .split('\n')
-      .map((f) => f.trim())
-      .filter((f) => f.length > 0 && !f.includes(DELIMITER));
+      .map((f: string) => sanitizeFilePath(f))
+      .filter((f: string) => f.length > 0);
 
     commits.push({ hash, authorEmail, authorName, timestamp, filesChanged });
   }
@@ -100,12 +116,8 @@ export function buildFileStats(commits: CommitRecord[]): Map<string, FileStats> 
         commit.authorEmail,
         (stats.authorChanges.get(commit.authorEmail) ?? 0) + 1
       );
-      if (commit.timestamp < stats.firstChanged) {
-        stats.firstChanged = commit.timestamp;
-      }
-      if (commit.timestamp > stats.lastChanged) {
-        stats.lastChanged = commit.timestamp;
-      }
+      if (commit.timestamp < stats.firstChanged) stats.firstChanged = commit.timestamp;
+      if (commit.timestamp > stats.lastChanged) stats.lastChanged = commit.timestamp;
       stats.changeTimeline.push(commit.timestamp);
     }
   }
