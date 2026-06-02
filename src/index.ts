@@ -2,8 +2,10 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
+import * as fs from 'fs';
 import { analyze } from './core/orchestrator';
 import { renderReport } from './output/terminalRenderer';
+import { generateHtmlReport } from './output/htmlReport';
 
 const program = new Command();
 
@@ -20,14 +22,13 @@ program
   .alias('a')
   .description('Analyze a git repository and print the full report')
   .option('-j, --json', 'Output raw JSON instead of the terminal report')
-  .action(async (repoPath: string | undefined, options: { json?: boolean }) => {
+  .option('-H, --html [outputFile]', 'Generate an HTML report file')
+  .action(async (repoPath: string | undefined, options: { json?: boolean; html?: boolean | string }) => {
     const resolvedPath = path.resolve(repoPath ?? '.');
-
     try {
       const result = await analyze(resolvedPath);
 
       if (options.json) {
-        // JSON output — convert Maps and Sets to plain objects first
         const serializable = {
           ...result,
           fileStats: Object.fromEntries(
@@ -42,6 +43,13 @@ program
           ),
         };
         console.log(JSON.stringify(serializable, null, 2));
+      } else if (options.html !== undefined) {
+        const defaultName = `git-arch-report-${result.repoName}.html`;
+        const outFile = typeof options.html === 'string' ? options.html : defaultName;
+        const outPath = path.resolve(outFile);
+        generateHtmlReport(result, outPath);
+        renderReport(result);
+        console.log(chalk.hex('#A78BFA')(`\n  📄 HTML report saved → ${outPath}\n`));
       } else {
         renderReport(result);
       }
@@ -63,8 +71,6 @@ program
       const result = await analyze(resolvedPath);
       const topN = parseInt(options.top, 10);
       result.cursedFiles = result.cursedFiles.slice(0, topN);
-      // Re-render only the cursed section by importing directly
-      const { renderReport } = await import('./output/terminalRenderer');
       renderReport({ ...result, busFactor: [], ownership: [], coupling: [] });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -73,7 +79,6 @@ program
     }
   });
 
-// Default command — running `git-arch` with no subcommand analyzes current dir
 program
   .action(async () => {
     const resolvedPath = path.resolve('.');
