@@ -1,0 +1,35 @@
+{
+  "name": "git-archaeologist",
+  "version": "1.0.0",
+  "description": "Uncover the hidden history, ownership, and tech debt in any git repository",
+  "main": "dist/index.js",
+  "bin": {
+    "git-arch": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "git",
+    "cli",
+    "code-quality",
+    "tech-debt",
+    "analytics"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "commander": "^9.5.0",
+    "ora": "^5.4.1"
+  }
+}
