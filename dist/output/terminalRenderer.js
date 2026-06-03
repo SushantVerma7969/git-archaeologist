@@ -152,7 +152,7 @@ function renderCoupling(r) {
 }
 function renderFooter() {
     console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
-    console.log(chalk_1.default.grey('  ⛏  Git Archaeologist  |  github.com/you/git-archaeologist'));
+    console.log(chalk_1.default.grey('  ⛏  Git Archaeologist  |  github.com/SushantVerma7969/git-archaeologist'));
     console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
 }
 //# sourceMappingURL=terminalRenderer.js.map

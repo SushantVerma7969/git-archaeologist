@@ -181,7 +181,7 @@ function renderCoupling(r: AnalysisResult): void {
 function renderFooter(): void {
   console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
   console.log(
-    chalk.grey('  ⛏  Git Archaeologist  |  github.com/you/git-archaeologist')
+    chalk.grey('  ⛏  Git Archaeologist  |  github.com/SushantVerma7969/git-archaeologist')
   );
   console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
 }
