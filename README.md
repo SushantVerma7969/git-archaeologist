@@ -19,41 +19,41 @@ This tool reads your git history and tells you which files are ticking time bomb
 
 ```bash
 git-arch analyze /path/to/repo
-git-arch analyze /path/to/repo --html   # saves a shareable report
-git-arch cursed --top 10                # just the danger list
+git-arch analyze /path/to/repo --html   # saves a shareable dark-themed report
+git-arch cursed --top 10                # just the danger ranking
 git-arch analyze /path/to/repo --json   # pipe into other tools
 ```
 
 
 ## What it outputs
 
-**Cursed files** - ranked by a score that combines how often a file changes, how many different people touched it, and how recently. A file changed 100 times in 6 months by 15 people scores higher than one changed 200 times over a decade by the same person.
+**Cursed files** - ranked by instability score. Not just most changed. A file touched 100 times in 6 months by 15 different developers scores way higher than one touched 200 times over a decade by the same person.
 
-**Bus factor per folder** - not per repo, per folder. The whole repo has bus factor 2 is useless. The lib/ folder is owned by one person is something you can act on.
+**Bus factor per folder** - not per repo. Knowing the whole repo has bus factor 2 is useless. Knowing lib/ will be orphaned the day one person leaves is something you can act on.
 
-**Implicit coupling** - pairs of files that always change together in the same commit, even though nothing in the code connects them. These are your hidden dependencies.
+**Implicit coupling** - files that always change together in the same commit even though nothing in the code connects them. Hidden dependencies. Future bugs.
 
-**Ownership** - who owns the lines that are alive in HEAD right now. Not who created the file. Not who committed last.
-
-
-## On Express.js
-
-1716 commits. 230 contributors. 12 years of history.
-
-`lib/response.js` - 128 changes, 53 authors, curse score 2261. The most dangerous file in the codebase and the one most people edit without thinking.
-
-Every module - lib/, test/, examples/, benchmarks/ - has bus factor 1. Douglas Christopher Wilson. If he stops, nobody else fully understands any of it.
-
-`benchmarks/Makefile` and `benchmarks/run` have 100% coupling. Committed together every single time. They are one file.
+**Ownership** - who owns the lines alive in HEAD right now. Not who created the file. Not who committed most recently.
 
 
-## The curse score
+## Tested on Express.js
+
+Express is one of the most downloaded npm packages ever. 230 contributors. 16 years old.
+
+`lib/response.js` - 128 changes, 53 different authors, curse score 2261. The core HTTP response logic of Express has been touched by 53 people and nobody fully owns it.
+
+Bus factor across every single module - lib/, test/, examples/, benchmarks/ - is 1. One person. Douglas Christopher Wilson. The entire project depends on one human being continuing to show up.
+
+`benchmarks/Makefile` and `benchmarks/run` have 100% coupling. They have never been committed separately. They are one file split across two paths for no reason.
+
+
+## The scoring formula
 
 ```
 score = changes x log2(authors + 1) x exp(-0.5 x age_in_years) x log2(churn_rate + 2)
 ```
 
-The exponential decay on age is the key part. A file that was chaotic 5 years ago but stable since does not show up. Only active danger shows up.
+The exponential decay on age is intentional. Old chaos that stabilized does not show up. Only files that are actively dangerous right now.
 
 
 ## Requirements
