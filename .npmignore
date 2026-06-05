@@ -1,6 +1,7 @@
 src/
 *.cast
-demo2.gif
-demo2.cast
+*.gif
+demo*.gif
 tsconfig.json
 .gitignore
+*-report-*.html
