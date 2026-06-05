@@ -1,6 +1,6 @@
 {
   "name": "git-archaeologist",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Uncover the hidden history, ownership, and tech debt in any git repository",
   "main": "dist/index.js",
   "bin": {
