@@ -1,0 +1,6 @@
+src/
+*.cast
+demo2.gif
+demo2.cast
+tsconfig.json
+.gitignore
