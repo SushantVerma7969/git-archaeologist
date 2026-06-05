@@ -35,13 +35,13 @@ git-arch analyze /path/to/repo --json    # pipe into other tools
 
 ## What it finds
 
-**Cursed files** — ranked by instability score, not just change count. A file touched 100 times in 6 months by 15 different developers scores way higher than one changed 200 times over a decade by the same person. The score weights recency, author chaos, and churn rate together.
+**Cursed file score** — not just most changed. A file touched 100 times in 6 months by 15 people who never talked scores way higher than one touched 200 times over a decade by the same person. Recency, author chaos, and churn rate combined into one number.
 
-**Bus factor per folder** — not per repo. "The whole repo has bus factor 2" is useless. "The lib/ folder will be orphaned the day this one person leaves" is something you can act on.
+**Bus factor per folder** — not per repo. Knowing "the whole repo has bus factor 2" is useless. Knowing "lib/ is orphaned the day Douglas leaves" is something you act on.
 
-**Implicit coupling** — pairs of files that always appear in the same commit, even though nothing in the code connects them. These are your hidden dependencies and your future bugs.
+**Implicit coupling** — finds pairs of files that always change together in the same commit even though nothing in the code connects them. These are your hidden dependencies.
 
-**Ownership** — who owns the lines that are actually alive in HEAD right now. Not who created the file. Not who committed most recently.
+**Ownership** — who owns the lines alive in HEAD right now, not who created the file or who committed last.
 
 ## Tested on Express.js
 
@@ -65,6 +65,3 @@ The exponential decay on age is the important part. A file that was chaotic 5 ye
 
 Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
 
-## License
-
-MIT
