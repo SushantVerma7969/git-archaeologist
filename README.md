@@ -1,8 +1,8 @@
 # git-archaeologist
 
-![demo](./demo.gif)
-
 ![HTML Report — interactive risk heatmap](./preview.png)
+
+![Terminal demo](./demo.gif)
 
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist)
 [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE)
