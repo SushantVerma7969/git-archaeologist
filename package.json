@@ -18,7 +18,7 @@
     "tech-debt",
     "analytics"
   ],
-  "author": "",
+  "author": "sushantverma7969",
   "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
@@ -31,5 +31,16 @@
     "cli-table3": "^0.6.5",
     "commander": "^9.5.0",
     "ora": "^5.4.1"
+  },
+  "homepage": "https://github.com/SushantVerma7969/git-archaeologist",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SushantVerma7969/git-archaeologist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SushantVerma7969/git-archaeologist/issues"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
