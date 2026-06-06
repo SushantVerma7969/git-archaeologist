@@ -36,6 +36,7 @@ export interface CursedFile {
   uniqueAuthors: number;
   recencyWeight: number;
   reasons: string[];
+  noisy?: boolean;
 }
 
 export interface BusFactor {
