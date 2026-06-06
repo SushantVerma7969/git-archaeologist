@@ -40,6 +40,24 @@ function isNoise(filepath: string): boolean {
   return NOISE_PATTERNS.some((p) => p.test(filename) || p.test(filepath));
 }
 
+
+function accelerationScore(timeline: number[]): number {
+  if (timeline.length < 4) return 1.0;
+  const sorted = [...timeline].sort((a, b) => a - b);
+  const now = Date.now() / 1000;
+  const oneYearAgo = now - ONE_YEAR_SECS;
+  const sixMonthsAgo = now - (ONE_YEAR_SECS / 2);
+
+  const recentChanges = sorted.filter((t) => t >= sixMonthsAgo).length;
+  const olderChanges = sorted.filter((t) => t >= oneYearAgo && t < sixMonthsAgo).length;
+
+  if (olderChanges === 0) return recentChanges > 0 ? 1.5 : 1.0;
+  const ratio = recentChanges / olderChanges;
+  // ratio > 1 means accelerating, < 1 means slowing down
+  // cap between 0.5 and 2.0 so it doesn't dominate the score
+  return Math.min(2.0, Math.max(0.5, ratio));
+}
+
 export function scoreCursedFiles(
   fileStatsMap: Map<string, FileStats>,
   topN: number = 20
@@ -50,13 +68,14 @@ export function scoreCursedFiles(
     const authorCount = stats.uniqueAuthors.size;
     const recency = recencyWeight(stats.lastChanged);
     const churn = churnRate(stats.changeTimeline);
+    const acceleration = accelerationScore(stats.changeTimeline);
 
     // Curse score formula:
     // Base = total changes × author count
-    // Multiplied by recency (recent files are more dangerous)
-    // Multiplied by churn rate (files changed frequently per year)
+    // Multiplied by recency, churn rate, and acceleration
+    // Acceleration > 1 means the file is getting MORE changes recently — more dangerous
     const curseScore = Math.round(
-      stats.totalChanges * Math.log2(authorCount + 1) * recency * Math.log2(churn + 2) * 100
+      stats.totalChanges * Math.log2(authorCount + 1) * recency * Math.log2(churn + 2) * acceleration * 100
     ) / 100;
 
     const reasons: string[] = [];
@@ -64,6 +83,7 @@ export function scoreCursedFiles(
     if (authorCount > 5) reasons.push(`Touched by ${authorCount} different authors`);
     if (churn > 20) reasons.push(`High churn rate (${Math.round(churn)}x/year)`);
     if (recency > 0.8) reasons.push('Modified very recently');
+    if (acceleration > 1.3) reasons.push(`Change rate accelerating (${acceleration.toFixed(1)}x recent vs prior period)`);
 
     const noisy = isNoise(stats.filepath);
 
