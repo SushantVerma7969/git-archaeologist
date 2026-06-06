@@ -11,18 +11,19 @@ import { scoreCursedFiles } from '../analyzers/curseScorer';
 import { analyzeOwnership, buildAuthorNameMap } from '../analyzers/ownershipAnalyzer';
 import { analyzeBusFactor, analyzeCoupling } from '../analyzers/busFactorAnalyzer';
 
-export async function analyze(repoPath: string): Promise<AnalysisResult> {
+export async function analyze(repoPath: string, since?: string): Promise<AnalysisResult> {
   const spinner = ora({ text: 'Validating repository...', color: 'magenta' }).start();
 
   try {
     // Step 1 — validate
     validateRepo(repoPath);
     const repoName = getRepoName(repoPath);
-    const totalCommits = getTotalCommitCount(repoPath);
-    spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}...`;
+    const totalCommits = getTotalCommitCount(repoPath, since);
+    const sinceLabel = since ? ` (since ${since})` : '';
+    spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
 
     // Step 2 — parse all commits
-    const commits = parseCommits(repoPath);
+    const commits = parseCommits(repoPath, since);
     spinner.text = 'Building file statistics...';
 
     // Step 3 — build per-file stats

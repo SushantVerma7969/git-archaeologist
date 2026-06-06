@@ -29,8 +29,9 @@ export function getRepoName(repoPath: string): string {
   return path.basename(path.resolve(repoPath));
 }
 
-export function getTotalCommitCount(repoPath: string): number {
-  const out = execSync('git rev-list --count HEAD', {
+export function getTotalCommitCount(repoPath: string, since?: string): number {
+  const sinceFlag = since ? ` --after="${since}"` : '';
+  const out = execSync(`git rev-list --count HEAD${sinceFlag}`, {
     cwd: repoPath,
     stdio: 'pipe',
   })
@@ -49,12 +50,13 @@ function sanitizeFilePath(raw: string): string {
   return p;
 }
 
-export function parseCommits(repoPath: string): CommitRecord[] {
+export function parseCommits(repoPath: string, since?: string): CommitRecord[] {
   const DELIMITER = '||GITARCH||';
   const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
+  const sinceFlag = since ? ` --after="${since}"` : '';
 
   const raw = execSync(
-    `git log --pretty=format:"${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at" --name-only`,
+    `git log --pretty=format:"${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at" --name-only${sinceFlag}`,
     { cwd: repoPath, stdio: 'pipe', maxBuffer: 512 * 1024 * 1024 }
   ).toString();
 

@@ -24,9 +24,12 @@ npm install -g git-archaeologist
 
 ```bash
 git-arch analyze /path/to/repo
-git-arch analyze /path/to/repo --html    # dark-themed interactive report
-git-arch cursed --top 10                 # just the danger ranking
-git-arch analyze /path/to/repo --json    # pipe into other tools
+git-arch analyze /path/to/repo --since 90d     # only last 90 days of commits
+git-arch analyze /path/to/repo --since 2y      # only last 2 years
+git-arch analyze /path/to/repo --since 2024-01-01  # since a specific date
+git-arch analyze /path/to/repo --html          # dark-themed interactive report
+git-arch cursed --top 10                       # just the danger ranking
+git-arch analyze /path/to/repo --json          # pipe into other tools
 ```
 
 ## What it finds
