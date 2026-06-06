@@ -36,8 +36,8 @@ async function analyze(repoPath, since) {
         const coupling = (0, busFactorAnalyzer_1.analyzeCoupling)(commits);
         // Step 6 — collect date range
         const allTimestamps = commits.map((c) => c.timestamp);
-        const minTs = Math.min(...allTimestamps);
-        const maxTs = Math.max(...allTimestamps);
+        const minTs = allTimestamps.reduce((a, b) => a < b ? a : b, allTimestamps[0] ?? 0);
+        const maxTs = allTimestamps.reduce((a, b) => a > b ? a : b, allTimestamps[0] ?? 0);
         // Step 7 — count unique authors
         const allAuthors = new Set(commits.map((c) => c.authorEmail));
         spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);

@@ -42,9 +42,9 @@ export function analyzeBusFactor(
       if (cumulative / totalChanges >= 0.5) break;
     }
 
-    const filesAtRisk = Array.from(fileStatsMap.values()).filter((s) =>
-      s.filepath.startsWith(folder + '/')
-    ).length;
+    const filesAtRisk = folder === '(root)'
+      ? Array.from(fileStatsMap.values()).filter((s) => !s.filepath.includes('/')).length
+      : Array.from(fileStatsMap.values()).filter((s) => s.filepath.startsWith(folder + '/')).length;
 
     let warning = '';
     if (busFactor === 1) {
@@ -76,6 +76,8 @@ export function analyzeCoupling(
     }
 
     // For every pair of files in this commit, increment their co-change count
+    // Skip commits touching too many files (bulk commits, merges) — they add noise
+    if (files.length > 50) continue;
     for (let i = 0; i < files.length; i++) {
       for (let j = i + 1; j < files.length; j++) {
         const key = [files[i], files[j]].sort().join('|||');

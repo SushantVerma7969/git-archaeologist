@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scoreCursedFiles = scoreCursedFiles;
-const NOW = Date.now() / 1000;
 const ONE_YEAR_SECS = 365 * 24 * 60 * 60;
 function recencyWeight(lastChangedTimestamp) {
-    const ageInYears = (NOW - lastChangedTimestamp) / ONE_YEAR_SECS;
+    const now = Date.now() / 1000;
+    const ageInYears = (now - lastChangedTimestamp) / ONE_YEAR_SECS;
     // Files touched recently score higher — exponential decay
     return Math.exp(-0.5 * ageInYears);
 }
