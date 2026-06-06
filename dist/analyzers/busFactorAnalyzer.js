@@ -34,7 +34,9 @@ function analyzeBusFactor(fileStatsMap, authorNameMap) {
             if (cumulative / totalChanges >= 0.5)
                 break;
         }
-        const filesAtRisk = Array.from(fileStatsMap.values()).filter((s) => s.filepath.startsWith(folder + '/')).length;
+        const filesAtRisk = folder === '(root)'
+            ? Array.from(fileStatsMap.values()).filter((s) => !s.filepath.includes('/')).length
+            : Array.from(fileStatsMap.values()).filter((s) => s.filepath.startsWith(folder + '/')).length;
         let warning = '';
         if (busFactor === 1) {
             warning = `⚠️  Single point of failure — only ${atRiskAuthors[0]} owns this module`;
@@ -58,6 +60,9 @@ function analyzeCoupling(commits, minCoChanges = 3) {
             fileChangeCount.set(file, (fileChangeCount.get(file) ?? 0) + 1);
         }
         // For every pair of files in this commit, increment their co-change count
+        // Skip commits touching too many files (bulk commits, merges) — they add noise
+        if (files.length > 50)
+            continue;
         for (let i = 0; i < files.length; i++) {
             for (let j = i + 1; j < files.length; j++) {
                 const key = [files[i], files[j]].sort().join('|||');

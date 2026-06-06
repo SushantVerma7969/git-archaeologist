@@ -37,7 +37,9 @@ export function buildAuthorNameMap(
 ): Map<string, string> {
   const map = new Map<string, string>();
   for (const c of commits) {
-    if (!map.has(c.authorEmail)) {
+    const existing = map.get(c.authorEmail);
+    // Keep the longest name seen for this email — more complete names win
+    if (!existing || c.authorName.length > existing.length) {
       map.set(c.authorEmail, c.authorName);
     }
   }
