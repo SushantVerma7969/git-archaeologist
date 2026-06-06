@@ -5,3 +5,7 @@ demo*.gif
 tsconfig.json
 .gitignore
 *-report-*.html
+preview.png
+demo.gif
+*.png
+*.gif
