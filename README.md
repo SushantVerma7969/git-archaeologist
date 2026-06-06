@@ -50,6 +50,11 @@ Running git-archaeologist on it takes 3 seconds and finds:
 - `benchmarks/Makefile` and `benchmarks/run` have been committed together 100% of the time. They have never changed separately. They are one file.
 
 ## How scoring works
+
+```
+curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rate+2)
+```
+
 The exponential decay on age means old chaos that stabilized does not show up. Only files actively dangerous right now.
 
 ## Requirements
