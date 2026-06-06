@@ -43,6 +43,24 @@ const path = __importStar(require("path"));
 const orchestrator_1 = require("./core/orchestrator");
 const terminalRenderer_1 = require("./output/terminalRenderer");
 const htmlReport_1 = require("./output/htmlReport");
+function parseSince(input) {
+    // Accept: 90d, 30days, 6months, 1year, or ISO date like 2024-01-01
+    const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
+    if (match) {
+        const n = parseInt(match[1], 10);
+        const unit = match[2].toLowerCase();
+        const date = new Date();
+        if (unit.startsWith('d'))
+            date.setDate(date.getDate() - n);
+        else if (unit.startsWith('m'))
+            date.setMonth(date.getMonth() - n);
+        else if (unit.startsWith('y'))
+            date.setFullYear(date.getFullYear() - n);
+        return date.toISOString().split('T')[0];
+    }
+    // Already a date string
+    return input;
+}
 const program = new commander_1.Command();
 program
     .name('git-arch')
@@ -55,10 +73,12 @@ program
     .description('Analyze a git repository and print the full report')
     .option('-j, --json', 'Output raw JSON instead of the terminal report')
     .option('-H, --html [outputFile]', 'Generate an HTML report file')
+    .option('-s, --since <date>', 'Only analyze commits after this date (e.g. 90d, 2024-01-01, 6months)')
     .action(async (repoPath, options) => {
     const resolvedPath = path.resolve(repoPath ?? '.');
+    const since = options.since ? parseSince(options.since) : undefined;
     try {
-        const result = await (0, orchestrator_1.analyze)(resolvedPath);
+        const result = await (0, orchestrator_1.analyze)(resolvedPath, since);
         if (options.json) {
             const serializable = {
                 ...result,
@@ -114,7 +134,7 @@ program
     .action(async () => {
     const resolvedPath = path.resolve('.');
     try {
-        const result = await (0, orchestrator_1.analyze)(resolvedPath);
+        const result = await (0, orchestrator_1.analyze)(resolvedPath, undefined);
         (0, terminalRenderer_1.renderReport)(result);
     }
     catch (err) {

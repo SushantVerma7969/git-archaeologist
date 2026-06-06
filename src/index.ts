@@ -7,6 +7,23 @@ import { analyze } from './core/orchestrator';
 import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
 
+
+function parseSince(input: string): string {
+  // Accept: 90d, 30days, 6months, 1year, or ISO date like 2024-01-01
+  const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
+  if (match) {
+    const n = parseInt(match[1], 10);
+    const unit = match[2].toLowerCase();
+    const date = new Date();
+    if (unit.startsWith('d')) date.setDate(date.getDate() - n);
+    else if (unit.startsWith('m')) date.setMonth(date.getMonth() - n);
+    else if (unit.startsWith('y')) date.setFullYear(date.getFullYear() - n);
+    return date.toISOString().split('T')[0];
+  }
+  // Already a date string
+  return input;
+}
+
 const program = new Command();
 
 program
@@ -23,10 +40,12 @@ program
   .description('Analyze a git repository and print the full report')
   .option('-j, --json', 'Output raw JSON instead of the terminal report')
   .option('-H, --html [outputFile]', 'Generate an HTML report file')
-  .action(async (repoPath: string | undefined, options: { json?: boolean; html?: boolean | string }) => {
+  .option('-s, --since <date>', 'Only analyze commits after this date (e.g. 90d, 2024-01-01, 6months)')
+  .action(async (repoPath: string | undefined, options: { json?: boolean; html?: boolean | string; since?: string }) => {
     const resolvedPath = path.resolve(repoPath ?? '.');
+    const since = options.since ? parseSince(options.since) : undefined;
     try {
-      const result = await analyze(resolvedPath);
+      const result = await analyze(resolvedPath, since);
 
       if (options.json) {
         const serializable = {
@@ -83,7 +102,7 @@ program
   .action(async () => {
     const resolvedPath = path.resolve('.');
     try {
-      const result = await analyze(resolvedPath);
+      const result = await analyze(resolvedPath, undefined);
       renderReport(result);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);

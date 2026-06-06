@@ -9,16 +9,17 @@ const gitParser_1 = require("./gitParser");
 const curseScorer_1 = require("../analyzers/curseScorer");
 const ownershipAnalyzer_1 = require("../analyzers/ownershipAnalyzer");
 const busFactorAnalyzer_1 = require("../analyzers/busFactorAnalyzer");
-async function analyze(repoPath) {
+async function analyze(repoPath, since) {
     const spinner = (0, ora_1.default)({ text: 'Validating repository...', color: 'magenta' }).start();
     try {
         // Step 1 — validate
         (0, gitParser_1.validateRepo)(repoPath);
         const repoName = (0, gitParser_1.getRepoName)(repoPath);
-        const totalCommits = (0, gitParser_1.getTotalCommitCount)(repoPath);
-        spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}...`;
+        const totalCommits = (0, gitParser_1.getTotalCommitCount)(repoPath, since);
+        const sinceLabel = since ? ` (since ${since})` : '';
+        spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
         // Step 2 — parse all commits
-        const commits = (0, gitParser_1.parseCommits)(repoPath);
+        const commits = (0, gitParser_1.parseCommits)(repoPath, since);
         spinner.text = 'Building file statistics...';
         // Step 3 — build per-file stats
         const fileStats = (0, gitParser_1.buildFileStats)(commits);
