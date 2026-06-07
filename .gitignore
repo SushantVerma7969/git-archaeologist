@@ -3,3 +3,5 @@ node_modules/
 *.d.ts.map
 .DS_Store
 git-arch-report-*.html
+
+!action/node_modules/
