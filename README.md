@@ -1,6 +1,6 @@
 # git-archaeologist
 
-[![HTML report](./preview.png)](./preview.png)
+![HTML report — interactive risk heatmap](./preview.png)
 
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
 
