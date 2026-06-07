@@ -69,7 +69,7 @@ function getRepoName(repoPath) {
     return path.basename(path.resolve(repoPath));
 }
 function getTotalCommitCount(repoPath, since) {
-    const sinceFlag = since ? ` --after="${since}"` : '';
+    const sinceFlag = since ? ` --since="${since}"` : '';
     const out = (0, child_process_1.execSync)(`git rev-list --count HEAD${sinceFlag}`, {
         cwd: repoPath,
         stdio: 'pipe',
@@ -90,7 +90,7 @@ function sanitizeFilePath(raw) {
 function parseCommits(repoPath, since) {
     const DELIMITER = '||GITARCH||';
     const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
-    const sinceFlag = since ? ` --after="${since}"` : '';
+    const sinceFlag = since ? ` --since="${since}"` : '';
     const raw = (0, child_process_1.execSync)(`git log --pretty=format:"${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at" --name-only${sinceFlag}`, { cwd: repoPath, stdio: 'pipe', maxBuffer: 512 * 1024 * 1024 }).toString();
     const commits = [];
     const blocks = raw

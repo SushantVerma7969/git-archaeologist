@@ -117,10 +117,12 @@ program
     .alias('c')
     .description('Show only the cursed files ranking')
     .option('-n, --top <number>', 'How many files to show', '10')
+    .option('-s, --since <date>', 'Only analyze commits after this date')
     .action(async (repoPath, options) => {
     const resolvedPath = path.resolve(repoPath ?? '.');
+    const since = options.since ? parseSince(options.since) : undefined;
     try {
-        const result = await (0, orchestrator_1.analyze)(resolvedPath);
+        const result = await (0, orchestrator_1.analyze)(resolvedPath, since);
         const topN = parseInt(options.top, 10);
         result.cursedFiles = result.cursedFiles.slice(0, topN);
         (0, terminalRenderer_1.renderReport)({ ...result, busFactor: [], ownership: [], coupling: [] });

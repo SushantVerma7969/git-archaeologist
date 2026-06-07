@@ -30,7 +30,7 @@ export function getRepoName(repoPath: string): string {
 }
 
 export function getTotalCommitCount(repoPath: string, since?: string): number {
-  const sinceFlag = since ? ` --after="${since}"` : '';
+  const sinceFlag = since ? ` --since="${since}"` : '';
   const out = execSync(`git rev-list --count HEAD${sinceFlag}`, {
     cwd: repoPath,
     stdio: 'pipe',
@@ -53,7 +53,7 @@ function sanitizeFilePath(raw: string): string {
 export function parseCommits(repoPath: string, since?: string): CommitRecord[] {
   const DELIMITER = '||GITARCH||';
   const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
-  const sinceFlag = since ? ` --after="${since}"` : '';
+  const sinceFlag = since ? ` --since="${since}"` : '';
 
   const raw = execSync(
     `git log --pretty=format:"${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at" --name-only${sinceFlag}`,

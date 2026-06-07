@@ -2,7 +2,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
-import * as fs from 'fs';
 import { analyze } from './core/orchestrator';
 import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
@@ -85,10 +84,12 @@ program
   .alias('c')
   .description('Show only the cursed files ranking')
   .option('-n, --top <number>', 'How many files to show', '10')
-  .action(async (repoPath: string | undefined, options: { top: string }) => {
+  .option('-s, --since <date>', 'Only analyze commits after this date')
+  .action(async (repoPath: string | undefined, options: { top: string; since?: string }) => {
     const resolvedPath = path.resolve(repoPath ?? '.');
+    const since = options.since ? parseSince(options.since) : undefined;
     try {
-      const result = await analyze(resolvedPath);
+      const result = await analyze(resolvedPath, since);
       const topN = parseInt(options.top, 10);
       result.cursedFiles = result.cursedFiles.slice(0, topN);
       renderReport({ ...result, busFactor: [], ownership: [], coupling: [] });
