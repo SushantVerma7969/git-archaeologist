@@ -25,21 +25,23 @@ export function registerBlameCommand(program: Command): void {
         }
 
         // Author breakdown
-        const authorMap = new Map<string, { count: number; first: number; last: number }>();
+        const authorMap = new Map<string, { name: string; count: number; first: number; last: number }>();
         for (const c of fileCommits) {
-          const existing = authorMap.get(c.authorName);
+          const existing = authorMap.get(c.authorEmail);
           if (existing) {
             existing.count++;
             if (c.timestamp < existing.first) existing.first = c.timestamp;
             if (c.timestamp > existing.last) existing.last = c.timestamp;
+            // Keep longest name for this email
+            if (c.authorName.length > existing.name.length) existing.name = c.authorName;
           } else {
-            authorMap.set(c.authorName, { count: 1, first: c.timestamp, last: c.timestamp });
+            authorMap.set(c.authorEmail, { name: c.authorName, count: 1, first: c.timestamp, last: c.timestamp });
           }
         }
 
         const totalChanges = fileCommits.length;
-        const authors = Array.from(authorMap.entries())
-          .sort((a, b) => b[1].count - a[1].count);
+        const authors = Array.from(authorMap.values())
+          .sort((a, b) => b.count - a.count);
 
         const timestamps = fileCommits.map((c) => c.timestamp);
         const firstTs = timestamps.reduce((a, b) => a < b ? a : b, timestamps[0]);
@@ -70,13 +72,13 @@ export function registerBlameCommand(program: Command): void {
         console.log(` ${chalk.bold.white('Authors')}`);
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
 
-        for (const [name, data] of authors) {
+        for (const data of authors) {
           const pct = Math.round((data.count / totalChanges) * 100);
           const bar = '█'.repeat(Math.round(pct / 5)).padEnd(20);
           const firstD = new Date(data.first * 1000).toISOString().split('T')[0];
           const lastD  = new Date(data.last  * 1000).toISOString().split('T')[0];
           const pctColor = pct >= 50 ? chalk.red : pct >= 25 ? chalk.yellow : chalk.white;
-          console.log(`  ${pctColor(bar)} ${pctColor(pct + '%')}  ${chalk.white(name.padEnd(28))} ${chalk.grey(data.count + ' commits  ' + firstD + ' → ' + lastD)}`);
+          console.log(`  ${pctColor(bar)} ${pctColor(pct + '%')}  ${chalk.white(data.name.padEnd(28))} ${chalk.grey(data.count + ' commits  ' + firstD + ' → ' + lastD)}`);
         }
 
         console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
