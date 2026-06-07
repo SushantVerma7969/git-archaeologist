@@ -76,8 +76,9 @@ function registerBlameCommand(program) {
             const totalChanges = fileCommits.length;
             const authors = Array.from(authorMap.entries())
                 .sort((a, b) => b[1].count - a[1].count);
-            const firstTs = Math.min(...fileCommits.map((c) => c.timestamp));
-            const lastTs = Math.max(...fileCommits.map((c) => c.timestamp));
+            const timestamps = fileCommits.map((c) => c.timestamp);
+            const firstTs = timestamps.reduce((a, b) => a < b ? a : b, timestamps[0]);
+            const lastTs = timestamps.reduce((a, b) => a > b ? a : b, timestamps[0]);
             const firstDate = new Date(firstTs * 1000).toISOString().split('T')[0];
             const lastDate = new Date(lastTs * 1000).toISOString().split('T')[0];
             // Acceleration: last 6 months vs prior 6 months

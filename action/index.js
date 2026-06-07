@@ -12,11 +12,8 @@ async function run() {
 
     core.info('⛏ Running Git Archaeologist...');
 
-    // Install git-archaeologist
-    execSync('npm install -g git-archaeologist', { stdio: 'inherit' });
-
-    // Build command
-    let cmd = `git-arch analyze ${repoPath} --json`;
+    // Build command using npx — no global install needed
+    let cmd = `npx git-archaeologist@latest analyze ${repoPath} --json`;
     if (since) cmd += ` --since ${since}`;
 
     const output = execSync(cmd, { maxBuffer: 50 * 1024 * 1024 }).toString();

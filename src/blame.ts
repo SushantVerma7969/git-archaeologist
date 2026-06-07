@@ -1,7 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
-import { execSync } from 'child_process';
 import { parseCommits, validateRepo } from './core/gitParser';
 
 export function registerBlameCommand(program: Command): void {
@@ -42,8 +41,9 @@ export function registerBlameCommand(program: Command): void {
         const authors = Array.from(authorMap.entries())
           .sort((a, b) => b[1].count - a[1].count);
 
-        const firstTs = Math.min(...fileCommits.map((c) => c.timestamp));
-        const lastTs  = Math.max(...fileCommits.map((c) => c.timestamp));
+        const timestamps = fileCommits.map((c) => c.timestamp);
+        const firstTs = timestamps.reduce((a, b) => a < b ? a : b, timestamps[0]);
+        const lastTs  = timestamps.reduce((a, b) => a > b ? a : b, timestamps[0]);
         const firstDate = new Date(firstTs * 1000).toISOString().split('T')[0];
         const lastDate  = new Date(lastTs  * 1000).toISOString().split('T')[0];
 
