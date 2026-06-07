@@ -9,3 +9,6 @@ preview.png
 demo.gif
 *.png
 *.gif
+action/
+.github/
+action.yml
