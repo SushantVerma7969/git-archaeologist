@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { AnalysisResult } from '../types';
 
 function esc(s: string): string {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function col(score: number, max: number): string {
@@ -14,10 +14,12 @@ function col(score: number, max: number): string {
   return '#3b82f6';
 }
 
-function buildTree(result: AnalysisResult): object {
+interface TreeNode { name: string; filepath?: string; value?: number; score?: number; changes?: number; authors?: number; lastTouched?: string; children?: TreeNode[]; }
+
+function buildTree(result: AnalysisResult): TreeNode {
   const sm = new Map<string, number>();
   for (const f of result.cursedFiles) sm.set(f.filepath, f.curseScore);
-  const fm = new Map<string, any[]>();
+  const fm = new Map<string, TreeNode[]>();
   for (const [fp, stats] of result.fileStats) {
     const parts = fp.split('/');
     const folder = parts.length > 1 ? parts[0] : '(root)';
@@ -32,7 +34,7 @@ function buildTree(result: AnalysisResult): object {
 export function generateHtmlReport(result: AnalysisResult, outputPath: string): void {
   const from = result.dateRange.from.toISOString().split('T')[0];
   const to   = result.dateRange.to.toISOString().split('T')[0];
-  const maxS = result.cursedFiles[0]?.curseScore ?? 1;
+  const maxS = Math.max(1, ...result.cursedFiles.map(f => f.curseScore));
   const treeJSON = JSON.stringify(buildTree(result));
 
   const cursedRows = result.cursedFiles.slice(0, 20).map((f, i) => {
@@ -163,7 +165,8 @@ const MAX=${maxS};
 function sc(s){const r=Math.min(s/Math.max(MAX,1),1);if(r>.7)return"#ef4444";if(r>.4)return"#f97316";if(r>.2)return"#eab308";if(r>.05)return"#22c55e";return"#3b82f6";}
 function dk(h,a){const n=parseInt(h.slice(1),16);return"#"+[Math.max(0,(n>>16)-a),Math.max(0,((n>>8)&255)-a),Math.max(0,(n&255)-a)].map(v=>v.toString(16).padStart(2,"0")).join("");}
 const el=document.getElementById("tm");
-const W=el.clientWidth,H=el.clientHeight;
+const W=el.getBoundingClientRect().width||el.offsetWidth||800;
+const H=el.getBoundingClientRect().height||el.offsetHeight||500;
 const svg=d3.select("#tm").append("svg").attr("width",W).attr("height",H);
 const root=d3.hierarchy(DATA).sum(d=>d.value||0).sort((a,b)=>(b.value||0)-(a.value||0));
 d3.treemap().size([W,H]).padding(2).paddingTop(22).round(true)(root);
@@ -203,8 +206,7 @@ lv.filter(d=>(d.x1-d.x0)>55&&(d.y1-d.y0)>22).append("text")
   .text(d=>{const nm=d.data.name;const mx=Math.floor((d.x1-d.x0-10)/6);return nm.length>mx?nm.slice(0,mx-1)+"…":nm;});
 window.hl=function(fp){
   lv.selectAll("rect").attr("stroke-width",d=>d.data.filepath===fp?3:.5).attr("stroke",d=>d.data.filepath===fp?"#fff":dk(sc(d.data.score||0),40)).attr("fill-opacity",d=>d.data.filepath===fp?1:.82);
-  const node=root.leaves().find(d=>d.data.filepath===fp);
-  if(node){const cx=(node.x0+node.x1)/2,cy=(node.y0+node.y1)/2;svg.transition().duration(400);}
+
 };
 <\/script>
 </body>
