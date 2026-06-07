@@ -56,7 +56,7 @@ Running git-archaeologist on it takes 3 seconds and finds:
 ## How scoring works
 
 ```
-curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rate+2)
+curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rate+2) x acceleration
 ```
 
 The exponential decay on age means old chaos that stabilized does not show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config files are automatically excluded so the list shows real source files.

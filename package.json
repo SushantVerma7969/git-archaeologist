@@ -1,7 +1,7 @@
 {
   "name": "git-archaeologist",
   "version": "1.4.1",
-  "description": "Find the most dangerous files in any git repo — curse scores, bus factor, hidden coupling",
+  "description": "Find the most dangerous files in any git repo \u2014 curse scores, bus factor, hidden coupling",
   "main": "dist/index.js",
   "bin": {
     "git-arch": "dist/index.js"
@@ -16,7 +16,12 @@
     "cli",
     "code-quality",
     "tech-debt",
-    "analytics"
+    "analytics",
+    "bus-factor",
+    "ownership",
+    "coupling",
+    "blame",
+    "git-analysis"
   ],
   "author": "Sushant Verma",
   "license": "MIT",

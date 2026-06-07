@@ -27,3 +27,4 @@ outputs:
 runs:
   using: 'node20'
   main: 'action/index.js'
+  post: 'action/index.js'
