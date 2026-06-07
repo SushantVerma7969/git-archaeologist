@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { analyze } from './core/orchestrator';
 import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
+import { registerBlameCommand } from './blame';
 
 
 function parseSince(input: string): string {
@@ -111,4 +112,5 @@ program
     }
   });
 
+registerBlameCommand(program);
 program.parse(process.argv);
