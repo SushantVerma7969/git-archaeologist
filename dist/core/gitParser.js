@@ -111,7 +111,14 @@ function parseCommits(repoPath, since) {
         const filesChanged = filesRaw
             .split('\n')
             .map((f) => sanitizeFilePath(f))
-            .filter((f) => f.length > 0);
+            .filter((f) => f.length > 0)
+            .filter((f) => !f.startsWith('node_modules/') &&
+            !f.startsWith('.git/') &&
+            !f.startsWith('dist/') &&
+            !f.startsWith('build/') &&
+            !f.startsWith('coverage/') &&
+            !f.endsWith('.map') &&
+            !f.endsWith('.d.ts'));
         commits.push({ hash, authorEmail, authorName, timestamp, filesChanged });
     }
     return commits;

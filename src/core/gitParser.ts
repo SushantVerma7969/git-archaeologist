@@ -86,7 +86,16 @@ export function parseCommits(repoPath: string, since?: string): CommitRecord[] {
     const filesChanged = filesRaw
       .split('\n')
       .map((f: string) => sanitizeFilePath(f))
-      .filter((f: string) => f.length > 0);
+      .filter((f: string) => f.length > 0)
+      .filter((f: string) =>
+        !f.startsWith('node_modules/') &&
+        !f.startsWith('.git/') &&
+        !f.startsWith('dist/') &&
+        !f.startsWith('build/') &&
+        !f.startsWith('coverage/') &&
+        !f.endsWith('.map') &&
+        !f.endsWith('.d.ts')
+      );
 
     commits.push({ hash, authorEmail, authorName, timestamp, filesChanged });
   }
