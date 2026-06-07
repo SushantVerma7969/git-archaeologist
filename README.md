@@ -34,7 +34,7 @@ git-arch analyze /path/to/repo --json          # pipe into other tools
 
 ## What it finds
 
-Curse score — not just most changed. A file touched 100 times in 6 months by 15 people who never talked scores way higher than one touched 200 times over a decade by the same person. Recency, author chaos, and churn rate combined into one number.
+Curse score — not just most changed. A file touched 100 times in 6 months by 15 people who never talked scores way higher than one touched 200 times over a decade by the same person. Recency, author chaos, churn rate, and acceleration combined into one number. Changelogs and lockfiles are automatically excluded — only real source files show up.
 
 Bus factor per folder — not per repo. Knowing the whole repo has bus factor 2 is useless. Knowing lib/ is orphaned the day one person leaves is something you can act on.
 
@@ -58,7 +58,7 @@ Running git-archaeologist on it takes 3 seconds and finds:
 curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rate+2)
 ```
 
-The exponential decay on age means old chaos that stabilized does not show up. Only files actively dangerous right now.
+The exponential decay on age means old chaos that stabilized does not show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config files are automatically excluded so the list shows real source files.
 
 ## Requirements
 
