@@ -1,0 +1,29 @@
+name: 'Git Archaeologist'
+description: 'Analyze your repo for cursed files, bus factor, and hidden coupling'
+author: 'Sushant Verma'
+
+inputs:
+  top:
+    description: 'Number of cursed files to show'
+    required: false
+    default: '10'
+  since:
+    description: 'Only analyze commits after this date (e.g. 90d, 1y, 2024-01-01)'
+    required: false
+    default: ''
+  fail-on-curse-score:
+    description: 'Fail the action if any file exceeds this curse score'
+    required: false
+    default: '0'
+
+outputs:
+  top-cursed-file:
+    description: 'The most cursed file in the repo'
+    value: ${{ steps.analyze.outputs.top-cursed-file }}
+  top-curse-score:
+    description: 'The highest curse score found'
+    value: ${{ steps.analyze.outputs.top-curse-score }}
+
+runs:
+  using: 'node20'
+  main: 'action/index.js'
