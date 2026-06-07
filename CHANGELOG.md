@@ -1,0 +1,26 @@
+# Changelog
+
+## [1.4.1] - 2026-06-07
+- Added GitHub Action for CI integration
+- Added `git-arch blame <filepath>` command for deep file history
+- Filtered dist/, .d.ts, .map files from analysis results
+
+## [1.3.1] - 2026-06-06
+- Added acceleration detection — files getting worse recently score higher
+- Added noise filter — changelogs and lockfiles excluded from curse rankings
+- Fixed 5 correctness bugs: stale NOW constant, O(n²) coupling guard, author name resolution, stack overflow on large repos, root filesAtRisk count
+
+## [1.2.1] - 2026-06-05
+- Added `--since` flag for time-bounded analysis (90d, 2y, 2024-01-01)
+- Reduced npm package size from 454KB to 23KB
+
+## [1.1.0] - 2026-06-04
+- Added interactive D3 treemap HTML report (`--html`)
+- Dark-themed, hover tooltips, color-coded by curse score
+
+## [1.0.0] - 2026-06-03
+- Initial release
+- Curse score algorithm with exponential decay
+- Bus factor per folder
+- Implicit coupling detection
+- Ownership analysis
