@@ -65,6 +65,34 @@ The exponential decay on age means old chaos that stabilized does not show up. T
 
 Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
 
+
+## GitHub Action
+
+Add this to any repo to get automatic analysis on every push:
+
+```yaml
+# .github/workflows/git-archaeologist.yml
+name: Git Archaeologist
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: SushantVerma7969/git-archaeologist@v1
+        with:
+          top: 10
+          since: 1y
+```
+
+`fetch-depth: 0` is required — without full history the analysis is incomplete.
+
 ## Contributing
 
 ```bash
