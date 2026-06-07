@@ -30,6 +30,7 @@ git-arch analyze /path/to/repo --since 2024-01-01  # since a specific date
 git-arch analyze /path/to/repo --html          # dark-themed interactive report
 git-arch cursed --top 10                       # just the danger ranking
 git-arch analyze /path/to/repo --json          # pipe into other tools
+git-arch blame lib/response.js /path/to/repo   # deep dive on one file
 ```
 
 ## What it finds
