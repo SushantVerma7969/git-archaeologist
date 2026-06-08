@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.6.0] - 2026-06-09
+- Added `git-arch blast <file>` — shows blast radius: every file that historically changes together with the target file, with percentage likelihood
+
 ## [1.5.0] - 2026-06-09
 - Added `git-arch trend` command — shows which files are getting more active (and more dangerous) compared to the previous 90-day period
 - Added RESEARCH.md — validation on Express, React, Vue: 11/11 top cursed files confirmed bug history
