@@ -34,6 +34,8 @@ git-arch analyze /path/to/repo --json          # pipe into other tools
 git-arch blame lib/response.js /path/to/repo   # deep dive on one file
 git-arch trend /path/to/repo                   # which files are getting more dangerous
 git-arch blast lib/response.js /path/to/repo   # what else breaks when you touch this file
+git-arch ownership /path/to/repo               # who owns what — folder breakdown + bus factor
+git-arch pr-risk /path/to/repo                 # score your changes before pushing
 ```
 
 ## What it finds
