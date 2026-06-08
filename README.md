@@ -4,15 +4,15 @@
 
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
 
-> Find the files most likely to break production — before you touch them.
+> Before you touch a file, know its blast radius, its curse score, and who will be left holding it when something breaks.
 
 [Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md)
 
 ---
 
-You inherit a codebase. You touch a file. Three things break that you had no idea were connected.
+You inherit a codebase. You touch a file. Three things break that had no visible connection.
 
-This tool reads your entire git history and tells you which files are ticking time bombs, who will orphan a whole module when they quit, which files are secretly coupled even though nothing in the code shows it, and who truly owns what right now.
+Most tools show you the code. This one shows you the history behind the code — which files are getting more dangerous, what breaks when you touch something, who truly owns what, and which modules will be orphaned the day one person leaves.
 
 ## Install
 
