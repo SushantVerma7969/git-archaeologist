@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.0] - 2026-06-09
+- Added `git-arch trend` command — shows which files are getting more active (and more dangerous) compared to the previous 90-day period
+- Added RESEARCH.md — validation on Express, React, Vue: 11/11 top cursed files confirmed bug history
+
 ## [1.4.4] - 2026-06-08
 - Updated preview screenshot with noise-filtered results
 - Removed unused demo.gif
