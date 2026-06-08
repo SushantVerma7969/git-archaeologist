@@ -36,7 +36,7 @@ program
     chalk.hex('#A78BFA')('⛏  Git Archaeologist') +
     ' — uncover history, ownership & tech debt in any git repo'
   )
-  .version('1.9.1');
+  .version('1.9.2');
 
 program
   .command('analyze [repoPath]')
