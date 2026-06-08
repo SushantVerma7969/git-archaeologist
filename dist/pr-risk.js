@@ -128,13 +128,25 @@ function registerPrRiskCommand(program) {
                 }
                 const blastRadius = Array.from(coChanges.values())
                     .filter(count => Math.round((count / Math.max(fileCommits.length, 1)) * 100) >= 20).length;
+                // Get top coupled files for display
+                const topCoupled = Array.from(coChanges.entries())
+                    .map(([f, count]) => ({ f, pct: Math.round((count / Math.max(fileCommits.length, 1)) * 100) }))
+                    .filter(x => x.pct >= 20)
+                    .sort((a, b) => b.pct - a.pct)
+                    .slice(0, 3);
                 if (blastRadius > 10) {
                     fileRisk += 20;
-                    reasons.push(`blast radius ${blastRadius} files (historically changes with ${blastRadius} other files)`);
+                    const coupled = topCoupled.map(x => `${x.f} (${x.pct}%)`).join(', ');
+                    reasons.push(`blast radius ${blastRadius} files — also check: ${coupled}`);
                 }
                 else if (blastRadius > 5) {
                     fileRisk += 10;
-                    reasons.push(`blast radius ${blastRadius} files`);
+                    const coupled = topCoupled.map(x => `${x.f} (${x.pct}%)`).join(', ');
+                    reasons.push(`blast radius ${blastRadius} files — also check: ${coupled}`);
+                }
+                else if (topCoupled.length > 0) {
+                    const coupled = topCoupled.map(x => `${x.f} (${x.pct}%)`).join(', ');
+                    reasons.push(`historically changes with: ${coupled}`);
                 }
                 if (fileRisk > 0) {
                     totalRisk += fileRisk;
