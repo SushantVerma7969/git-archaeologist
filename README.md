@@ -6,6 +6,10 @@
 
 > Before you touch a file, know its blast radius, its curse score, and who will be left holding it when something breaks.
 
+## 📊 State of OSS Maintainability 2026
+We analyzed 26 major OSS repositories — 438,904 files, 26/26 had at least one bus factor 1 module.
+👉 **[Read the full report](https://sushantverma7969.github.io/git-archaeologist/)**
+
 [Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 ---
