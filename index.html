@@ -565,6 +565,28 @@
   </div>
 </header>
 
+<!-- ── WHY IT MATTERS ── -->
+<section style="padding:48px 0;border-top:1px solid var(--border);">
+  <div class="container">
+    <span class="section-label">Context</span>
+    <h2>Why ownership concentration matters</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:28px;">
+      <div style="background:var(--surface);border:1px solid var(--border);padding:24px;border-radius:4px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:10px;">ONBOARDING</div>
+        <p style="margin:0;font-size:14px;">When a critical module is effectively owned by one person, new contributors can't ramp up on it without that person's involvement. Reviews bottleneck. Knowledge doesn't transfer.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);padding:24px;border-radius:4px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:10px;">CONTRIBUTOR DEPARTURE</div>
+        <p style="margin:0;font-size:14px;">When that contributor leaves — changes job, loses interest, or becomes unavailable — maintenance of that module effectively stops or shifts entirely to whoever is willing to learn it from scratch.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);padding:24px;border-radius:4px;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:10px;">SCALE DOESN'T HELP</div>
+        <p style="margin:0;font-size:14px;">The assumption is that large, popular projects are safe from this. This dataset suggests otherwise. Having thousands of contributors does not appear to prevent ownership concentration in individual modules.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── FINDINGS ── -->
 <section id="findings">
   <div class="container">
@@ -580,7 +602,7 @@
       </div>
       <div class="finding-card danger">
         <span class="fc-num">02</span>
-        <div class="fc-title">Spring Boot is the most fragile large project</div>
+        <div class="fc-title">Spring Boot showed the highest BF-1 module count in this dataset</div>
         <p>25 bus factor 1 modules with only 140 authors — the worst ratio in the entire dataset. This number will surprise readers. It held up across three separate analysis runs. Spring Boot's architecture is highly modular: 22,528 files spread across dozens of sub-modules, many of which appear to have been authored and maintained by a small number of contributors. The raw data is in <a href="https://github.com/SushantVerma7969/git-archaeologist/blob/main/research/spring-boot.json" target="_blank" style="color:var(--accent)">research/spring-boot.json</a>.</p>
       </div>
       <div class="finding-card good">
