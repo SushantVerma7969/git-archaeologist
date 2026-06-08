@@ -7,6 +7,7 @@ import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
 import { registerBlameCommand } from './blame';
 import { registerTrendCommand } from './trend';
+import { registerBlastCommand } from './blast';
 
 
 function parseSince(input: string): string {
@@ -116,4 +117,5 @@ program
 
 registerBlameCommand(program);
 registerTrendCommand(program);
+registerBlastCommand(program);
 program.parse(process.argv);

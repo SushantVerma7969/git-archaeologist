@@ -4,7 +4,7 @@
 
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
 
-> Find the most dangerous files in any git repo — before you touch them.
+> Find the files most likely to break production — before you touch them.
 
 [Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md)
 
