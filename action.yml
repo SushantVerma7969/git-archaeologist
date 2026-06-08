@@ -15,6 +15,10 @@ inputs:
     description: 'Fail the action if any file exceeds this curse score'
     required: false
     default: '0'
+  github-token:
+    description: 'GitHub token for posting PR comments (use secrets.GITHUB_TOKEN)'
+    required: false
+    default: ''
 
 outputs:
   top-cursed-file:
