@@ -6,7 +6,7 @@
 
 > Before you touch a file, know its blast radius, its curse score, and who will be left holding it when something breaks.
 
-[Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md)
+[Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 ---
 
