@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>State of OSS Maintainability 2026 — git-archaeologist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;450;500&display=swap');
+
+  :root {
+    --bg:        #0a0a0f;
+    --surface:   #111118;
+    --surface2:  #18181f;
+    --border:    #23232e;
+    --text:      #e8e8f0;
+    --muted:     #6b6b80;
+    --accent:    #ff4d6d;
+    --accent2:   #7c3aed;
+    --good:      #22c55e;
+    --warn:      #f59e0b;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'Inter', sans-serif;
+    --display:   'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 0;
+  }
+  nav .inner {
+    max-width: 1100px; margin: 0 auto; padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    letter-spacing: 0.04em; text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a {
+    font-size: 13px; color: var(--muted); text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 100px 0 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; left: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,77,109,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--mono); font-size: 11px;
+    color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+    border: 1px solid rgba(255,77,109,0.3);
+    padding: 5px 12px; border-radius: 2px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    max-width: 820px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 18px; color: var(--muted);
+    max-width: 560px; margin-bottom: 44px;
+    line-height: 1.7;
+  }
+
+  /* ── BIG STAT ── */
+  .big-stat {
+    display: inline-flex; flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 28px 36px;
+    margin-bottom: 40px;
+    border-radius: 4px;
+  }
+  .big-stat .number {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+  }
+  .big-stat .label {
+    font-size: 14px; color: var(--muted);
+    letter-spacing: 0.02em; margin-top: 8px;
+  }
+
+  /* ── STAT ROW ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 60px 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 4px;
+  }
+  .stat-card .val {
+    font-family: var(--display);
+    font-size: 32px; font-weight: 700;
+    color: var(--text); letter-spacing: -0.02em;
+  }
+  .stat-card .desc {
+    font-size: 12px; color: var(--muted);
+    margin-top: 4px; line-height: 1.5;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 80px 0; border-top: 1px solid var(--border); }
+
+  .section-label {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 16px; display: block;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 700; letter-spacing: -0.02em;
+    margin-bottom: 20px; line-height: 1.15;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 20px; font-weight: 600;
+    margin-bottom: 12px; margin-top: 36px;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    color: var(--muted); font-size: 15px;
+    max-width: 680px; line-height: 1.75;
+    margin-bottom: 16px;
+  }
+  p strong { color: var(--text); font-weight: 500; }
+
+  /* ── FINDINGS ── */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+  }
+  .finding-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    border-radius: 4px;
+    position: relative;
+  }
+  .finding-card.danger { border-top-color: var(--accent); border-top-width: 2px; }
+  .finding-card.good   { border-top-color: var(--good);   border-top-width: 2px; }
+  .finding-card.warn   { border-top-color: var(--warn);   border-top-width: 2px; }
+
+  .finding-card .fc-num {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--muted); letter-spacing: 0.08em;
+    margin-bottom: 12px; display: block;
+  }
+  .finding-card .fc-title {
+    font-family: var(--display);
+    font-size: 18px; font-weight: 700;
+    color: var(--text); margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .finding-card p { margin: 0; font-size: 14px; }
+
+  /* ── BAR CHART ── */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 36px;
+    margin-top: 40px;
+    overflow-x: auto;
+  }
+  .chart-title {
+    font-family: var(--display);
+    font-size: 15px; font-weight: 600;
+    color: var(--text); margin-bottom: 28px;
+  }
+  .bar-chart { display: flex; flex-direction: column; gap: 9px; min-width: 480px; }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 36px;
+    align-items: center;
+    gap: 12px;
+  }
+  .bar-name {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--muted); text-align: right;
+    white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bar-track {
+    height: 22px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bar-val {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--text); text-align: right;
+  }
+  .bar-row.highlight .bar-name { color: var(--text); }
+  .bar-row.is-good .bar-fill { background: var(--good); opacity: 0.7; }
+
+  /* ── OUTLIERS ── */
+  .outlier-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+  }
+  @media (max-width: 640px) { .outlier-grid { grid-template-columns: 1fr; } }
+
+  .outlier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    border-radius: 4px;
+  }
+  .outlier-card.bad  { border-left: 3px solid var(--accent); }
+  .outlier-card.good { border-left: 3px solid var(--good); }
+  .outlier-card .oc-tag {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 12px; display: block;
+  }
+  .outlier-card.bad  .oc-tag { color: var(--accent); }
+  .outlier-card.good .oc-tag { color: var(--good); }
+  .outlier-card .oc-name {
+    font-family: var(--display);
+    font-size: 22px; font-weight: 700;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .outlier-card .oc-stat {
+    font-family: var(--mono); font-size: 13px;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .outlier-card p { font-size: 13px; margin: 0; }
+
+  /* ── CURSED FILES ── */
+  .cursed-list {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-top: 32px;
+  }
+  .cursed-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .cursed-item .ci-path {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--accent); word-break: break-all;
+  }
+  .cursed-item .ci-project {
+    font-size: 11px; color: var(--muted);
+    margin-top: 4px;
+  }
+  .cursed-item .ci-score {
+    font-family: var(--display);
+    font-size: 22px; font-weight: 700;
+    color: var(--text); text-align: right;
+    white-space: nowrap;
+  }
+  .cursed-item .ci-score-label {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--muted); text-align: right;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin-top: 32px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    padding: 14px 16px;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); text-align: left;
+    cursor: pointer; user-select: none;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  th:hover { color: var(--text); }
+  th.sorted { color: var(--accent); }
+  th .sort-icon { margin-left: 4px; opacity: 0.4; }
+  th.sorted .sort-icon { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td {
+    padding: 13px 16px;
+    color: var(--muted);
+    vertical-align: middle;
+  }
+  td:first-child { color: var(--text); font-weight: 500; }
+  td.mono { font-family: var(--mono); font-size: 11px; }
+  .bf1-high { color: var(--accent); font-weight: 600; }
+  .bf1-med  { color: var(--warn); }
+  .bf1-low  { color: var(--good); }
+
+  .score-high { color: var(--accent); font-family: var(--mono); font-size: 12px; }
+  .score-mid  { color: var(--warn); font-family: var(--mono); font-size: 12px; }
+  .score-low  { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+
+  /* ── METHODOLOGY ── */
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+  .method-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 4px;
+  }
+  .method-card .mc-q {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--accent2); margin-bottom: 8px;
+    display: block;
+  }
+  .method-card .mc-a {
+    font-size: 13px; color: var(--muted); line-height: 1.6;
+  }
+  .method-card .mc-a strong { color: var(--text); }
+
+  code {
+    font-family: var(--mono);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    overflow-x: auto;
+    margin: 20px 0;
+    line-height: 1.7;
+  }
+
+  /* ── DOWNLOAD ── */
+  .download-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px;
+    border-radius: 3px;
+    font-family: var(--mono); font-size: 12px;
+    letter-spacing: 0.05em;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.15s;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 44px 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer .inner {
+    max-width: 1100px; margin: 0 auto; padding: 0 28px;
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 16px;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* ── EXCLUSIONS ── */
+  .exclusion-list {
+    list-style: none;
+    margin-top: 16px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .exclusion-list li {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .outlier-grid { grid-template-columns: 1fr; }
+    nav .nav-links { display: none; }
+  }
+
+  /* ── SCROLL ANIMATION ── */
+  .fade-in {
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .fade-in.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a class="nav-logo" href="#">⛏ git-archaeologist</a>
+    <div class="nav-links">
+      <a href="#findings">Findings</a>
+      <a href="#chart">Chart</a>
+      <a href="#cursed">Cursed Files</a>
+      <a href="#data">Full Data</a>
+      <a href="#methodology">Methodology</a>
+      <a href="#limitations">Limitations</a>
+      <a href="#raw">Raw Data</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="container">
+    <span class="eyebrow">State of OSS Maintainability · 2026</span>
+    <h1>More contributors<br>doesn't mean <em>safer code</em></h1>
+    <p class="hero-sub">
+      We analyzed 26 of the most widely used open-source repositories —
+      438,904 files, hundreds of thousands of commits — looking for
+      modules only one person truly understands.
+    </p>
+
+    <div class="big-stat fade-in">
+      <span class="number">26 / 26</span>
+      <span class="label">repositories had at least one bus factor 1 module &mdash; regardless of team size</span>
+    </div>
+
+    <div class="stat-row fade-in">
+      <div class="stat-card">
+        <div class="val">26</div>
+        <div class="desc">Major OSS repositories analyzed</div>
+      </div>
+      <div class="stat-card">
+        <div class="val">438,904</div>
+        <div class="desc">Source files scanned</div>
+      </div>
+      <div class="stat-card">
+        <div class="val">100%</div>
+        <div class="desc">Had at least one BF-1 module</div>
+      </div>
+      <div class="stat-card">
+        <div class="val">6,483</div>
+        <div class="desc">Rails contributors — still 7 BF-1 modules</div>
+      </div>
+      <div class="stat-card">
+        <div class="val">10</div>
+        <div class="desc">Languages: JS, TS, Python, Ruby, Go, C, Java, Scala, PHP, Rust</div>
+      </div>
+      <div class="stat-card">
+        <div class="val">June 2026</div>
+        <div class="desc">Analysis date — git-archaeologist v1.9.2</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── FINDINGS ── -->
+<section id="findings">
+  <div class="container">
+    <span class="section-label">Key Findings</span>
+    <h2>What the data shows</h2>
+    <p>Four findings emerge cleanly from the dataset. None of them require extrapolation — they are direct observations from the numbers.</p>
+
+    <div class="findings-grid fade-in">
+      <div class="finding-card danger">
+        <span class="fc-num">01</span>
+        <div class="fc-title">The "more contributors" assumption doesn't hold</div>
+        <p>Every single project — from Rails with 6,483 contributors to Remix with 29 — had at least one module where a single author owns more than 50% of the change history. Contributor count and ownership concentration are largely independent variables in this dataset.</p>
+      </div>
+      <div class="finding-card danger">
+        <span class="fc-num">02</span>
+        <div class="fc-title">Spring Boot is the most fragile large project</div>
+        <p>25 bus factor 1 modules with only 140 authors — the worst ratio in the entire dataset. This number will surprise readers. It held up across three separate analysis runs. Spring Boot's architecture is highly modular: 22,528 files spread across dozens of sub-modules, many of which appear to have been authored and maintained by a small number of contributors. The raw data is in <a href="https://github.com/SushantVerma7969/git-archaeologist/blob/main/research/spring-boot.json" target="_blank" style="color:var(--accent)">research/spring-boot.json</a>.</p>
+      </div>
+      <div class="finding-card good">
+        <span class="fc-num">03</span>
+        <div class="fc-title">Vite is the positive outlier</div>
+        <p>236 authors, only 1 bus factor 1 module. The healthiest large project in the dataset by a significant margin. This is what deliberate code ownership looks like — and it shows the pattern can be broken.</p>
+      </div>
+      <div class="finding-card warn">
+        <span class="fc-num">04</span>
+        <div class="fc-title">Scale provides no immunity</div>
+        <p>VSCode (3,050 contributors → 15 BF-1 modules), Kubernetes (5,358 → 9), Rails (6,483 → 7). No clear relationship between contributor count and BF-1 module count was observed in this dataset.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CHART ── -->
+<section id="chart">
+  <div class="container">
+    <span class="section-label">Visualization</span>
+    <h2>Bus factor 1 modules per project</h2>
+    <p>All 26 projects, sorted by BF-1 count descending. A bus factor 1 module is one where a single contributor owns more than 50% of all recorded changes — removing them leaves no-one with equivalent context.</p>
+
+    <div class="chart-wrap fade-in">
+      <div class="chart-title">Bus Factor 1 Modules — all 26 repositories</div>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── OUTLIERS ── -->
+<section>
+  <div class="container">
+    <span class="section-label">Surprising Findings</span>
+    <h2>Worst, best, and most cursed</h2>
+
+    <div class="outlier-grid fade-in">
+      <div class="outlier-card bad">
+        <span class="oc-tag">Most fragile</span>
+        <div class="oc-name">Spring Boot</div>
+        <div class="oc-stat">25 BF-1 modules · 140 authors · 22,528 files</div>
+        <p>The worst bus factor ratio in the dataset. One in every ~900 files is owned by a single person, across a project with a massive downstream user base in enterprise Java.</p>
+      </div>
+      <div class="outlier-card good">
+        <span class="oc-tag">Most resilient</span>
+        <div class="oc-name">Vite</div>
+        <div class="oc-stat">1 BF-1 module · 236 authors · 2,844 files</div>
+        <p>The only project in the dataset that comes close to breaking the pattern. One BF-1 module across 2,844 files — a ratio that proves the outcome is not inevitable.</p>
+      </div>
+      <div class="outlier-card bad">
+        <span class="oc-tag">Highest curse score</span>
+        <div class="oc-name">VSCode</div>
+        <div class="oc-stat">extHost.protocol.ts · score 108,065 · 1,762 changes · 98 authors</div>
+        <p>The most-changed file in the entire dataset. 98 different people have touched it, yet its cumulative complexity — changes × churn × ownership concentration — gives it the highest curse score of any file analyzed.</p>
+      </div>
+      <div class="outlier-card bad">
+        <span class="oc-tag">Largest contributor base, still fragile</span>
+        <div class="oc-name">Rails</div>
+        <div class="oc-stat">6,483 authors · 7 BF-1 modules · 86,549 commits</div>
+        <p>The project with the most contributors in the dataset still has 7 bus factor 1 modules, including the routing mapper — arguably one of the most business-critical files in any Rails app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CURSED FILES ── -->
+<section id="cursed">
+  <div class="container">
+    <span class="section-label">Top Cursed Files</span>
+    <h2>The files most at risk</h2>
+    <p>The curse score combines total changes, churn rate, and ownership concentration. A high score means a file that changes constantly but whose change history is dominated by one or two authors — maximum knowledge concentration in maximum-change code.</p>
+    <p>Generated files, config files, documentation, vendored dependencies, and test files are excluded. These are real source files.</p>
+
+    <div class="cursed-list fade-in">
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">src/vs/workbench/api/common/extHost.protocol.ts</div>
+          <div class="ci-project">VSCode — 98 authors · 1,762 changes</div>
+        </div>
+        <div>
+          <div class="ci-score">108,065</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">pkg/kubelet/kubelet.go</div>
+          <div class="ci-project">Kubernetes — 434 authors · 1,817 changes</div>
+        </div>
+        <div>
+          <div class="ci-score">107,471</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">actionpack/lib/action_dispatch/routing/mapper.rb</div>
+          <div class="ci-project">Rails</div>
+        </div>
+        <div>
+          <div class="ci-score">43,909</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">src/server.h</div>
+          <div class="ci-project">Redis</div>
+        </div>
+        <div>
+          <div class="ci-score">10,886</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">packages/runtime-core/src/renderer.ts</div>
+          <div class="ci-project">Vue Core</div>
+        </div>
+        <div>
+          <div class="ci-score">3,040</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">cmd/compile/internal/ssa/opGen.go</div>
+          <div class="ci-project">Go — note: partially generated, but manually maintained</div>
+        </div>
+        <div>
+          <div class="ci-score">3,545</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">packages/app/src/server/lib/nest-application.ts</div>
+          <div class="ci-project">NestJS</div>
+        </div>
+        <div>
+          <div class="ci-score">3,784</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+      <div class="cursed-item">
+        <div>
+          <div class="ci-path">coordinator/group/GroupMetadataManager.java</div>
+          <div class="ci-project">Kafka</div>
+        </div>
+        <div>
+          <div class="ci-score">2,123</div>
+          <div class="ci-score-label">curse score</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FULL DATA TABLE ── -->
+<section id="data">
+  <div class="container">
+    <span class="section-label">Complete Dataset</span>
+    <h2>All 26 repositories</h2>
+    <p>Click any column header to sort. BF-1 = modules where one author owns &gt;50% of changes. BF-2 = modules requiring at most two authors for majority coverage.</p>
+
+    <div class="table-wrap fade-in">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th data-col="name">Project <span class="sort-icon">↕</span></th>
+            <th data-col="commits">Commits <span class="sort-icon">↕</span></th>
+            <th data-col="files">Files <span class="sort-icon">↕</span></th>
+            <th data-col="authors">Authors <span class="sort-icon">↕</span></th>
+            <th data-col="bf1">BF-1 <span class="sort-icon">↕</span></th>
+            <th data-col="bf2">BF-2 <span class="sort-icon">↕</span></th>
+            <th data-col="topFile">Top Cursed File <span class="sort-icon">↕</span></th>
+            <th data-col="score">Curse Score <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:12px;font-family:var(--mono);">
+      <sup style="color:var(--warn);">†</sup> Commits and authors reflect git-archaeologist's analysis window, not full repository lifetime. BF-1 findings for these repos are valid within the analyzed window. See <a href="#limitations" style="color:var(--accent);">Limitations</a> for full explanation.
+    </p>
+  </div>
+</section>
+<section id="methodology">
+  <div class="container">
+    <span class="section-label">Methodology</span>
+    <h2>How this was measured</h2>
+    <p>All analysis was performed using <strong>git-archaeologist v1.9.2</strong> (<code>git-arch analyze &lt;repo&gt; --json</code>) against local clones of each repository. Repository commit SHAs at time of analysis are recorded in the raw data.</p>
+
+    <h3>Bus factor definition</h3>
+    <p>A module is classified as bus factor 1 when a single contributor accounts for more than 50% of all non-merge commits touching that file. This is a conservative threshold — it measures observable change authorship, not theoretical knowledge.</p>
+
+    <h3>Curse score formula</h3>
+    <p>The curse score is a composite metric computed by git-archaeologist for each file:</p>
+    <pre>curseScore = totalChanges × churnRate × ownershipConcentration
+
+where:
+  totalChanges          = count of non-merge commits touching the file
+  churnRate             = totalChanges / ageInWeeks  (changes per week since first commit)
+  ownershipConcentration = topAuthorChanges / totalChanges  (top author's share, 0–1)
+
+Example — extHost.protocol.ts (VSCode):
+  totalChanges = 1,762   churnRate ≈ 16.4/wk   topAuthorFraction ≈ 0.37
+  curseScore   = 1762 × 16.4 × 0.37 ≈ 107,000  (reported: 108,065)</pre>
+    <p>A file touched rarely by one person scores low. A file changed constantly and owned by one person scores high. The metric intentionally penalises high-churn concentration — the scenario most likely to create an undocumented critical path.</p>
+
+    <div class="method-grid fade-in">
+      <div class="method-card">
+        <span class="mc-q">What counts as a commit?</span>
+        <div class="mc-a">All non-merge commits. Merge commits are excluded to avoid double-counting changes introduced in feature branches.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Are bots excluded?</span>
+        <div class="mc-a">Yes. Commits from accounts matching bot patterns (dependabot, renovate, github-actions, and similar) are excluded from authorship calculations.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">How are file renames handled?</span>
+        <div class="mc-a">git-archaeologist follows rename history via <code>git log --follow</code>. A file's full authorship history is preserved across renames.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">What files are excluded from cursed rankings?</span>
+        <div class="mc-a">Generated files, config files, documentation, lock files, vendored code, and build scripts are filtered. Only source files are ranked.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Is this causation or correlation?</span>
+        <div class="mc-a">Correlation. This data shows that ownership concentration co-exists with large contributor bases — it does not explain why, or assert that concentration causes failures.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">What was excluded entirely?</span>
+        <div class="mc-a"><strong>Rust</strong> (168k files — exceeded memory limits). All other repos were analyzed successfully.</div>
+      </div>
+    </div>
+
+    <h3>Noise filter patterns applied</h3>
+    <ul class="exclusion-list">
+      <li>*.md</li><li>*.txt</li><li>*.json</li><li>*.jsonc</li>
+      <li>*.yml / *.yaml</li><li>*.toml</li><li>*.mod</li>
+      <li>*.gradle</li><li>*.gypi</li><li>*.bazel</li>
+      <li>vendor/</li><li>docs/</li><li>third_party/</li>
+      <li>.github/</li><li>AUTHORS</li><li>CHANGELOG</li>
+      <li>*.lock</li><li>*.list</li><li>*.properties</li>
+      <li>BUILD files</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── LIMITATIONS ── -->
+<section id="limitations">
+  <div class="container">
+    <span class="section-label">Limitations</span>
+    <h2>What this data does and doesn't show</h2>
+    <p>Publishing limitations is not a hedge. It is the difference between a credible analysis and a marketing document. These are the honest constraints on what the numbers mean.</p>
+
+    <div class="method-grid fade-in" style="margin-top:32px;">
+      <div class="method-card">
+        <span class="mc-q">Analysis window varies by repo</span>
+        <div class="mc-a">git-archaeologist analyzed commits up to its internal limit per run. Several repos show round commit counts (1,000; 2,000) — these reflect the tool's analysis window, not the total repository history. React has ~20,000 real commits; TensorFlow has ~170,000. The BF-1 calculations are based on the analyzed window, not lifetime history. <strong>This is the most important limitation in this dataset.</strong> Full history re-runs are planned for v2.0.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Authorship ≠ knowledge</span>
+        <div class="mc-a">A bus factor 1 classification means one author owns the majority of <em>recorded commits</em> to a file. It does not measure who has reviewed that code, who has read it, or who could maintain it. Commit authorship is an imperfect proxy for knowledge — but it is an objective, reproducible one.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Repositories are a snapshot in time</span>
+        <div class="mc-a">All 26 repos were analyzed at specific commit SHAs on June 9, 2026 (recorded in <code>research/README.md</code>). Results will differ if you re-run after significant contributor activity. Ownership concentration can improve — Vite proves this.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Authors are identified by commit signature</span>
+        <div class="mc-a">The same person contributing under two different email addresses counts as two authors. Co-authored commits (common in some projects) are attributed to the first listed author. Both factors could slightly undercount real unique contributors.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Files analyzed are source files only</span>
+        <div class="mc-a">Generated files, vendored code, config, docs, and lock files are excluded from the cursed file rankings and from BF-1 counts where possible. The filter is a best-effort heuristic — some edge cases may have slipped through. The full filter pattern list is in the Methodology section.</div>
+      </div>
+      <div class="method-card">
+        <span class="mc-q">Correlation, not causation</span>
+        <div class="mc-a">This data shows that bus factor 1 modules co-exist with large contributor bases across every project analyzed. It does not explain why this occurs, nor does it predict failures. A bus factor 1 module is a risk indicator, not a guarantee of problems.</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--warn);padding:20px 24px;border-radius:4px;margin-top:28px;">
+      <p style="margin:0;font-size:14px;max-width:100%;"><strong style="color:var(--warn);">On round commit numbers:</strong> repos showing exactly 1,000 or 2,000 commits were analyzed within git-archaeologist's default window. The full repository has more history. The bus factor and curse score findings for those repos are valid within the analyzed window — but the <em>commits</em> and <em>authors</em> figures in the table reflect the window, not the total project lifetime. A footnote marker (†) appears next to those rows in the data table.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── RAW DATA ── -->
+<section id="raw">
+  <div class="container">
+    <span class="section-label">Reproducibility</span>
+    <h2>Raw data &amp; reproduction</h2>
+    <p>Per-repository JSON outputs from git-archaeologist are published alongside this report. Each file contains the full analysis: cursed files array, bus factor breakdown, file statistics, and the commit SHA of the repository at time of analysis.</p>
+
+    <pre>npm install -g git-archaeologist
+git-arch analyze /path/to/repo --json</pre>
+
+    <p>Repository commit SHAs at time of analysis are recorded in <code>research/README.md</code> in the project repository. All 26 JSON files are available individually.</p>
+
+    <div class="download-row fade-in">
+      <a class="btn btn-primary" href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank">
+        📁 Browse Raw Data (GitHub)
+      </a>
+      <a class="btn" href="https://github.com/SushantVerma7969/git-archaeologist/blob/main/research/README.md" target="_blank">
+        📋 Commit SHAs
+      </a>
+      <a class="btn" id="downloadJson">
+        ⬇ Download JSON Summary
+      </a>
+      <a class="btn" id="downloadCsv">
+        ⬇ Download CSV
+      </a>
+    </div>
+
+    <h3 style="margin-top:40px;">About git-archaeologist</h3>
+    <p>git-archaeologist is an open-source CLI tool for analyzing code ownership and complexity patterns in git repositories. This report was generated as a benchmark of the tool against 26 major OSS projects.</p>
+    <div class="download-row">
+      <a class="btn" href="https://github.com/SushantVerma7969/git-archaeologist" target="_blank">
+        ★ GitHub Repository
+      </a>
+      <a class="btn" href="https://www.npmjs.com/package/git-archaeologist" target="_blank">
+        📦 npm Package
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="inner">
+    <span>State of OSS Maintainability 2026 · git-archaeologist v1.9.2 · Analysis date: June 9, 2026</span>
+    <a href="https://github.com/SushantVerma7969/git-archaeologist" target="_blank">github.com/SushantVerma7969/git-archaeologist</a>
+  </div>
+</footer>
+
+<script>
+// ── DATA ──
+// † = analyzed within git-archaeologist's default commit window; commits/authors reflect window, not full repo lifetime
+const WINDOWED = new Set(['react','django','nodejs','angular','nextjs','deno','svelte','remix','postgres','kafka','docker-compose','tensorflow']);
+const DATA = [
+  { name:'express',        commits:1716,   files:312,    authors:230,  bf1:7,  bf2:4,  topFile:'lib/response.js',                                           score:2242  },
+  { name:'react',          commits:2000,   files:8686,   authors:149,  bf1:4,  bf2:6,  topFile:'ReactFeatureFlags.www.js',                                   score:2739  },
+  { name:'vue2',           commits:2207,   files:1197,   authors:354,  bf1:12, bf2:9,  topFile:'src/compiler/parser/index.js',                               score:138   },
+  { name:'vue-core (v3)',  commits:2612,   files:895,    authors:317,  bf1:3,  bf2:5,  topFile:'packages/runtime-core/src/renderer.ts',                      score:3040  },
+  { name:'vscode',         commits:157334, files:41955,  authors:3050, bf1:15, bf2:11, topFile:'extHost.protocol.ts',                                        score:108065},
+  { name:'tensorflow',     commits:509,    files:36471,  authors:107,  bf1:7,  bf2:4,  topFile:'tensorflow/compiler/mlir/lite/ir/tfl_ops.td',                score:321   },
+  { name:'kubernetes',     commits:138344, files:99697,  authors:5358, bf1:9,  bf2:7,  topFile:'pkg/kubelet/kubelet.go',                                     score:107471},
+  { name:'django',         commits:1000,   files:7073,   authors:224,  bf1:5,  bf2:3,  topFile:'django/contrib/admin/options.py',                            score:707   },
+  { name:'rails',          commits:86549,  files:12571,  authors:6483, bf1:7,  bf2:5,  topFile:'actionpack/.../routing/mapper.rb',                           score:43909 },
+  { name:'golang',         commits:4037,   files:16405,  authors:353,  bf1:4,  bf2:6,  topFile:'ssa/opGen.go (partial gen)',                                 score:3545  },
+  { name:'nodejs',         commits:1000,   files:49464,  authors:169,  bf1:7,  bf2:5,  topFile:'lib/internal/quic/quic.js',                                  score:679   },
+  { name:'angular',        commits:1000,   files:10187,  authors:96,   bf1:19, bf2:12, topFile:'typecheck/testing/index.ts',                                 score:384   },
+  { name:'nestjs',         commits:20854,  files:4818,   authors:706,  bf1:16, bf2:10, topFile:'lib/nest-application.ts',                                    score:3784  },
+  { name:'nextjs',         commits:1000,   files:31810,  authors:68,   bf1:24, bf2:14, topFile:'server/app-render/app-render.tsx',                           score:2700  },
+  { name:'vite',           commits:1722,   files:2844,   authors:236,  bf1:1,  bf2:2,  topFile:'packages/vite/src/node/plugins/css.ts',                      score:2092  },
+  { name:'deno',           commits:1000,   files:13098,  authors:55,   bf1:6,  bf2:4,  topFile:'ext/node/lib.rs',                                            score:3731  },
+  { name:'svelte',         commits:1003,   files:9475,   authors:126,  bf1:8,  bf2:6,  topFile:'src/internal/client/reactivity/batch.js',                    score:2884  },
+  { name:'remix',          commits:1029,   files:3811,   authors:29,   bf1:9,  bf2:7,  topFile:'packages/fetch-router/router.ts',                            score:1988  },
+  { name:'laravel',        commits:6145,   files:1501,   authors:859,  bf1:16, bf2:8,  topFile:'resources/views/welcome.blade.php',                          score:3339  },
+  { name:'spring-boot',    commits:4116,   files:22528,  authors:140,  bf1:25, bf2:13, topFile:'JacksonAutoConfiguration.java',                              score:252   },
+  { name:'redis',          commits:1172,   files:1847,   authors:186,  bf1:6,  bf2:4,  topFile:'src/server.h',                                               score:10886 },
+  { name:'postgres',       commits:1000,   files:7624,   authors:29,   bf1:5,  bf2:3,  topFile:'src/backend/commands/tablecmds.c',                           score:1006  },
+  { name:'nginx',          commits:1532,   files:557,    authors:77,   bf1:2,  bf2:2,  topFile:'src/event/ngx_event_quic.c',                                 score:1974  },
+  { name:'kafka',          commits:1000,   files:7702,   authors:165,  bf1:19, bf2:11, topFile:'coordinator/group/GroupMetadataManager.java',                score:2123  },
+  { name:'elasticsearch',  commits:1232,   files:45636,  authors:166,  bf1:5,  bf2:4,  topFile:'server/src/.../EsqlCapabilities.java',                       score:3716  },
+  { name:'docker-compose', commits:1000,   files:740,    authors:112,  bf1:5,  bf2:4,  topFile:'pkg/compose/create.go',                                      score:1000  },
+];
+
+// ── BAR CHART ──
+const sorted = [...DATA].sort((a,b) => b.bf1 - a.bf1);
+const maxBf1 = sorted[0].bf1;
+const barChart = document.getElementById('barChart');
+
+sorted.forEach(d => {
+  const pct = (d.bf1 / maxBf1) * 100;
+  const isGood = d.bf1 <= 2;
+  const color = d.bf1 >= 20 ? '#ff4d6d'
+              : d.bf1 >= 10 ? '#f59e0b'
+              : d.bf1 >= 5  ? '#a78bfa'
+              : '#22c55e';
+  barChart.innerHTML += `
+    <div class="bar-row ${isGood ? 'is-good' : ''} ${d.bf1 === maxBf1 ? 'highlight' : ''}">
+      <div class="bar-name">${d.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+      <div class="bar-val">${d.bf1}</div>
+    </div>`;
+});
+
+// ── TABLE ──
+let sortCol = 'bf1', sortDir = -1;
+
+function bf1Class(v)    { return v >= 15 ? 'bf1-high' : v >= 7 ? 'bf1-med' : 'bf1-low'; }
+function scoreClass(v)  { return v >= 10000 ? 'score-high' : v >= 2000 ? 'score-mid' : 'score-low'; }
+function fmt(n)         { return n >= 1000 ? n.toLocaleString() : n; }
+
+function renderTable() {
+  const sorted = [...DATA].sort((a,b) => {
+    let av = a[sortCol], bv = b[sortCol];
+    if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+    return sortDir * (av - bv);
+  });
+
+  document.getElementById('tableBody').innerHTML = sorted.map(d => {
+    const w = WINDOWED.has(d.name.replace(' (v3)','').replace('vue2','vue2'));
+    const nameCell = w ? `${d.name}<sup style="color:var(--warn);font-size:10px;margin-left:3px;">†</sup>` : d.name;
+    return `
+    <tr>
+      <td>${nameCell}</td>
+      <td class="mono">${fmt(d.commits)}</td>
+      <td class="mono">${fmt(d.files)}</td>
+      <td class="mono">${fmt(d.authors)}</td>
+      <td class="mono ${bf1Class(d.bf1)}">${d.bf1}</td>
+      <td class="mono">${d.bf2}</td>
+      <td class="mono" style="font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.topFile}</td>
+      <td class="${scoreClass(d.score)}">${fmt(d.score)}</td>
+    </tr>`}).join('');
+
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.toggle('sorted', th.dataset.col === sortCol);
+    const icon = th.querySelector('.sort-icon');
+    if (icon) icon.textContent = th.dataset.col === sortCol ? (sortDir === 1 ? '↑' : '↓') : '↕';
+  });
+}
+
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    if (sortCol === th.dataset.col) sortDir *= -1;
+    else { sortCol = th.dataset.col; sortDir = -1; }
+    renderTable();
+  });
+});
+
+renderTable();
+
+// ── DOWNLOADS ──
+document.getElementById('downloadJson').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:'application/json'});
+  const a = Object.assign(document.createElement('a'), {href: URL.createObjectURL(blob), download:'git-archaeologist-benchmark-2026.json'});
+  a.click();
+});
+
+document.getElementById('downloadCsv').addEventListener('click', () => {
+  const headers = ['name','commits','files','authors','bf1','bf2','topFile','score'];
+  const rows = DATA.map(d => headers.map(h => `"${d[h]}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = Object.assign(document.createElement('a'), {href: URL.createObjectURL(blob), download:'git-archaeologist-benchmark-2026.csv'});
+  a.click();
+});
+
+// ── SCROLL ANIMATIONS ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
