@@ -105,3 +105,4 @@ node dist/index.js analyze /any/repo
 ## License
 
 [MIT](LICENSE)
+
