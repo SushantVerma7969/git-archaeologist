@@ -32,6 +32,7 @@ git-arch cursed --top 10                       # just the danger ranking
 git-arch cursed --top 10 --since 1y /path/to/repo  # danger ranking, recent only
 git-arch analyze /path/to/repo --json          # pipe into other tools
 git-arch blame lib/response.js /path/to/repo   # deep dive on one file
+git-arch trend /path/to/repo                   # which files are getting more dangerous
 ```
 
 ## What it finds
