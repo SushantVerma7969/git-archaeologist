@@ -12,10 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history needed for accurate analysis
+          fetch-depth: 0
 
       - name: Run Git Archaeologist
-        uses: SushantVerma7969/git-archaeologist@v1.4.1
+        uses: SushantVerma7969/git-archaeologist@v1
         with:
           top: '10'
           since: '1y'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
