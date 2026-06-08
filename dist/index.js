@@ -71,7 +71,7 @@ program
     .name('git-arch')
     .description(chalk_1.default.hex('#A78BFA')('⛏  Git Archaeologist') +
     ' — uncover history, ownership & tech debt in any git repo')
-    .version('1.7.0');
+    .version('1.9.1');
 program
     .command('analyze [repoPath]')
     .alias('a')
