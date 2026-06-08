@@ -6,6 +6,7 @@ import { analyze } from './core/orchestrator';
 import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
 import { registerBlameCommand } from './blame';
+import { registerTrendCommand } from './trend';
 
 
 function parseSince(input: string): string {
@@ -114,4 +115,5 @@ program
   });
 
 registerBlameCommand(program);
+registerTrendCommand(program);
 program.parse(process.argv);

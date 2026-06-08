@@ -44,6 +44,7 @@ const orchestrator_1 = require("./core/orchestrator");
 const terminalRenderer_1 = require("./output/terminalRenderer");
 const htmlReport_1 = require("./output/htmlReport");
 const blame_1 = require("./blame");
+const trend_1 = require("./trend");
 function parseSince(input) {
     // Accept: 90d, 30days, 6months, 1year, or ISO date like 2024-01-01
     const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
@@ -147,5 +148,6 @@ program
     }
 });
 (0, blame_1.registerBlameCommand)(program);
+(0, trend_1.registerTrendCommand)(program);
 program.parse(process.argv);
 //# sourceMappingURL=index.js.map
