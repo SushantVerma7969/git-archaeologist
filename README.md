@@ -92,6 +92,7 @@ jobs:
         with:
           top: 10
           since: 1y
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 `fetch-depth: 0` is required — without full history the analysis is incomplete.
