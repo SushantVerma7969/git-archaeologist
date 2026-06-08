@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0] - 2026-06-09
+- GitHub Action now posts PR risk score as a comment on every pull request
+- PR risk score (0-100) based on cursed files touched and bus factor 1 modules affected
+- Added `github-token` input to action.yml
+- README reframed — outcomes over metrics
+
 ## [1.6.0] - 2026-06-09
 - Added `git-arch blast <file>` — shows blast radius: every file that historically changes together with the target file, with percentage likelihood
 
