@@ -6,7 +6,7 @@
 
 > Find the most dangerous files in any git repo — before you touch them.
 
-[Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works)
+[Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md)
 
 ---
 
