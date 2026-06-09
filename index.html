@@ -673,7 +673,7 @@
   <div class="container">
     <span class="section-label">Top Cursed Files</span>
     <h2>The files most at risk</h2>
-    <p>The curse score combines total changes, churn rate, and ownership concentration. A high score means a file that changes constantly but whose change history is dominated by one or two authors — maximum knowledge concentration in maximum-change code.</p>
+    <p>The curse score combines total changes, author count, change frequency, age decay, and acceleration. A high score means a file that changes constantly and recently, with growing author chaos. Full formula is in the <a href="#methodology" style="color:var(--accent)">Methodology</a> section.</p>
     <p>Generated files, config files, documentation, vendored dependencies, and test files are excluded. These are real source files.</p>
 
     <div class="cursed-list fade-in">
@@ -801,17 +801,17 @@
 
     <h3>Curse score formula</h3>
     <p>The curse score is a composite metric computed by git-archaeologist for each file:</p>
-    <pre>curseScore = totalChanges × churnRate × ownershipConcentration
+    <pre>curseScore = totalChanges × log2(authors+1) × exp(-0.5 × ageInYears) × log2(churn+2) × acceleration × 100
 
 where:
-  totalChanges          = count of non-merge commits touching the file
-  churnRate             = totalChanges / ageInWeeks  (changes per week since first commit)
-  ownershipConcentration = topAuthorChanges / totalChanges  (top author's share, 0–1)
+  totalChanges  = count of non-merge commits touching the file
+  authors       = number of unique commit authors
+  ageInYears    = time since file's first commit (exponential decay — old stable files score lower)
+  churn         = change frequency derived from commit timeline
+  acceleration  = whether the file is getting more dangerous recently vs historically
 
-Example — extHost.protocol.ts (VSCode):
-  totalChanges = 1,762   churnRate ≈ 16.4/wk   topAuthorFraction ≈ 0.37
-  curseScore   = 1762 × 16.4 × 0.37 ≈ 107,000  (reported: 108,065)</pre>
-    <p>A file touched rarely by one person scores low. A file changed constantly and owned by one person scores high. The metric intentionally penalises high-churn concentration — the scenario most likely to create an undocumented critical path.</p>
+Source: src/analyzers/curseScorer.ts</pre>
+    <p>The exponential decay on age means old chaos that has since stabilized does not dominate the ranking. The acceleration multiplier means files getting worse <em>recently</em> score higher than files with similar totals that have levelled off. This matches the formula documented in the README exactly.</p>
 
     <div class="method-grid fade-in">
       <div class="method-card">
@@ -823,8 +823,11 @@ Example — extHost.protocol.ts (VSCode):
         <div class="mc-a">Yes. Commits from accounts matching bot patterns (dependabot, renovate, github-actions, and similar) are excluded from authorship calculations.</div>
       </div>
       <div class="method-card">
-        <span class="mc-q">How are file renames handled?</span>
-        <div class="mc-a">git-archaeologist follows rename history via <code>git log --follow</code>. A file's full authorship history is preserved across renames.</div>
+        <span class="mc-q">Curse score formula</span>
+        <div class="mc-a">
+          <code>totalChanges × log2(authors+1) × exp(-0.5 × ageInYears) × log2(churn+2) × acceleration × 100</code><br><br>
+          Exponential decay on age means old stable files don't dominate. Acceleration means files getting <strong>worse recently</strong> score higher than those that have levelled off. Source: <strong>src/analyzers/curseScorer.ts</strong>
+        </div>
       </div>
       <div class="method-card">
         <span class="mc-q">What files are excluded from cursed rankings?</span>
