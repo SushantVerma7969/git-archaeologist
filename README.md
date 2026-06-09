@@ -24,6 +24,12 @@ Most tools show you the code. This one shows you the history behind the code —
 npm install -g git-archaeologist
 ```
 
+Then run it on any repository:
+
+```bash
+git-arch analyze /path/to/repo
+```
+
 ## Usage
 
 ```bash
@@ -41,6 +47,28 @@ git-arch blast lib/response.js /path/to/repo   # what else breaks when you touch
 git-arch ownership /path/to/repo               # who owns what — folder breakdown + bus factor
 git-arch pr-risk /path/to/repo                 # score your changes before pushing
 ```
+
+## Example output
+
+```
+$ git-arch analyze ./express
+
+✔ Analysis complete — 312 files scanned
+
+CURSE SCORE — top files by risk
+  1. lib/response.js        score 2242   53 authors   128 changes
+  2. lib/router/index.js    score 1891   41 authors   109 changes
+  3. lib/application.js     score 1204   38 authors    87 changes
+
+BUS FACTOR
+  lib/        → 1  (dougwilson owns 71%)
+  test/       → 1  (dougwilson owns 68%)
+
+IMPLICIT COUPLING
+  benchmarks/Makefile ↔ benchmarks/run   co-commit rate: 100%
+```
+
+> Run time: Express ~3 seconds · Kubernetes (99k files) ~3 minutes
 
 ## What it finds
 
@@ -69,6 +97,18 @@ curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rat
 ```
 
 The exponential decay on age means old chaos that stabilized does not show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config files are automatically excluded so the list shows real source files.
+
+## Why not git log?
+
+`git log` tells you what happened. `git-archaeologist` tells you where the risk is.
+
+- Finds bus-factor-1 modules automatically across every folder
+- Detects ownership concentration before it becomes a problem
+- Surfaces files becoming more dangerous over time
+- Discovers hidden coupling through commit co-occurrence
+- Generates interactive HTML reports for large repositories
+
+Instead of reading thousands of commits manually, you get a ranked view of the parts of a codebase most likely to cause trouble.
 
 ## Requirements
 
