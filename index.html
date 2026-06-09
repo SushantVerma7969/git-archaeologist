@@ -612,7 +612,7 @@ footer a:hover { color: var(--ink2); }
       <span>June 9, 2026</span>
     </div>
     <h1>More contributors<br>doesn't mean<br><em>safer code</em></h1>
-    <p class="deck">We analyzed 26 of the most widely used open-source repositories — 438,904 files, hundreds of thousands of commits — looking for modules only one person truly understands.</p>
+    <p class="deck">We analyzed 26 of the most widely used open-source repositories — 438,904 files, hundreds of thousands of commits — looking for modules where a single contributor dominates the change history.</p>
     <div class="byline-row">
       <div class="byline-item">
         <span class="bl-label">Tool</span>
@@ -643,7 +643,7 @@ footer a:hover { color: var(--ink2); }
   <div class="lede fade-in">
     <div class="lede-num">26/26</div>
     <div class="lede-body">
-      <p>Every repository analyzed had at least one module where a single contributor owns the majority of commit history — <strong>regardless of team size.</strong> Projects with 6,483 contributors. Projects with 5,358. Still had them.</p>
+      <p>Every repository analyzed had at least one module with highly concentrated ownership — a single contributor accounting for the majority of commit history — <strong>regardless of team size.</strong> Projects with 6,483 contributors. Projects with 5,358. Still had them.</p>
     </div>
   </div>
 </div>
@@ -661,7 +661,7 @@ footer a:hover { color: var(--ink2); }
     </div>
     <div class="stat-cell">
       <span class="sv">100%</span>
-      <span class="sd">had ≥1 BF-1<br>module</span>
+      <span class="sd">had ≥1 high-concentration<br>ownership module</span>
     </div>
     <div class="stat-cell">
       <span class="sv">6,483</span>
@@ -979,6 +979,9 @@ footer a:hover { color: var(--ink2); }
       <h2>What this data does<br>and doesn't show</h2>
     </div>
     <p class="narrow">Documenting limitations is not a hedge — it is the difference between a credible analysis and a marketing document.</p>
+    <div class="callout" style="margin-bottom:28px">
+      <p>This tool measures <strong>historical ownership concentration from git history</strong>. It does not directly measure who understands a codebase, who reviewed changes, or who could maintain a module today. Results should be interpreted as <strong>maintenance-risk signals</strong> rather than ground truth about organizational knowledge.</p>
+    </div>
 
     <div class="ruled-grid-3" style="margin-top:32px">
       <div class="grid-cell">
