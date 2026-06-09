@@ -685,7 +685,7 @@ footer a:hover { color: var(--ink2); }
       <div class="sec-label red">Context</div>
       <h2>Why ownership<br>concentration matters</h2>
     </div>
-    <p class="narrow">Bus factor measures how many contributors a project can lose before a given module becomes unmaintainable. A bus factor of 1 means a single person leaving effectively orphans that code.</p>
+    <p class="narrow">Bus factor measures how many contributors a project can lose before a given module becomes unmaintainable. A bus factor of 1 means a single person leaving effectively orphans that code. <strong>Important:</strong> this tool measures <em>maintenance activity concentration</em> from commit history — not who holds knowledge of the code. These are related but not the same thing.</p>
     <div class="ruled-grid-3">
       <div class="grid-cell">
         <span class="cell-tag red">Onboarding</span>
@@ -916,7 +916,7 @@ footer a:hover { color: var(--ink2); }
     <p class="narrow">All analysis used <strong>git-archaeologist v1.9.2</strong> (<code>git-arch analyze &lt;repo&gt; --json</code>) against local clones. Commit SHAs at time of analysis are in <code>research/README.md</code>.</p>
 
     <h3>Bus factor definition</h3>
-    <p class="narrow">A module is BF-1 when a single contributor accounts for more than 50% of all non-merge commits touching that file. Conservative threshold — measures observable change authorship, not theoretical knowledge.</p>
+    <p class="narrow">A module is BF-1 when a single contributor accounts for more than 50% of all non-merge commits touching that file. This measures <strong>historical maintenance activity concentration</strong> — not who understands the code, who has reviewed it, or who could maintain it if needed. A stable, rarely-changed module will appear concentrated even if it is widely understood. The metric is objective and reproducible; what it cannot capture is tacit knowledge.</p>
 
     <h3>Curse score formula</h3>
     <p class="narrow">Implemented in <code>src/analyzers/curseScorer.ts</code>:</p>
@@ -987,9 +987,9 @@ footer a:hover { color: var(--ink2); }
         <p>Several repos show round commit counts (1,000; 2,000) — these reflect the tool's analysis window, not full repository history. React has ~20,000 real commits; TensorFlow ~170,000. BF-1 findings are valid within the window. Full history re-runs are planned for v2.0.</p>
       </div>
       <div class="grid-cell">
-        <span class="cell-tag">Authorship ≠ knowledge</span>
-        <h3 style="font-size:16px;margin-top:0">Commit authorship is a proxy</h3>
-        <p>BF-1 means one author owns the majority of <em>recorded commits</em>. It does not measure who has reviewed the code, read it, or could maintain it. Objective and reproducible, but imperfect.</p>
+        <span class="cell-tag amber">⚠ Key distinction</span>
+        <h3 style="font-size:16px;margin-top:0">BF-1 measures activity concentration, not knowledge</h3>
+        <p>This is the most important conceptual limitation. A module with one active committer may be widely understood across the team. A module with many committers may be understood by none of them. This metric identifies where <em>maintenance activity</em> is concentrated — not who holds knowledge. A stable, well-understood module that hasn't needed changes will appear concentrated even if dozens of engineers know it cold.</p>
       </div>
       <div class="grid-cell">
         <span class="cell-tag">Snapshot in time</span>
