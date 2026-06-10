@@ -1,5 +1,11 @@
 # git-archaeologist
 
+## Demo
+
+[![git-archaeologist demo](https://img.youtube.com/vi/NKVN00Dj6YA/maxresdefault.jpg)](https://youtu.be/NKVN00Dj6YA)
+
+> 2-minute demo running git-archaeologist on the Express.js repository.
+
 ![HTML report — interactive risk heatmap](./preview.png)
 
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
