@@ -156,3 +156,15 @@ node dist/index.js analyze /any/repo
 
 [MIT](LICENSE)
 
+
+## Known limitations
+- Commit authorship ≠ knowledge ownership
+- Squash merges can distort concentration scores
+- PR reviewers and code reviewers are not considered
+- Analysis window cap on some repos (see report)
+- Git history is one signal among many
+
+## Roadmap
+- [ ] PR reviewer/approver data (v2)
+- [ ] Full history mode — remove commit window cap (v2)
+- [ ] Rename metric away from "bus factor" (v2)
