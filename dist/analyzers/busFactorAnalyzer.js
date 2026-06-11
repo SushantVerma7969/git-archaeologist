@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyzeBusFactor = analyzeBusFactor;
 exports.analyzeCoupling = analyzeCoupling;
+const botFilter_1 = require("../utils/botFilter");
 function analyzeBusFactor(fileStatsMap, authorNameMap) {
-    // Group files by top-level folder
     const folderMap = new Map();
     for (const [, stats] of fileStatsMap) {
         const parts = stats.filepath.split('/');
@@ -13,6 +13,9 @@ function analyzeBusFactor(fileStatsMap, authorNameMap) {
         }
         const authorTotals = folderMap.get(folder);
         for (const [email, count] of stats.authorChanges) {
+            const name = authorNameMap.get(email) ?? email;
+            if ((0, botFilter_1.isBot)(name, email))
+                continue;
             authorTotals.set(email, (authorTotals.get(email) ?? 0) + count);
         }
     }
@@ -23,7 +26,6 @@ function analyzeBusFactor(fileStatsMap, authorNameMap) {
             continue;
         const sorted = Array.from(authorTotals.entries())
             .sort((a, b) => b[1] - a[1]);
-        // Bus factor = how many top authors account for >50% of all changes
         let cumulative = 0;
         let busFactor = 0;
         const atRiskAuthors = [];
@@ -59,8 +61,6 @@ function analyzeCoupling(commits, minCoChanges = 3) {
         for (const file of files) {
             fileChangeCount.set(file, (fileChangeCount.get(file) ?? 0) + 1);
         }
-        // For every pair of files in this commit, increment their co-change count
-        // Skip commits touching too many files (bulk commits, merges) — they add noise
         if (files.length > 50)
             continue;
         for (let i = 0; i < files.length; i++) {
@@ -76,7 +76,6 @@ function analyzeCoupling(commits, minCoChanges = 3) {
             continue;
         const [fileA, fileB] = key.split('|||');
         const maxChanges = Math.max(fileChangeCount.get(fileA) ?? 1, fileChangeCount.get(fileB) ?? 1);
-        // Coupling score = how often they change together relative to how often each changes
         const couplingScore = Math.round((coChanges / maxChanges) * 1000) / 10;
         results.push({ fileA, fileB, coChanges, couplingScore });
     }
