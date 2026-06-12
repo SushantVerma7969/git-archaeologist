@@ -1,7 +1,7 @@
 {
   "name": "git-archaeologist",
-  "version": "1.10.0",
-  "description": "Find the most dangerous files in any git repo \u2014 curse scores, bus factor, hidden coupling",
+  "version": "1.10.1",
+  "description": "Find the most dangerous files in any git repo — curse scores, bus factor, hidden coupling",
   "main": "dist/index.js",
   "bin": {
     "git-arch": "dist/index.js"
