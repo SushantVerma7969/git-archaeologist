@@ -23,21 +23,21 @@ Works on any git repository. No install required.
 ```
 $ npx git-archaeologist risk .
 
-⛏  git-arch risk — my-project
+⛏  git-arch risk — express
 Maintenance risk map — not an ownership leaderboard
 ──────────────────────────────────────────────────────────────────────
 HIGH RISK
 lib
-Bus Factor: 1   Ownership Concentration: 81.5%   Contributors: 12   Files: 24
-Owner: jane-doe   Last active: 14 months ago
-Reason: Single dominant maintainer (jane-doe) with limited contributor
+Bus Factor: 1   Ownership Concentration: 100%   Contributors: 12   Files: 24
+Owner: Douglas Christopher Wilson   Last active: 14 months ago
+Reason: Single dominant maintainer (Douglas Christopher Wilson) with limited contributor
 redundancy. Dominant owner last committed 14 months ago.
 
 MEDIUM RISK
 api
-Bus Factor: 1   Ownership Concentration: 68.2%   Contributors: 9   Files: 31
-Owner: john-smith   Last active: 6 days ago
-Reason: Ownership concentrated in john-smith, but other contributors exist.
+Bus Factor: 1   Ownership Concentration: 65.3%   Contributors: 9   Files: 31
+Owner: Douglas Christopher Wilson   Last active: 6 days ago
+Reason: Ownership concentrated in Douglas Christopher Wilson, but other contributors exist.
 ```
 
 ## Why ownership concentration alone is misleading
@@ -59,15 +59,13 @@ Same concentration, roughly 65–70%. One has had no single contributor with sus
 
 ## Concepts
 
-The risk map is built from three things, and they only make sense together — which is really the point of the Express/Vue 3 example above.
+**Ownership Concentration** — percent of a folder's commits from its biggest contributor. High isn't inherently bad on its own.
 
-**Ownership Concentration** is just "what percent of this folder's commits came from its biggest contributor." A brand-new module written by one person starts at 100%, and that's completely normal. On its own, this number doesn't tell you much.
+**Bus Factor** — computed per-folder, not per-repo. A repo-wide bus factor of 5 means nothing if your most critical module is bus factor 1.
 
-**Bus Factor** is computed per-folder, not per-repo. A healthy-looking repo-wide number is meaningless if the one folder nobody else touches happens to be the one that breaks.
+**Owner Activity** — when did that dominant contributor last commit anywhere in the repo? This is what separates Express `lib/` (65%, owner gone 2 years) from Vue 3 `packages/` (70%, owner active 4 months ago).
 
-**Owner Activity** is the piece that makes the other two useful: has that dominant contributor committed anywhere in the repo recently? This is exactly what separated Express's `lib/` from Vue 3's `packages/` above — same concentration, but one owner is still around and one isn't.
-
-**HIGH / MEDIUM / LOW** is shorthand for how much attention a scope's combination of concentration and activity warrants. HIGH generally means one inactive owner with little redundancy; LOW means ownership is genuinely shared or actively maintained. Run with `--all` to see every scope, including ones below the threshold.
+**HIGH / MEDIUM / LOW** — concentration + bus factor + activity combined. HIGH means one inactive owner with little redundancy. Run `--all` to see every scope.
 
 ## Known limitations
 
