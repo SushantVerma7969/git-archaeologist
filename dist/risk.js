@@ -41,6 +41,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const path = __importStar(require("path"));
 const orchestrator_1 = require("./core/orchestrator");
 const botFilter_1 = require("./utils/botFilter");
+const activity_1 = require("./utils/activity");
 function parseSince(input) {
     const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
     if (match) {
@@ -84,6 +85,16 @@ function registerRiskCommand(program) {
             }
             const bfMap = new Map(result.busFactor.map((b) => [b.scope, b]));
             const risks = [];
+            // Build a name -> email map from ownership contributor data,
+            // so we can look up lastActiveByAuthor (keyed by email) for a
+            // given display name (as stored in atRiskAuthors).
+            const nameToEmail = new Map();
+            for (const o of result.ownership) {
+                for (const c of o.contributors) {
+                    if (!nameToEmail.has(c.name))
+                        nameToEmail.set(c.name, c.email);
+                }
+            }
             for (const [folder, authorTotals] of folderAuthorChanges) {
                 const bf = bfMap.get(folder);
                 if (!bf)
@@ -114,6 +125,16 @@ function registerRiskCommand(program) {
                     level = 'LOW';
                     reason = `Ownership reasonably distributed across ${contributors} contributors.`;
                 }
+                const ownerEmail = nameToEmail.get(topOwner);
+                const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
+                let lastActive;
+                if (lastActiveTs !== undefined) {
+                    lastActive = (0, activity_1.formatTimeAgo)(lastActiveTs);
+                    const monthsAgo = (Date.now() / 1000 - lastActiveTs) / (86400 * 30);
+                    if (monthsAgo > 18) {
+                        reason += ` Dominant owner last committed ${lastActive}.`;
+                    }
+                }
                 risks.push({
                     scope: folder,
                     level,
@@ -123,6 +144,7 @@ function registerRiskCommand(program) {
                     topOwner,
                     filesAtRisk: bf.filesAtRisk,
                     reason,
+                    lastActive,
                 });
             }
             const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
@@ -141,6 +163,9 @@ function registerRiskCommand(program) {
                 console.log(color.bold(`  ${r.level} RISK`));
                 console.log(`  ${chalk_1.default.cyan(r.scope)}`);
                 console.log(`  Bus Factor: ${chalk_1.default.bold(String(r.busFactor))}   Ownership Concentration: ${chalk_1.default.bold(r.concentration + '%')}   Contributors: ${r.contributors}   Files: ${r.filesAtRisk}`);
+                if (r.lastActive) {
+                    console.log(`  Owner: ${chalk_1.default.cyan(r.topOwner)}   Last active: ${chalk_1.default.bold(r.lastActive)}`);
+                }
                 console.log(chalk_1.default.grey(`  Reason: ${r.reason}`));
                 console.log();
             }

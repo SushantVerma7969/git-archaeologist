@@ -9,6 +9,7 @@ const gitParser_1 = require("./gitParser");
 const curseScorer_1 = require("../analyzers/curseScorer");
 const ownershipAnalyzer_1 = require("../analyzers/ownershipAnalyzer");
 const busFactorAnalyzer_1 = require("../analyzers/busFactorAnalyzer");
+const activity_1 = require("../utils/activity");
 async function analyze(repoPath, since) {
     const spinner = (0, ora_1.default)({ text: 'Validating repository...', color: 'magenta' }).start();
     try {
@@ -40,6 +41,7 @@ async function analyze(repoPath, since) {
         const maxTs = allTimestamps.length > 0 ? allTimestamps.reduce((a, b) => a > b ? a : b) : 0;
         // Step 7 — count unique authors
         const allAuthors = new Set(commits.map((c) => c.authorEmail));
+        const lastActiveByAuthor = (0, activity_1.buildLastActiveMap)(commits);
         spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
         return {
             repoPath,
@@ -57,6 +59,7 @@ async function analyze(repoPath, since) {
             busFactor,
             coupling,
             fileStats,
+            lastActiveByAuthor,
         };
     }
     catch (err) {
