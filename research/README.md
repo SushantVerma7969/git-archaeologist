@@ -29,11 +29,11 @@ Each file contains the full analysis output including cursed files array, bus fa
 - **tensorflow**: `bb81f08af80dcfab8e5eca338dfeaa6229b6acdd`
 - **vite**: `689a0669ad926461f3f1b81701cb6c01f7b2bd4a`
 - **vscode**: `ddba262fb781af40477e24d5fed51f421f909a99`
-- **vue3**: `48ad452dd61926a59e358da3c74c5ef750ae21c4`
+- **vue2**: `9e88707940088cb1f4cd7dd210c9168a50dc347c`
+- **vue3**: `478e3e83acd34dd213a860be4a2a2bf2090dc26b`
 
 ## Notes
 - **elasticsearch**, **kubernetes**, and **vscode** were analyzed but their JSON outputs exceed GitHub's 100MB file size limit and are not hosted here. The analysis data is available on request.
-- **vue2** was not analyzed separately; vue3 covers the current Vue codebase.
 
 ## Reproduce
 
