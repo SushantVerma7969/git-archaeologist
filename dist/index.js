@@ -48,6 +48,7 @@ const trend_1 = require("./trend");
 const blast_1 = require("./blast");
 const ownership_1 = require("./ownership");
 const pr_risk_1 = require("./pr-risk");
+const risk_1 = require("./risk");
 function parseSince(input) {
     // Accept: 90d, 30days, 6months, 1year, or ISO date like 2024-01-01
     const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
@@ -155,5 +156,6 @@ program
 (0, blast_1.registerBlastCommand)(program);
 (0, ownership_1.registerOwnershipCommand)(program);
 (0, pr_risk_1.registerPrRiskCommand)(program);
+(0, risk_1.registerRiskCommand)(program);
 program.parse(process.argv);
 //# sourceMappingURL=index.js.map

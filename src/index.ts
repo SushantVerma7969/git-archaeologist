@@ -10,6 +10,7 @@ import { registerTrendCommand } from './trend';
 import { registerBlastCommand } from './blast';
 import { registerOwnershipCommand } from './ownership';
 import { registerPrRiskCommand } from './pr-risk';
+import { registerRiskCommand } from './risk';
 
 
 function parseSince(input: string): string {
@@ -122,4 +123,5 @@ registerTrendCommand(program);
 registerBlastCommand(program);
 registerOwnershipCommand(program);
 registerPrRiskCommand(program);
+registerRiskCommand(program);
 program.parse(process.argv);
