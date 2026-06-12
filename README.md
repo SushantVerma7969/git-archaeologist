@@ -1,51 +1,103 @@
 # git-archaeologist
 
-## Demo
-
-[![git-archaeologist demo](https://img.youtube.com/vi/NKVN00Dj6YA/maxresdefault.jpg)](https://youtu.be/NKVN00Dj6YA)
-
-> 2-minute demo running git-archaeologist on the Express.js repository.
-
-![HTML report — interactive risk heatmap](./preview.png)
-
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
 
-> Before you touch a file, know its blast radius, its curse score, and who will be left holding it when something breaks.
+**Find out who actually owns your code, and whether that's still true.**
 
-## 📊 State of OSS Maintainability 2026
-We analyzed 26 major OSS repositories — 438,904 files, 26/26 had at least one bus factor 1 module.
-👉 **[Read the full report](https://sushantverma7969.github.io/git-archaeologist/)**
+git-archaeologist reads your git history and tells you which parts of your codebase are concentrated in one person's hands — and, critically, whether that person is still around. A directory that's 70% owned by someone who committed last week is a completely different situation than one that's 70% owned by someone who hasn't committed in two years. Most ownership tools can't tell you which one you're looking at. This one can.
 
-[Install](#install) · [Usage](#usage) · [What it finds](#what-it-finds) · [How scoring works](#how-scoring-works) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
+[Quick Start](#quick-start) · [Concepts](#concepts) · [Commands](#commands) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 ---
 
-You inherit a codebase. You touch a file. Three things break that had no visible connection.
+## Quick Start
 
-Most tools show you the code. This one shows you the history behind the code — which files are getting more dangerous, what breaks when you touch something, who truly owns what, and which modules will be orphaned the day one person leaves.
+```bash
+npx git-archaeologist risk .
+```
+
+Works on any git repository. No install required.
+
+## Example output
+
+```
+$ npx git-archaeologist risk .
+
+⛏  git-arch risk — my-project
+Maintenance risk map — not an ownership leaderboard
+──────────────────────────────────────────────────────────────────────
+HIGH RISK
+lib
+Bus Factor: 1   Ownership Concentration: 81.5%   Contributors: 12   Files: 24
+Owner: jane-doe   Last active: 14 months ago
+Reason: Single dominant maintainer (jane-doe) with limited contributor
+redundancy. Dominant owner last committed 14 months ago.
+
+MEDIUM RISK
+api
+Bus Factor: 1   Ownership Concentration: 68.2%   Contributors: 9   Files: 31
+Owner: john-smith   Last active: 6 days ago
+Reason: Ownership concentrated in john-smith, but other contributors exist.
+```
+
+## Why ownership concentration alone is misleading
+
+We ran `git-arch risk` on two well-known projects and found nearly identical ownership numbers — with completely different stories underneath.
+
+**Express.js — `lib/`**
+- 65.3% of changes attributed to one long-time contributor
+- 91 contributors total
+- That contributor hasn't committed anywhere in the repo for **2 years**
+- In the last 6 months, 5 different people made exactly 1 commit each — no clear successor
+
+**Vue 3 — `packages/`**
+- 70.7% of changes attributed to Evan You
+- 384 contributors total
+- Evan You committed **4 months ago**
+
+Same concentration, roughly 65–70%. One looks like a module nobody currently understands well; the other looks like normal founder-led maintenance. The number alone can't tell you which — that's why `git-arch risk` reports **Ownership Concentration** and **Owner Activity** together.
+
+## Concepts
+
+**Ownership Concentration** — what percentage of a scope's changes (by commit count) come from its single largest contributor. High concentration isn't inherently bad — it's only one half of the picture.
+
+**Bus Factor** — how many people would need to disappear before a scope has no one with deep familiarity. `git-arch` computes this per-folder, not per-repo — a repo-wide bus factor of 5 is meaningless if your most critical module is bus factor 1.
+
+**Owner Activity Status** — for each flagged scope, when did the dominant owner last commit *anywhere in the repo* (not just that scope). This is the signal that turns "62% concentration" into either "62%, and they're still active" or "62%, and they've been gone for 2 years" — two very different risk profiles with the same raw number.
+
+**HIGH / MEDIUM / LOW risk levels** — derived from ownership concentration and bus factor per scope:
+- **HIGH** — bus factor 1 and concentration ≥ 80%
+- **MEDIUM** — bus factor 1 and concentration 50–80%, with meaningful contributor diversity
+- **LOW** — bus factor ≥ 2, or concentration spread across multiple active contributors
+
+(Exact thresholds may be tuned over time — run `--all` to see every scope regardless of level.)
+
+## Known limitations
+
+- Commit authorship ≠ knowledge ownership. Someone can deeply understand code they rarely commit to.
+- **Owner Activity Status helps here** — but it only sees commits, not reviews, PR approvals, or informal triage.
+- Squash merges can distort concentration scores.
+- PR reviewers and approvers are not currently considered (see Roadmap).
+- Git history is one signal among several — use it as a starting point for questions, not a final verdict.
 
 ## Install
+
+For repeated use:
 
 ```bash
 npm install -g git-archaeologist
 ```
 
-Then run it on any repository:
+## Commands
 
 ```bash
-git-arch analyze /path/to/repo
-```
-
-## Usage
-
-```bash
-git-arch analyze /path/to/repo
+git-arch risk /path/to/repo                    # ownership/maintenance risk map (start here)
+git-arch risk /path/to/repo --all              # show every scope, including LOW risk
+git-arch analyze /path/to/repo                 # full analysis: curse scores, coupling, ownership
 git-arch analyze /path/to/repo --since 90d     # only last 90 days of commits
 git-arch analyze /path/to/repo --since 2y      # only last 2 years
-git-arch analyze /path/to/repo --since 2024-01-01  # since a specific date
 git-arch analyze /path/to/repo --html          # dark-themed interactive report
 git-arch cursed --top 10                       # just the danger ranking
-git-arch cursed --top 10 --since 1y /path/to/repo  # danger ranking, recent only
 git-arch analyze /path/to/repo --json          # pipe into other tools
 git-arch blame lib/response.js /path/to/repo   # deep dive on one file
 git-arch trend /path/to/repo                   # which files are getting more dangerous
@@ -54,7 +106,9 @@ git-arch ownership /path/to/repo               # who owns what — folder breakd
 git-arch pr-risk /path/to/repo                 # score your changes before pushing
 ```
 
-## Example output
+## Deeper analysis: curse score & coupling
+
+`git-arch analyze` goes beyond the risk map — it ranks individual files by **curse score** (a combination of recency, author churn, and acceleration) and detects **implicit coupling** (files that always change together despite no code-level connection).
 
 ```
 $ git-arch analyze ./express
@@ -66,35 +120,11 @@ CURSE SCORE — top files by risk
   2. lib/router/index.js    score 1891   41 authors   109 changes
   3. lib/application.js     score 1204   38 authors    87 changes
 
-BUS FACTOR
-  lib/        → 1  (dougwilson owns 71%)
-  test/       → 1  (dougwilson owns 68%)
-
 IMPLICIT COUPLING
   benchmarks/Makefile ↔ benchmarks/run   co-commit rate: 100%
 ```
 
 > Run time: Express ~3 seconds · Kubernetes (99k files) ~3 minutes
-
-## What it finds
-
-Curse score — not just most changed. A file touched 100 times in 6 months by 15 people who never talked scores way higher than one touched 200 times over a decade by the same person. Recency, author chaos, churn rate, and acceleration combined into one number. Changelogs and lockfiles are automatically excluded — only real source files show up.
-
-Bus factor per folder — not per repo. Knowing the whole repo has bus factor 2 is useless. Knowing lib/ is orphaned the day one person leaves is something you can act on.
-
-Implicit coupling — files that always change together in the same commit even though nothing in the code connects them. These are your hidden dependencies.
-
-Ownership — who owns the lines alive in HEAD right now, not who created the file or who committed last.
-
-## Tested on Express.js
-
-Express is one of the most downloaded npm packages in history. 230 contributors. 16 years old.
-
-Running git-archaeologist on it takes 3 seconds and finds:
-
-- `lib/response.js` — 128 changes, 53 different authors, curse score 2261. The core HTTP response logic of the framework has been touched by 53 people and nobody fully owns it.
-- Bus factor across every module (lib/, test/, examples/, benchmarks/) is 1. One person. The entire project depends on Douglas Christopher Wilson continuing to show up.
-- `benchmarks/Makefile` and `benchmarks/run` have been committed together 100% of the time. They have never changed separately. They are one file.
 
 ## How scoring works
 
@@ -102,28 +132,21 @@ Running git-archaeologist on it takes 3 seconds and finds:
 curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rate+2) x acceleration
 ```
 
-The exponential decay on age means old chaos that stabilized does not show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config files are automatically excluded so the list shows real source files.
+The exponential decay on age means old chaos that stabilized doesn't show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config are automatically excluded.
 
-## Why not git log?
+## Why not `git log`?
 
 `git log` tells you what happened. `git-archaeologist` tells you where the risk is.
 
 - Finds bus-factor-1 modules automatically across every folder
-- Detects ownership concentration before it becomes a problem
+- Pairs ownership concentration with owner activity to distinguish healthy concentration from abandonment
 - Surfaces files becoming more dangerous over time
 - Discovers hidden coupling through commit co-occurrence
 - Generates interactive HTML reports for large repositories
 
-Instead of reading thousands of commits manually, you get a ranked view of the parts of a codebase most likely to cause trouble.
+## GitHub Action (advanced)
 
-## Requirements
-
-Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
-
-
-## GitHub Action
-
-Add this to any repo to get automatic analysis on every push:
+For automatic curse-score analysis on every push or PR:
 
 ```yaml
 # .github/workflows/git-archaeologist.yml
@@ -144,10 +167,27 @@ jobs:
         with:
           top: 10
           since: 1y
+          fail-on-curse-score: 0
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-`fetch-depth: 0` is required — without full history the analysis is incomplete.
+`fetch-depth: 0` is required — without full history the analysis is incomplete. The Action currently reports curse-score findings (most dangerous files); it does not yet run the `risk` ownership/activity analysis.
+
+## Demo & deep dives
+
+[![git-archaeologist demo](https://img.youtube.com/vi/NKVN00Dj6YA/maxresdefault.jpg)](https://youtu.be/NKVN00Dj6YA)
+
+> 2-minute demo running git-archaeologist on the Express.js repository.
+
+![HTML report — interactive risk heatmap](./preview.png)
+
+**State of OSS Maintainability 2026** — we analyzed 26 major OSS repositories (438,904 files). 26/26 had at least one bus-factor-1 module. [Read the full report](https://sushantverma7969.github.io/git-archaeologist/)
+
+See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
+
+## Requirements
+
+Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
 
 ## Contributing
 
@@ -162,15 +202,8 @@ node dist/index.js analyze /any/repo
 
 [MIT](LICENSE)
 
-
-## Known limitations
-- Commit authorship ≠ knowledge ownership
-- Squash merges can distort concentration scores
-- PR reviewers and code reviewers are not considered
-- Analysis window cap on some repos (see report)
-- Git history is one signal among many
-
 ## Roadmap
-- [ ] PR reviewer/approver data (v2)
-- [ ] Full history mode — remove commit window cap (v2)
-- [ ] Rename metric away from "bus factor" (v2)
+
+- [ ] PR reviewer/approver data
+- [ ] Full history mode — remove commit window cap
+- [ ] Extend GitHub Action to report `risk`/Owner Activity findings, not just curse score
