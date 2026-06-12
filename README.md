@@ -55,22 +55,19 @@ We ran `git-arch risk` on two well-known projects and found nearly identical own
 - 384 contributors total
 - Evan You committed **4 months ago**
 
-Same concentration, roughly 65–70%. One looks like a module nobody currently understands well; the other looks like normal founder-led maintenance. The number alone can't tell you which — that's why `git-arch risk` reports **Ownership Concentration** and **Owner Activity** together.
+Same concentration, roughly 65–70%. One has had no single contributor with sustained recent involvement; the other has its original dominant contributor still actively committing. The number alone can't tell you which — that's why `git-arch risk` reports **Ownership Concentration** and **Owner Activity** together.
 
 ## Concepts
 
-**Ownership Concentration** — what percentage of a scope's changes (by commit count) come from its single largest contributor. High concentration isn't inherently bad — it's only one half of the picture.
+The risk map is built from three things, and they only make sense together — which is really the point of the Express/Vue 3 example above.
 
-**Bus Factor** — how many people would need to disappear before a scope has no one with deep familiarity. `git-arch` computes this per-folder, not per-repo — a repo-wide bus factor of 5 is meaningless if your most critical module is bus factor 1.
+**Ownership Concentration** is just "what percent of this folder's commits came from its biggest contributor." A brand-new module written by one person starts at 100%, and that's completely normal. On its own, this number doesn't tell you much.
 
-**Owner Activity Status** — for each flagged scope, when did the dominant owner last commit *anywhere in the repo* (not just that scope). This is the signal that turns "62% concentration" into either "62%, and they're still active" or "62%, and they've been gone for 2 years" — two very different risk profiles with the same raw number.
+**Bus Factor** is computed per-folder, not per-repo. A healthy-looking repo-wide number is meaningless if the one folder nobody else touches happens to be the one that breaks.
 
-**HIGH / MEDIUM / LOW risk levels** — derived from ownership concentration and bus factor per scope:
-- **HIGH** — bus factor 1 and concentration ≥ 80%
-- **MEDIUM** — bus factor 1 and concentration 50–80%, with meaningful contributor diversity
-- **LOW** — bus factor ≥ 2, or concentration spread across multiple active contributors
+**Owner Activity** is the piece that makes the other two useful: has that dominant contributor committed anywhere in the repo recently? This is exactly what separated Express's `lib/` from Vue 3's `packages/` above — same concentration, but one owner is still around and one isn't.
 
-(Exact thresholds may be tuned over time — run `--all` to see every scope regardless of level.)
+**HIGH / MEDIUM / LOW** is shorthand for how much attention a scope's combination of concentration and activity warrants. HIGH generally means one inactive owner with little redundancy; LOW means ownership is genuinely shared or actively maintained. Run with `--all` to see every scope, including ones below the threshold.
 
 ## Known limitations
 
