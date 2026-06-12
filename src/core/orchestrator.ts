@@ -10,6 +10,7 @@ import {
 import { scoreCursedFiles } from '../analyzers/curseScorer';
 import { analyzeOwnership, buildAuthorNameMap } from '../analyzers/ownershipAnalyzer';
 import { analyzeBusFactor, analyzeCoupling } from '../analyzers/busFactorAnalyzer';
+import { buildLastActiveMap } from '../utils/activity';
 
 export async function analyze(repoPath: string, since?: string): Promise<AnalysisResult> {
   const spinner = ora({ text: 'Validating repository...', color: 'magenta' }).start();
@@ -53,6 +54,7 @@ export async function analyze(repoPath: string, since?: string): Promise<Analysi
 
     // Step 7 — count unique authors
     const allAuthors = new Set(commits.map((c) => c.authorEmail));
+    const lastActiveByAuthor = buildLastActiveMap(commits);
 
     spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
 
@@ -72,6 +74,7 @@ export async function analyze(repoPath: string, since?: string): Promise<Analysi
       busFactor,
       coupling,
       fileStats,
+      lastActiveByAuthor,
     };
   } catch (err) {
     spinner.fail('Analysis failed');

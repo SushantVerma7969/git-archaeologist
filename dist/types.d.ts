@@ -64,5 +64,6 @@ export interface AnalysisResult {
     busFactor: BusFactor[];
     coupling: CouplingPair[];
     fileStats: Map<string, FileStats>;
+    lastActiveByAuthor: Map<string, number>;
 }
 //# sourceMappingURL=types.d.ts.map
