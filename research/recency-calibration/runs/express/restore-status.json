@@ -10,5 +10,7 @@
   "exitCode": 0,
   "signal": null,
   "stdout": "",
-  "stderr": "HEAD is now at dae209a build(deps): bump github/codeql-action from 4.35.1 to 4.35.2 (#7212)\n"
+  "stderr": "HEAD is now at dae209a build(deps): bump github/codeql-action from 4.35.1 to 4.35.2 (#7212)\n",
+  "restoreTargetType": "head",
+  "restoreTarget": "dae209ae6559c29cfca2a1f4414c51d89ea643d5"
 }

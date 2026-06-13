@@ -1,7 +1,7 @@
 {
   "repoPath": "/home/sushantv/express",
   "repoName": "express",
-  "analyzedAt": "2026-06-13T07:20:57.021Z",
+  "analyzedAt": "2026-06-13T07:50:44.725Z",
   "totalCommits": 83,
   "totalFiles": 43,
   "totalAuthors": 28,
@@ -12,7 +12,7 @@
   "cursedFiles": [
     {
       "filepath": "test/req.query.js",
-      "curseScore": 31.3,
+      "curseScore": 31.29,
       "totalChanges": 2,
       "uniqueAuthors": 2,
       "recencyWeight": 0.77,

@@ -74,6 +74,17 @@ function requireSuccess(label, result) {
   }
 }
 
+function restoreRepository(repoPath, outputDir, originalBranch, originalHeadSha) {
+  const target = originalBranch || originalHeadSha;
+  const result = run('git', ['-C', repoPath, 'checkout', target]);
+  writeJson(path.join(outputDir, 'restore-status.json'), {
+    ...result,
+    restoreTargetType: originalBranch ? 'branch' : 'head',
+    restoreTarget: target,
+  });
+  requireSuccess('restore', result);
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   ensureRequired(args);
@@ -88,89 +99,105 @@ function main() {
   fs.mkdirSync(outputDir, { recursive: true });
 
   const commands = {};
+  let originalBranch = '';
+  let originalHeadSha = '';
 
-  commands.checkout = run('git', ['-C', repoPath, 'checkout', repoSha]);
-  writeJson(path.join(outputDir, 'checkout-status.json'), commands.checkout);
-  requireSuccess('checkout', commands.checkout);
+  commands.originalBranch = run('git', ['-C', repoPath, 'branch', '--show-current']);
+  requireSuccess('originalBranch', commands.originalBranch);
+  originalBranch = commands.originalBranch.stdout.trim();
 
-  commands.repositorySha = run('git', ['-C', repoPath, 'rev-parse', 'HEAD']);
-  commands.repositoryStatus = run('git', ['-C', repoPath, 'status', '--short']);
-  commands.toolSha = run('git', ['-C', toolRoot, 'rev-parse', 'HEAD']);
-  commands.gitVersion = run('git', ['--version']);
-  commands.nodeVersion = run('node', ['--version']);
-  commands.toolVersion = run('node', [path.join(toolRoot, 'dist/index.js'), '--version']);
+  commands.originalHeadSha = run('git', ['-C', repoPath, 'rev-parse', 'HEAD']);
+  requireSuccess('originalHeadSha', commands.originalHeadSha);
+  originalHeadSha = commands.originalHeadSha.stdout.trim();
 
-  for (const [label, result] of Object.entries(commands)) {
-    if (label === 'checkout') continue;
-    requireSuccess(label, result);
-  }
+  try {
+    commands.checkout = run('git', ['-C', repoPath, 'checkout', repoSha]);
+    writeJson(path.join(outputDir, 'checkout-status.json'), commands.checkout);
+    requireSuccess('checkout', commands.checkout);
 
-  const metadata = {
-    repository: repoName,
-    repositoryPath: repoPath,
-    requestedRepositorySha: repoSha,
-    repositorySha: commands.repositorySha.stdout.trim(),
-    repositoryStatus: commands.repositoryStatus.stdout,
-    toolSha: commands.toolSha.stdout.trim(),
-    toolVersion: commands.toolVersion.stdout.trim(),
-    nodeVersion: commands.nodeVersion.stdout.trim(),
-    gitVersion: commands.gitVersion.stdout.trim(),
-    executionDate: new Date().toISOString(),
-    cutoffDate,
-  };
-  writeJson(path.join(outputDir, 'metadata.json'), metadata);
+    commands.repositorySha = run('git', ['-C', repoPath, 'rev-parse', 'HEAD']);
+    commands.repositoryStatus = run('git', ['-C', repoPath, 'status', '--short']);
+    commands.toolSha = run('git', ['-C', toolRoot, 'rev-parse', 'HEAD']);
+    commands.gitVersion = run('git', ['--version']);
+    commands.nodeVersion = run('node', ['--version']);
+    commands.toolVersion = run('node', [path.join(toolRoot, 'dist/index.js'), '--version']);
 
-  const analysisEnv = {
-    ...process.env,
-    TZ: 'UTC',
-    LC_ALL: 'C',
-  };
-  const cli = path.join(toolRoot, 'dist/index.js');
-  const commandSpecs = [
-    {
-      label: 'lifetime-analysis',
-      args: [cli, 'analyze', repoPath, '--json'],
-      stdoutFile: 'lifetime-analysis.json',
-    },
-    {
-      label: 'recent-analysis',
-      args: [cli, 'analyze', repoPath, '--since', cutoffDate, '--json'],
-      stdoutFile: 'recent-analysis.json',
-    },
-    {
-      label: 'lifetime-risk',
-      args: [cli, 'risk', repoPath, '--all'],
-      stdoutFile: 'lifetime-risk.txt',
-    },
-    {
-      label: 'recent-risk',
-      args: [cli, 'risk', repoPath, '--all', '--since', cutoffDate],
-      stdoutFile: 'recent-risk.txt',
-    },
-  ];
+    for (const [label, result] of Object.entries(commands)) {
+      if (['checkout', 'originalBranch', 'originalHeadSha'].includes(label)) continue;
+      requireSuccess(label, result);
+    }
 
-  const statuses = [];
-  for (const spec of commandSpecs) {
-    const result = run('node', spec.args, { cwd: toolRoot, env: analysisEnv });
-    writeText(path.join(outputDir, spec.stdoutFile), result.stdout);
-    writeText(path.join(outputDir, `${spec.label}.stderr.txt`), result.stderr);
-    const status = {
-      label: spec.label,
-      command: ['node', ...spec.args],
-      cwd: toolRoot,
-      exitCode: result.exitCode,
-      signal: result.signal,
-      error: result.error,
-      stdoutFile: spec.stdoutFile,
-      stderrFile: `${spec.label}.stderr.txt`,
+    const metadata = {
+      repository: repoName,
+      repositoryPath: repoPath,
+      requestedRepositorySha: repoSha,
+      repositorySha: commands.repositorySha.stdout.trim(),
+      repositoryStatus: commands.repositoryStatus.stdout,
+      originalBranch,
+      originalHeadSha,
+      toolSha: commands.toolSha.stdout.trim(),
+      toolVersion: commands.toolVersion.stdout.trim(),
+      nodeVersion: commands.nodeVersion.stdout.trim(),
+      gitVersion: commands.gitVersion.stdout.trim(),
+      executionDate: new Date().toISOString(),
+      cutoffDate,
     };
-    statuses.push(status);
-    writeJson(path.join(outputDir, `${spec.label}-status.json`), status);
-    requireSuccess(spec.label, result);
-  }
+    writeJson(path.join(outputDir, 'metadata.json'), metadata);
 
-  writeJson(path.join(outputDir, 'command-status.json'), statuses);
-  console.log(outputDir);
+    const analysisEnv = {
+      ...process.env,
+      TZ: 'UTC',
+      LC_ALL: 'C',
+    };
+    const cli = path.join(toolRoot, 'dist/index.js');
+    const commandSpecs = [
+      {
+        label: 'lifetime-analysis',
+        args: [cli, 'analyze', repoPath, '--json'],
+        stdoutFile: 'lifetime-analysis.json',
+      },
+      {
+        label: 'recent-analysis',
+        args: [cli, 'analyze', repoPath, '--since', cutoffDate, '--json'],
+        stdoutFile: 'recent-analysis.json',
+      },
+      {
+        label: 'lifetime-risk',
+        args: [cli, 'risk', repoPath, '--all'],
+        stdoutFile: 'lifetime-risk.txt',
+      },
+      {
+        label: 'recent-risk',
+        args: [cli, 'risk', repoPath, '--all', '--since', cutoffDate],
+        stdoutFile: 'recent-risk.txt',
+      },
+    ];
+
+    const statuses = [];
+    for (const spec of commandSpecs) {
+      const result = run('node', spec.args, { cwd: toolRoot, env: analysisEnv });
+      writeText(path.join(outputDir, spec.stdoutFile), result.stdout);
+      writeText(path.join(outputDir, `${spec.label}.stderr.txt`), result.stderr);
+      const status = {
+        label: spec.label,
+        command: ['node', ...spec.args],
+        cwd: toolRoot,
+        exitCode: result.exitCode,
+        signal: result.signal,
+        error: result.error,
+        stdoutFile: spec.stdoutFile,
+        stderrFile: `${spec.label}.stderr.txt`,
+      };
+      statuses.push(status);
+      writeJson(path.join(outputDir, `${spec.label}-status.json`), status);
+      requireSuccess(spec.label, result);
+    }
+
+    writeJson(path.join(outputDir, 'command-status.json'), statuses);
+    console.log(outputDir);
+  } finally {
+    restoreRepository(repoPath, outputDir, originalBranch, originalHeadSha);
+  }
 }
 
 try {

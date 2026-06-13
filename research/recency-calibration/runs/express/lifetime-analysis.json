@@ -1,7 +1,7 @@
 {
   "repoPath": "/home/sushantv/express",
   "repoName": "express",
-  "analyzedAt": "2026-06-13T07:20:56.878Z",
+  "analyzedAt": "2026-06-13T07:50:44.586Z",
   "totalCommits": 1716,
   "totalFiles": 312,
   "totalAuthors": 230,
@@ -12,7 +12,7 @@
   "cursedFiles": [
     {
       "filepath": "lib/response.js",
-      "curseScore": 2228.76,
+      "curseScore": 2228.7,
       "totalChanges": 128,
       "uniqueAuthors": 53,
       "recencyWeight": 0.82,
@@ -25,7 +25,7 @@
     },
     {
       "filepath": "lib/request.js",
-      "curseScore": 828.22,
+      "curseScore": 828.2,
       "totalChanges": 47,
       "uniqueAuthors": 17,
       "recencyWeight": 0.82,
@@ -38,7 +38,7 @@
     },
     {
       "filepath": "lib/application.js",
-      "curseScore": 605.41,
+      "curseScore": 605.4,
       "totalChanges": 58,
       "uniqueAuthors": 22,
       "recencyWeight": 0.83,
@@ -51,7 +51,7 @@
     },
     {
       "filepath": "test/utils.js",
-      "curseScore": 344.27,
+      "curseScore": 344.26,
       "totalChanges": 28,
       "uniqueAuthors": 10,
       "recencyWeight": 0.83,
@@ -75,7 +75,7 @@
     },
     {
       "filepath": "lib/utils.js",
-      "curseScore": 202.28,
+      "curseScore": 202.27,
       "totalChanges": 47,
       "uniqueAuthors": 19,
       "recencyWeight": 0.77,
@@ -86,7 +86,7 @@
     },
     {
       "filepath": "Contributing.md",
-      "curseScore": 184.64,
+      "curseScore": 184.63,
       "totalChanges": 33,
       "uniqueAuthors": 15,
       "recencyWeight": 0.6,
@@ -97,7 +97,7 @@
     },
     {
       "filepath": "test/res.jsonp.js",
-      "curseScore": 169.85,
+      "curseScore": 169.84,
       "totalChanges": 21,
       "uniqueAuthors": 9,
       "recencyWeight": 0.85,
@@ -110,7 +110,7 @@
     },
     {
       "filepath": "test/Router.js",
-      "curseScore": 128.65,
+      "curseScore": 128.64,
       "totalChanges": 32,
       "uniqueAuthors": 11,
       "recencyWeight": 0.49,
@@ -133,7 +133,7 @@
     },
     {
       "filepath": "test/res.location.js",
-      "curseScore": 121.96,
+      "curseScore": 121.95,
       "totalChanges": 17,
       "uniqueAuthors": 8,
       "recencyWeight": 0.85,
