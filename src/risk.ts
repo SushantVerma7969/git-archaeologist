@@ -2,8 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
 import { analyze } from './core/orchestrator';
-import { isBot } from './utils/botFilter';
-import { formatTimeAgo } from './utils/activity';
+import { buildScopeRisks, buildTemporalScopeRisks } from './riskExplanation';
 
 function parseSince(input: string): string {
   const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
@@ -19,118 +18,78 @@ function parseSince(input: string): string {
   return input;
 }
 
-interface ScopeRisk {
-  scope: string;
-  level: 'HIGH' | 'MEDIUM' | 'LOW';
-  busFactor: number;
-  concentration: number;
-  contributors: number;
-  totalFileTouches: number;
-  topOwner: string;
-  filesAtRisk: number;
-  whyClassified: string[];
-  lastActive?: string;
-}
-
 export function registerRiskCommand(program: Command): void {
   program
     .command('risk [repoPath]')
     .description('Identify maintenance risk areas — risk map, not a leaderboard')
     .option('-s, --since <date>', 'Only analyze commits after this date')
     .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
-    .action(async (repoPath: string | undefined, options: { since?: string; all?: boolean }) => {
+    .option('--temporal', 'Compare lifetime risk with the last 12 months')
+    .action(async (repoPath: string | undefined, options: { since?: string; all?: boolean; temporal?: boolean }) => {
       const resolvedPath = path.resolve(repoPath ?? '.');
       const since = options.since ? parseSince(options.since) : undefined;
 
       try {
+        if (options.temporal) {
+          if (options.since) {
+            console.error(chalk.red('\n  ✖  Error: ') + '--since cannot be used with --temporal. Temporal risk uses a fixed 12-month recent window.');
+            process.exit(1);
+          }
+
+          const recentSince = parseSince('12m');
+          const lifetimeResult = await analyze(resolvedPath);
+          const recentResult = await analyze(resolvedPath, recentSince);
+          const temporalRisks = buildTemporalScopeRisks(lifetimeResult, recentResult);
+
+          console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
+          console.log(` ${chalk.bold.white('⛏  git-arch risk --temporal')} — ${chalk.grey(resolvedPath.split('/').pop())}`);
+          console.log(chalk.grey('  Lifetime vs recent ownership concentration'));
+          console.log(chalk.grey(`  Recent window: since ${recentSince} (12 months)`));
+          console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
+
+          if (temporalRisks.length === 0) {
+            console.log(chalk.green('  ✓ No eligible lifetime scopes found.\n'));
+          }
+
+          for (const r of temporalRisks) {
+            const color =
+              r.category === 'Persistent concentration' || r.category === 'Emerging concentration'
+                ? chalk.red
+                : r.category === 'Historical concentration'
+                  ? chalk.yellow
+                  : chalk.green;
+            console.log(color.bold(`  ${r.category}`));
+            console.log(`  ${chalk.cyan(r.scope)}`);
+            console.log(
+              `  Lifetime: ${chalk.bold(r.lifetime.level)} risk, `
+              + `${chalk.bold(r.lifetime.concentration + '%')} concentration, `
+              + `bus factor ${chalk.bold(String(r.lifetime.busFactor))}`
+            );
+            if (r.category === 'No recent activity' || r.category === 'Insufficient recent evidence') {
+              console.log(`  Recent:   ${chalk.bold(String(r.recentTouches))} non-bot file touches`);
+            } else if (r.recent) {
+              console.log(
+                `  Recent:   ${chalk.bold(r.recent.level)} risk, `
+                + `${chalk.bold(r.recent.concentration + '%')} concentration, `
+                + `bus factor ${chalk.bold(String(r.recent.busFactor))}`
+              );
+            } else {
+              console.log(`  Recent:   ${chalk.bold(String(r.recentTouches))} non-bot file touches`);
+            }
+            console.log(chalk.grey(`  ${r.summary}`));
+            console.log();
+          }
+
+          console.log(chalk.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));
+          console.log(chalk.grey('  Recent scopes with 1-9 non-bot touches are marked insufficient recent evidence.'));
+          console.log(chalk.grey('  These signals do not prove ownership, expertise, or maintainership.'));
+          console.log();
+          console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
+          return;
+        }
+
         const result = await analyze(resolvedPath, since);
-
-        // Aggregate per top-level folder: total changes per author
-        const folderAuthorChanges = new Map<string, Map<string, number>>();
-        for (const [, stats] of result.fileStats) {
-          const parts = stats.filepath.split('/');
-          const folder = parts.length > 1 ? parts[0] : '(root)';
-          if (!folderAuthorChanges.has(folder)) folderAuthorChanges.set(folder, new Map());
-          const authorTotals = folderAuthorChanges.get(folder)!;
-          for (const [email, count] of stats.authorChanges) {
-            if (isBot(email, email)) continue;
-            authorTotals.set(email, (authorTotals.get(email) ?? 0) + count);
-          }
-        }
-
-        const bfMap = new Map(result.busFactor.map((b) => [b.scope, b]));
-        const risks: ScopeRisk[] = [];
-
-        // Build a name -> email map from ownership contributor data,
-        // so we can look up lastActiveByAuthor (keyed by email) for a
-        // given display name (as stored in atRiskAuthors).
-        const nameToEmail = new Map<string, string>();
-        for (const o of result.ownership) {
-          for (const c of o.contributors) {
-            if (!nameToEmail.has(c.name)) nameToEmail.set(c.name, c.email);
-          }
-        }
-
-        for (const [folder, authorTotals] of folderAuthorChanges) {
-          const bf = bfMap.get(folder);
-          if (!bf) continue;
-          if (bf.filesAtRisk < 3) continue; // skip tiny/noise scopes
-
-          const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
-          if (total === 0) continue;
-          const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
-          const topShare = sorted[0][1] / total;
-          const concentration = Math.round(topShare * 1000) / 10;
-          const contributors = sorted.length;
-          const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
-
-          let level: ScopeRisk['level'];
-          let concentrationExplanation: string;
-
-          if (bf.busFactor === 1 && concentration >= 80) {
-            level = 'HIGH';
-            concentrationExplanation =
-              'Historical activity is highly concentrated in a single contributor identity.';
-          } else if (bf.busFactor === 1 || (bf.busFactor === 2 && concentration >= 50)) {
-            level = 'MEDIUM';
-            concentrationExplanation = bf.busFactor === 1
-              ? 'Historical activity is concentrated enough that one identity accounts for at least half of file touches.'
-              : 'Historical activity is concentrated across a small number of contributor identities.';
-          } else {
-            level = 'LOW';
-            concentrationExplanation =
-              `Historical activity is distributed across ${contributors} contributor identities.`;
-          }
-
-          const whyClassified = [
-            `One contributor identity accounts for ${concentration}% of historical file touches.`,
-            `Bus Factor is ${bf.busFactor}.`,
-            concentrationExplanation,
-          ];
-
-          const ownerEmail = nameToEmail.get(topOwner);
-          const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
-          let lastActive: string | undefined;
-          if (lastActiveTs !== undefined) {
-            lastActive = formatTimeAgo(lastActiveTs);
-          }
-
-          risks.push({
-            scope: folder,
-            level,
-            busFactor: bf.busFactor,
-            concentration,
-            contributors,
-            totalFileTouches: total,
-            topOwner,
-            filesAtRisk: bf.filesAtRisk,
-            whyClassified,
-            lastActive,
-          });
-        }
-
-        const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
-        risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
+        const risks = buildScopeRisks(result);
 
         const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');
         const lowCount = risks.filter((r) => r.level === 'LOW').length;
@@ -162,10 +121,13 @@ export function registerRiskCommand(program: Command): void {
             console.log(`  Latest analyzed activity: ${chalk.bold(r.lastActive)}`);
           }
           console.log();
-          console.log(chalk.grey('  Why classified:'));
-          for (const explanation of r.whyClassified) {
-            console.log(chalk.grey(`    * ${explanation}`));
+          console.log(chalk.grey('  Why:'));
+          for (const reason of r.explanation.reasons) {
+            console.log(chalk.grey(`    * ${reason}`));
           }
+          console.log();
+          console.log(chalk.grey('  Interpretation:'));
+          console.log(chalk.grey(`    ${r.explanation.summary}`));
           console.log();
         }
 
