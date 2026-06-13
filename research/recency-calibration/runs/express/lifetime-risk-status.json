@@ -1,0 +1,15 @@
+{
+  "label": "lifetime-risk",
+  "command": [
+    "node",
+    "/home/sushantv/git-archaeologist/dist/index.js",
+    "risk",
+    "/home/sushantv/express",
+    "--all"
+  ],
+  "cwd": "/home/sushantv/git-archaeologist",
+  "exitCode": 0,
+  "signal": null,
+  "stdoutFile": "lifetime-risk.txt",
+  "stderrFile": "lifetime-risk.stderr.txt"
+}

@@ -49,3 +49,8 @@ the two calibration cases.
 - Bus factor is manually verified to reach the 50% touch threshold correctly.
 - Raw outputs and metadata are retained under the repository-specific
   calibration directory.
+
+## Automation
+
+See `automation.md` for the reusable runner, parser, Express workflow, React
+workflow, and full-study execution pattern.

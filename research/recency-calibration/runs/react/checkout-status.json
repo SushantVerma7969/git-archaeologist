@@ -1,0 +1,14 @@
+{
+  "command": [
+    "git",
+    "-C",
+    "/home/sushantv/react",
+    "checkout",
+    "900ae094d85b11c67d53dd14af50a2bda5db4495"
+  ],
+  "cwd": "/home/sushantv/git-archaeologist",
+  "exitCode": 0,
+  "signal": null,
+  "stdout": "",
+  "stderr": "Note: switching to '900ae094d85b11c67d53dd14af50a2bda5db4495'.\n\nYou are in 'detached HEAD' state. You can look around, make experimental\nchanges and commit them, and you can discard any commits you make in this\nstate without impacting any branches by switching back to a branch.\n\nIf you want to create a new branch to retain commits you create, you may\ndo so (now or later) by using -c with the switch command. Example:\n\n  git switch -c <new-branch-name>\n\nOr undo this operation with:\n\n  git switch -\n\nTurn off this advice by setting config variable advice.detachedHead to false\n\nHEAD is now at 900ae094 [flow] Bump flow to v0.317.0 (#36701)\n"
+}

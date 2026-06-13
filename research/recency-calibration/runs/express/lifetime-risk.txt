@@ -1,0 +1,139 @@
+
+──────────────────────────────────────────────────────────────────────
+ ⛏  git-arch risk — express
+  Maintenance risk map — not an ownership leaderboard
+  Analysis window: all available history
+──────────────────────────────────────────────────────────────────────
+
+  HIGH RISK
+  support
+  Historical commit-touch concentration: 100%
+  Bus Factor: 1
+  Historical file paths: 3
+  Contributor identities: 1
+  Total file-touch evidence: 8
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 100% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is highly concentrated in a single contributor identity.
+
+  HIGH RISK
+  (root)
+  Historical commit-touch concentration: 81.5%
+  Bus Factor: 1
+  Historical file paths: 24
+  Contributor identities: 123
+  Total file-touch evidence: 2042
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 81.5% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is highly concentrated in a single contributor identity.
+
+  MEDIUM RISK
+  examples
+  Historical commit-touch concentration: 73.4%
+  Bus Factor: 1
+  Historical file paths: 127
+  Contributor identities: 34
+  Total file-touch evidence: 482
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 73.4% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  MEDIUM RISK
+  test
+  Historical commit-touch concentration: 69.4%
+  Bus Factor: 1
+  Historical file paths: 133
+  Contributor identities: 83
+  Total file-touch evidence: 934
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 69.4% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  MEDIUM RISK
+  lib
+  Historical commit-touch concentration: 65.3%
+  Bus Factor: 1
+  Historical file paths: 13
+  Contributor identities: 91
+  Total file-touch evidence: 403
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 65.3% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  MEDIUM RISK
+  benchmarks
+  Historical commit-touch concentration: 53.3%
+  Bus Factor: 1
+  Historical file paths: 4
+  Contributor identities: 4
+  Total file-touch evidence: 15
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 53.3% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  LOW RISK
+  .github
+  Historical commit-touch concentration: 40.7%
+  Bus Factor: 2
+  Historical file paths: 7
+  Contributor identities: 13
+  Total file-touch evidence: 81
+
+  Top historical contributor: Douglas Christopher Wilson
+
+  Activity context:
+  Latest analyzed activity: 2 years ago
+
+  Why classified:
+    * One contributor identity accounts for 40.7% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 13 contributor identities.
+
+  Based on commit touches.
+  Contributor identities are Git email addresses.
+  These signals do not prove ownership, expertise, or maintainership.
+
+──────────────────────────────────────────────────────────────────────
+

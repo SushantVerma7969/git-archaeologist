@@ -1,0 +1,15 @@
+{
+  "label": "lifetime-analysis",
+  "command": [
+    "node",
+    "/home/sushantv/git-archaeologist/dist/index.js",
+    "analyze",
+    "/home/sushantv/react",
+    "--json"
+  ],
+  "cwd": "/home/sushantv/git-archaeologist",
+  "exitCode": 0,
+  "signal": null,
+  "stdoutFile": "lifetime-analysis.json",
+  "stderrFile": "lifetime-analysis.stderr.txt"
+}

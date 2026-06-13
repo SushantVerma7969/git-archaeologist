@@ -1,0 +1,121 @@
+
+──────────────────────────────────────────────────────────────────────
+ ⛏  git-arch risk — express
+  Maintenance risk map — not an ownership leaderboard
+  Analysis window: since 2025-06-13T00:00:00Z
+──────────────────────────────────────────────────────────────────────
+
+  HIGH RISK
+  examples
+  Historical commit-touch concentration: 100%
+  Bus Factor: 1
+  Historical file paths: 4
+  Contributor identities: 1
+  Total file-touch evidence: 1
+
+  Top historical contributor: Viny Brun Kriesang
+
+  Activity context:
+  Latest analyzed activity: 4 months ago
+
+  Why classified:
+    * One contributor identity accounts for 100% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is highly concentrated in a single contributor identity.
+
+  HIGH RISK
+  benchmarks
+  Historical commit-touch concentration: 100%
+  Bus Factor: 1
+  Historical file paths: 4
+  Contributor identities: 1
+  Total file-touch evidence: 4
+
+  Top historical contributor: Sebastian Beltran
+
+  Activity context:
+  Latest analyzed activity: 4 months ago
+
+  Why classified:
+    * One contributor identity accounts for 100% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is highly concentrated in a single contributor identity.
+
+  MEDIUM RISK
+  test
+  Historical commit-touch concentration: 73.3%
+  Bus Factor: 1
+  Historical file paths: 20
+  Contributor identities: 5
+  Total file-touch evidence: 15
+
+  Top historical contributor: Shivam Sharma
+
+  Activity context:
+  Latest analyzed activity: 26 days ago
+
+  Why classified:
+    * One contributor identity accounts for 73.3% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  LOW RISK
+  lib
+  Historical commit-touch concentration: 37.5%
+  Bus Factor: 2
+  Historical file paths: 4
+  Contributor identities: 4
+  Total file-touch evidence: 8
+
+  Top historical contributor: Sebastian Beltran
+
+  Activity context:
+  Latest analyzed activity: 4 months ago
+
+  Why classified:
+    * One contributor identity accounts for 37.5% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 4 contributor identities.
+
+  LOW RISK
+  .github
+  Historical commit-touch concentration: 33.3%
+  Bus Factor: 2
+  Historical file paths: 4
+  Contributor identities: 3
+  Total file-touch evidence: 3
+
+  Top historical contributor: Shivam Sharma
+
+  Activity context:
+  Latest analyzed activity: 26 days ago
+
+  Why classified:
+    * One contributor identity accounts for 33.3% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 3 contributor identities.
+
+  LOW RISK
+  (root)
+  Historical commit-touch concentration: 26.9%
+  Bus Factor: 2
+  Historical file paths: 7
+  Contributor identities: 10
+  Total file-touch evidence: 26
+
+  Top historical contributor: Shivam Sharma
+
+  Activity context:
+  Latest analyzed activity: 26 days ago
+
+  Why classified:
+    * One contributor identity accounts for 26.9% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 10 contributor identities.
+
+  Based on commit touches.
+  Contributor identities are Git email addresses.
+  These signals do not prove ownership, expertise, or maintainership.
+
+──────────────────────────────────────────────────────────────────────
+

@@ -1,0 +1,157 @@
+
+──────────────────────────────────────────────────────────────────────
+ ⛏  git-arch risk — react
+  Maintenance risk map — not an ownership leaderboard
+  Analysis window: since 2025-06-13T00:00:00Z
+──────────────────────────────────────────────────────────────────────
+
+  HIGH RISK
+  .claude
+  Historical commit-touch concentration: 100%
+  Bus Factor: 1
+  Historical file paths: 9
+  Contributor identities: 1
+  Total file-touch evidence: 9
+
+  Top historical contributor: Ricky
+
+  Activity context:
+  Latest analyzed activity: 3 months ago
+
+  Why classified:
+    * One contributor identity accounts for 100% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is highly concentrated in a single contributor identity.
+
+  MEDIUM RISK
+  .github
+  Historical commit-touch concentration: 72.5%
+  Bus Factor: 1
+  Historical file paths: 19
+  Contributor identities: 6
+  Total file-touch evidence: 40
+
+  Top historical contributor: Sebastian "Sebbie" Silbermann
+
+  Activity context:
+  Latest analyzed activity: 9 days ago
+
+  Why classified:
+    * One contributor identity accounts for 72.5% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  MEDIUM RISK
+  scripts
+  Historical commit-touch concentration: 58.4%
+  Bus Factor: 1
+  Historical file paths: 75
+  Contributor identities: 12
+  Total file-touch evidence: 113
+
+  Top historical contributor: Sebastian "Sebbie" Silbermann
+
+  Activity context:
+  Latest analyzed activity: 9 days ago
+
+  Why classified:
+    * One contributor identity accounts for 58.4% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  MEDIUM RISK
+  flow-typed
+  Historical commit-touch concentration: 57.1%
+  Bus Factor: 1
+  Historical file paths: 11
+  Contributor identities: 3
+  Total file-touch evidence: 21
+
+  Top historical contributor: Jan Kassens
+
+  Activity context:
+  Latest analyzed activity: 9 months ago
+
+  Why classified:
+    * One contributor identity accounts for 57.1% of historical file touches.
+    * Bus Factor is 1.
+    * Historical activity is concentrated enough that one identity accounts for at least half of file touches.
+
+  LOW RISK
+  (root)
+  Historical commit-touch concentration: 44%
+  Bus Factor: 2
+  Historical file paths: 12
+  Contributor identities: 13
+  Total file-touch evidence: 84
+
+  Top historical contributor: Jan Kassens
+
+  Activity context:
+  Latest analyzed activity: 9 months ago
+
+  Why classified:
+    * One contributor identity accounts for 44% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 13 contributor identities.
+
+  LOW RISK
+  compiler
+  Historical commit-touch concentration: 38.5%
+  Bus Factor: 2
+  Historical file paths: 2022
+  Contributor identities: 12
+  Total file-touch evidence: 452
+
+  Top historical contributor: Sebastian Markbåge
+
+  Activity context:
+  Latest analyzed activity: 4 months ago
+
+  Why classified:
+    * One contributor identity accounts for 38.5% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 12 contributor identities.
+
+  LOW RISK
+  fixtures
+  Historical commit-touch concentration: 31.1%
+  Bus Factor: 2
+  Historical file paths: 107
+  Contributor identities: 6
+  Total file-touch evidence: 135
+
+  Top historical contributor: Hendrik Liebau
+
+  Activity context:
+  Latest analyzed activity: 14 days ago
+
+  Why classified:
+    * One contributor identity accounts for 31.1% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 6 contributor identities.
+
+  LOW RISK
+  packages
+  Historical commit-touch concentration: 29.8%
+  Bus Factor: 2
+  Historical file paths: 970
+  Contributor identities: 48
+  Total file-touch evidence: 3330
+
+  Top historical contributor: Sebastian Markbåge
+
+  Activity context:
+  Latest analyzed activity: 4 months ago
+
+  Why classified:
+    * One contributor identity accounts for 29.8% of historical file touches.
+    * Bus Factor is 2.
+    * Historical activity is distributed across 48 contributor identities.
+
+  Based on commit touches.
+  Contributor identities are Git email addresses.
+  These signals do not prove ownership, expertise, or maintainership.
+
+──────────────────────────────────────────────────────────────────────
+

@@ -1,0 +1,1683 @@
+{
+  "repoPath": "/home/sushantv/express",
+  "repoName": "express",
+  "analyzedAt": "2026-06-13T07:20:57.021Z",
+  "totalCommits": 83,
+  "totalFiles": 43,
+  "totalAuthors": 28,
+  "dateRange": {
+    "from": "2025-06-13T09:29:27.000Z",
+    "to": "2026-05-17T14:48:32.000Z"
+  },
+  "cursedFiles": [
+    {
+      "filepath": "test/req.query.js",
+      "curseScore": 31.3,
+      "totalChanges": 2,
+      "uniqueAuthors": 2,
+      "recencyWeight": 0.77,
+      "reasons": [
+        "High churn rate (7484x/year)"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "lib/response.js",
+      "curseScore": 20.91,
+      "totalChanges": 4,
+      "uniqueAuthors": 3,
+      "recencyWeight": 0.82,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "lib/request.js",
+      "curseScore": 15.84,
+      "totalChanges": 3,
+      "uniqueAuthors": 3,
+      "recencyWeight": 0.82,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/utils.js",
+      "curseScore": 14.08,
+      "totalChanges": 3,
+      "uniqueAuthors": 3,
+      "recencyWeight": 0.83,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "lib/utils.js",
+      "curseScore": 10.74,
+      "totalChanges": 4,
+      "uniqueAuthors": 3,
+      "recencyWeight": 0.77,
+      "reasons": [
+        "Mild instability"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "lib/application.js",
+      "curseScore": 9.66,
+      "totalChanges": 2,
+      "uniqueAuthors": 2,
+      "recencyWeight": 0.83,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": ".npmrc",
+      "curseScore": 0.96,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.96,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "examples/auth/index.js",
+      "curseScore": 0.87,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.87,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "examples/ejs/index.js",
+      "curseScore": 0.87,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.87,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "examples/route-middleware/index.js",
+      "curseScore": 0.87,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.87,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/res.type.js",
+      "curseScore": 0.86,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.86,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/res.jsonp.js",
+      "curseScore": 0.85,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.85,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/res.location.js",
+      "curseScore": 0.85,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.85,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "examples/search/index.js",
+      "curseScore": 0.83,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.83,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/app.render.js",
+      "curseScore": 0.83,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.83,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "benchmarks/Makefile",
+      "curseScore": 0.82,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.82,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "benchmarks/middleware.js",
+      "curseScore": 0.82,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.82,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "benchmarks/run",
+      "curseScore": 0.82,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.82,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/res.redirect.js",
+      "curseScore": 0.82,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.82,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    },
+    {
+      "filepath": "test/req.acceptsCharsets.js",
+      "curseScore": 0.81,
+      "totalChanges": 1,
+      "uniqueAuthors": 1,
+      "recencyWeight": 0.81,
+      "reasons": [
+        "Modified very recently"
+      ],
+      "noisy": false
+    }
+  ],
+  "ownership": [
+    {
+      "filepath": "examples/search/index.js",
+      "owner": "Viny Brun Kriesang",
+      "ownerEmail": "viniciusbrun.dev@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Viny Brun Kriesang",
+          "email": "viniciusbrun.dev@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "benchmarks/Makefile",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "benchmarks/README.md",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "benchmarks/middleware.js",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "benchmarks/run",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "SECURITY.md",
+      "owner": "Ulises Gascon",
+      "ownerEmail": "ulisesgascongonzalez@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Ulises Gascon",
+          "email": "ulisesgascongonzalez@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/req.protocol.js",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": ".gitignore",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/res.append.js",
+      "owner": "mountdisk",
+      "ownerEmail": "mountdisk@icloud.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "mountdisk",
+          "email": "mountdisk@icloud.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": ".eslintrc.yml",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/express.json.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/express.raw.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/express.static.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/express.text.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/express.urlencoded.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/res.attachment.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/res.download.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/res.send.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/res.sendFile.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "test/support/utils.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 100,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "filepath": "lib/response.js",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 50,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 2,
+          "percent": 50
+        },
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 25
+        }
+      ]
+    },
+    {
+      "filepath": "lib/utils.js",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 50,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 2,
+          "percent": 50
+        },
+        {
+          "name": "Ulises Gascon",
+          "email": "ulisesgascongonzalez@gmail.com",
+          "changes": 1,
+          "percent": 25
+        }
+      ]
+    },
+    {
+      "filepath": "test/req.query.js",
+      "owner": "Ulises Gascon",
+      "ownerEmail": "ulisesgascongonzalez@gmail.com",
+      "ownershipPercent": 50,
+      "contributors": [
+        {
+          "name": "Ulises Gascon",
+          "email": "ulisesgascongonzalez@gmail.com",
+          "changes": 1,
+          "percent": 50
+        }
+      ]
+    },
+    {
+      "filepath": "test/utils.js",
+      "owner": "sukdev24",
+      "ownerEmail": "successoruno@gmail.com",
+      "ownershipPercent": 33.3,
+      "contributors": [
+        {
+          "name": "sukdev24",
+          "email": "successoruno@gmail.com",
+          "changes": 1,
+          "percent": 33.3
+        },
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 33.3
+        }
+      ]
+    },
+    {
+      "filepath": "lib/request.js",
+      "owner": "Marcos Molina",
+      "ownerEmail": "marcosmol204@gmail.com",
+      "ownershipPercent": 33.3,
+      "contributors": [
+        {
+          "name": "Marcos Molina",
+          "email": "marcosmol204@gmail.com",
+          "changes": 1,
+          "percent": 33.3
+        },
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 33.3
+        }
+      ]
+    },
+    {
+      "filepath": "Readme.md",
+      "owner": "Sebastian Beltran",
+      "ownerEmail": "bjohansebas@gmail.com",
+      "ownershipPercent": 30.8,
+      "contributors": [
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 4,
+          "percent": 30.8
+        },
+        {
+          "name": "Jon Church",
+          "email": "me@jonchurch.com",
+          "changes": 2,
+          "percent": 15.4
+        },
+        {
+          "name": "Vansh Sharma",
+          "email": "s.vansh1811@gmail.com",
+          "changes": 1,
+          "percent": 7.7
+        },
+        {
+          "name": "Ayush Shukla",
+          "email": "Ayush.Shukla@adypu.edu.in",
+          "changes": 1,
+          "percent": 7.7
+        },
+        {
+          "name": "Pavan Shinde",
+          "email": "pavann97@gmail.com",
+          "changes": 1,
+          "percent": 7.7
+        },
+        {
+          "name": "Rick Markins",
+          "email": "rmarkins@gmail.com",
+          "changes": 1,
+          "percent": 7.7
+        },
+        {
+          "name": "Phillip Barta",
+          "email": "barta.phillip@gmail.com",
+          "changes": 1,
+          "percent": 7.7
+        },
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 7.7
+        }
+      ]
+    },
+    {
+      "filepath": "package.json",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 27.3,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 3,
+          "percent": 27.3
+        },
+        {
+          "name": "Ulises Gascon",
+          "email": "ulisesgascongonzalez@gmail.com",
+          "changes": 2,
+          "percent": 18.2
+        },
+        {
+          "name": "Gabriel Alves",
+          "email": "ga654066@gmail.com",
+          "changes": 1,
+          "percent": 9.1
+        },
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 9.1
+        }
+      ]
+    },
+    {
+      "filepath": "History.md",
+      "owner": "Ulises Gascon",
+      "ownerEmail": "ulisesgascongonzalez@gmail.com",
+      "ownershipPercent": 25,
+      "contributors": [
+        {
+          "name": "Ulises Gascon",
+          "email": "ulisesgascongonzalez@gmail.com",
+          "changes": 2,
+          "percent": 25
+        },
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 12.5
+        },
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 12.5
+        }
+      ]
+    },
+    {
+      "filepath": ".github/workflows/ci.yml",
+      "owner": "Shivam Sharma",
+      "ownerEmail": "meshivam81@gmail.com",
+      "ownershipPercent": 4.3,
+      "contributors": [
+        {
+          "name": "Shivam Sharma",
+          "email": "meshivam81@gmail.com",
+          "changes": 1,
+          "percent": 4.3
+        },
+        {
+          "name": "Phillip Barta",
+          "email": "barta.phillip@gmail.com",
+          "changes": 1,
+          "percent": 4.3
+        },
+        {
+          "name": "Sebastian Beltran",
+          "email": "bjohansebas@gmail.com",
+          "changes": 1,
+          "percent": 4.3
+        }
+      ]
+    }
+  ],
+  "busFactor": [
+    {
+      "scope": "examples",
+      "busFactor": 1,
+      "atRiskAuthors": [
+        "Viny Brun Kriesang"
+      ],
+      "filesAtRisk": 4,
+      "warning": "⚠️  Single point of failure — only Viny Brun Kriesang owns this module"
+    },
+    {
+      "scope": "test",
+      "busFactor": 1,
+      "atRiskAuthors": [
+        "Shivam Sharma"
+      ],
+      "filesAtRisk": 20,
+      "warning": "⚠️  Single point of failure — only Shivam Sharma owns this module"
+    },
+    {
+      "scope": "benchmarks",
+      "busFactor": 1,
+      "atRiskAuthors": [
+        "Sebastian Beltran"
+      ],
+      "filesAtRisk": 4,
+      "warning": "⚠️  Single point of failure — only Sebastian Beltran owns this module"
+    },
+    {
+      "scope": ".github",
+      "busFactor": 2,
+      "atRiskAuthors": [
+        "Shivam Sharma",
+        "Phillip Barta"
+      ],
+      "filesAtRisk": 4,
+      "warning": "⚡ High risk — only 2 people understand this module"
+    },
+    {
+      "scope": "(root)",
+      "busFactor": 2,
+      "atRiskAuthors": [
+        "Shivam Sharma",
+        "Sebastian Beltran"
+      ],
+      "filesAtRisk": 7,
+      "warning": "⚡ High risk — only 2 people understand this module"
+    },
+    {
+      "scope": "lib",
+      "busFactor": 2,
+      "atRiskAuthors": [
+        "Sebastian Beltran",
+        "Shivam Sharma"
+      ],
+      "filesAtRisk": 4,
+      "warning": "⚡ High risk — only 2 people understand this module"
+    }
+  ],
+  "coupling": [
+    {
+      "fileA": ".github/workflows/ci.yml",
+      "fileB": ".github/workflows/legacy.yml",
+      "coChanges": 20,
+      "couplingScore": 87
+    },
+    {
+      "fileA": ".github/workflows/codeql.yml",
+      "fileB": ".github/workflows/scorecard.yml",
+      "coChanges": 15,
+      "couplingScore": 71.4
+    },
+    {
+      "fileA": ".github/workflows/legacy.yml",
+      "fileB": ".github/workflows/scorecard.yml",
+      "coChanges": 8,
+      "couplingScore": 38.1
+    },
+    {
+      "fileA": ".github/workflows/ci.yml",
+      "fileB": ".github/workflows/scorecard.yml",
+      "coChanges": 8,
+      "couplingScore": 34.8
+    },
+    {
+      "fileA": "History.md",
+      "fileB": "package.json",
+      "coChanges": 3,
+      "couplingScore": 27.3
+    },
+    {
+      "fileA": ".github/workflows/codeql.yml",
+      "fileB": ".github/workflows/legacy.yml",
+      "coChanges": 4,
+      "couplingScore": 20
+    },
+    {
+      "fileA": ".github/workflows/ci.yml",
+      "fileB": ".github/workflows/codeql.yml",
+      "coChanges": 4,
+      "couplingScore": 17.4
+    }
+  ],
+  "fileStats": {
+    ".github/workflows/codeql.yml": {
+      "filepath": ".github/workflows/codeql.yml",
+      "totalChanges": 15,
+      "uniqueAuthors": [
+        "49699333+dependabot[bot]@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "49699333+dependabot[bot]@users.noreply.github.com": 15
+      },
+      "firstChanged": 1750282580,
+      "lastChanged": 1779029312,
+      "changeTimeline": [
+        1779029312,
+        1776966602,
+        1772360505,
+        1770678613,
+        1770678240,
+        1767797261,
+        1767797180,
+        1764591225,
+        1764591172,
+        1761990351,
+        1759495208,
+        1759494865,
+        1757860772,
+        1752049661,
+        1750282580
+      ]
+    },
+    ".github/workflows/scorecard.yml": {
+      "filepath": ".github/workflows/scorecard.yml",
+      "totalChanges": 21,
+      "uniqueAuthors": [
+        "49699333+dependabot[bot]@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "49699333+dependabot[bot]@users.noreply.github.com": 21
+      },
+      "firstChanged": 1750282580,
+      "lastChanged": 1779029312,
+      "changeTimeline": [
+        1779029312,
+        1779029195,
+        1776966602,
+        1772360653,
+        1772360505,
+        1770678613,
+        1770678240,
+        1767797261,
+        1767797180,
+        1767797147,
+        1764591225,
+        1764591172,
+        1761990397,
+        1761990351,
+        1759495425,
+        1759495208,
+        1759494865,
+        1757860772,
+        1752049661,
+        1750282612,
+        1750282580
+      ]
+    },
+    ".github/workflows/ci.yml": {
+      "filepath": ".github/workflows/ci.yml",
+      "totalChanges": 23,
+      "uniqueAuthors": [
+        "49699333+dependabot[bot]@users.noreply.github.com",
+        "meshivam81@gmail.com",
+        "barta.phillip@gmail.com",
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "49699333+dependabot[bot]@users.noreply.github.com": 20,
+        "meshivam81@gmail.com": 1,
+        "barta.phillip@gmail.com": 1,
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1752632870,
+      "lastChanged": 1779029195,
+      "changeTimeline": [
+        1779029195,
+        1779029039,
+        1779028992,
+        1776966559,
+        1776966515,
+        1772360653,
+        1772360607,
+        1770678317,
+        1770678240,
+        1767797327,
+        1767797261,
+        1767797147,
+        1767796733,
+        1764591225,
+        1764591128,
+        1761990397,
+        1761990307,
+        1761990252,
+        1760615499,
+        1759495442,
+        1759495434,
+        1759494865,
+        1752632870
+      ]
+    },
+    ".github/workflows/legacy.yml": {
+      "filepath": ".github/workflows/legacy.yml",
+      "totalChanges": 20,
+      "uniqueAuthors": [
+        "49699333+dependabot[bot]@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "49699333+dependabot[bot]@users.noreply.github.com": 20
+      },
+      "firstChanged": 1759494865,
+      "lastChanged": 1779029195,
+      "changeTimeline": [
+        1779029195,
+        1779029039,
+        1776966559,
+        1776966515,
+        1772360653,
+        1772360607,
+        1770678317,
+        1770678240,
+        1767797327,
+        1767797261,
+        1767797147,
+        1767796733,
+        1764591225,
+        1764591128,
+        1761990397,
+        1761990307,
+        1761990252,
+        1759495442,
+        1759495434,
+        1759494865
+      ]
+    },
+    "package.json": {
+      "filepath": "package.json",
+      "totalChanges": 11,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com",
+        "5702882+davetashner@users.noreply.github.com",
+        "ga654066@gmail.com",
+        "ulisesgascongonzalez@gmail.com",
+        "sheplu@users.noreply.github.com",
+        "49699333+dependabot[bot]@users.noreply.github.com",
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 3,
+        "5702882+davetashner@users.noreply.github.com": 1,
+        "ga654066@gmail.com": 1,
+        "ulisesgascongonzalez@gmail.com": 2,
+        "sheplu@users.noreply.github.com": 1,
+        "49699333+dependabot[bot]@users.noreply.github.com": 2,
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1752549490,
+      "lastChanged": 1779028992,
+      "changeTimeline": [
+        1779028992,
+        1771729868,
+        1767797197,
+        1764614103,
+        1764605851,
+        1764166797,
+        1758777645,
+        1755039493,
+        1754443488,
+        1754443462,
+        1752549490
+      ]
+    },
+    ".npmrc": {
+      "filepath": ".npmrc",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "sheplu@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "sheplu@users.noreply.github.com": 1
+      },
+      "firstChanged": 1779028930,
+      "lastChanged": 1779028930,
+      "changeTimeline": [
+        1779028930
+      ]
+    },
+    "History.md": {
+      "filepath": "History.md",
+      "totalChanges": 8,
+      "uniqueAuthors": [
+        "269018900+opensourcezeal@users.noreply.github.com",
+        "104684660+AkaHarshit@users.noreply.github.com",
+        "bjohansebas@gmail.com",
+        "78245731+Bernice55231@users.noreply.github.com",
+        "ctcpip@users.noreply.github.com",
+        "ulisesgascongonzalez@gmail.com",
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "269018900+opensourcezeal@users.noreply.github.com": 1,
+        "104684660+AkaHarshit@users.noreply.github.com": 1,
+        "bjohansebas@gmail.com": 1,
+        "78245731+Bernice55231@users.noreply.github.com": 1,
+        "ctcpip@users.noreply.github.com": 1,
+        "ulisesgascongonzalez@gmail.com": 2,
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1764166797,
+      "lastChanged": 1777884821,
+      "changeTimeline": [
+        1777884821,
+        1769914277,
+        1768834613,
+        1768577341,
+        1764799689,
+        1764614103,
+        1764605851,
+        1764166797
+      ]
+    },
+    "Readme.md": {
+      "filepath": "Readme.md",
+      "totalChanges": 13,
+      "uniqueAuthors": [
+        "s.vansh1811@gmail.com",
+        "Ayush.Shukla@adypu.edu.in",
+        "pavann97@gmail.com",
+        "bjohansebas@gmail.com",
+        "me@jonchurch.com",
+        "rmarkins@gmail.com",
+        "barta.phillip@gmail.com",
+        "meshivam81@gmail.com",
+        "91728992+ShubhamOulkar@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "s.vansh1811@gmail.com": 1,
+        "Ayush.Shukla@adypu.edu.in": 1,
+        "pavann97@gmail.com": 1,
+        "bjohansebas@gmail.com": 4,
+        "me@jonchurch.com": 2,
+        "rmarkins@gmail.com": 1,
+        "barta.phillip@gmail.com": 1,
+        "meshivam81@gmail.com": 1,
+        "91728992+ShubhamOulkar@users.noreply.github.com": 1
+      },
+      "firstChanged": 1753139673,
+      "lastChanged": 1775509084,
+      "changeTimeline": [
+        1775509084,
+        1774931963,
+        1771730111,
+        1769947448,
+        1768210134,
+        1767653483,
+        1766137489,
+        1764066752,
+        1764041548,
+        1763458976,
+        1755846729,
+        1753882913,
+        1753139673
+      ]
+    },
+    "examples/auth/index.js": {
+      "filepath": "examples/auth/index.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "126325182+stuckvgn@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "126325182+stuckvgn@users.noreply.github.com": 1
+      },
+      "firstChanged": 1772373302,
+      "lastChanged": 1772373302,
+      "changeTimeline": [
+        1772373302
+      ]
+    },
+    "examples/ejs/index.js": {
+      "filepath": "examples/ejs/index.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "126325182+stuckvgn@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "126325182+stuckvgn@users.noreply.github.com": 1
+      },
+      "firstChanged": 1772373302,
+      "lastChanged": 1772373302,
+      "changeTimeline": [
+        1772373302
+      ]
+    },
+    "examples/route-middleware/index.js": {
+      "filepath": "examples/route-middleware/index.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "126325182+stuckvgn@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "126325182+stuckvgn@users.noreply.github.com": 1
+      },
+      "firstChanged": 1772373302,
+      "lastChanged": 1772373302,
+      "changeTimeline": [
+        1772373302
+      ]
+    },
+    "test/res.type.js": {
+      "filepath": "test/res.type.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "127220309+IshitaSingh0822@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "127220309+IshitaSingh0822@users.noreply.github.com": 1
+      },
+      "firstChanged": 1771840706,
+      "lastChanged": 1771840706,
+      "changeTimeline": [
+        1771840706
+      ]
+    },
+    "test/res.jsonp.js": {
+      "filepath": "test/res.jsonp.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "77299279+GroophyLifefor@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "77299279+GroophyLifefor@users.noreply.github.com": 1
+      },
+      "firstChanged": 1771089936,
+      "lastChanged": 1771089936,
+      "changeTimeline": [
+        1771089936
+      ]
+    },
+    "test/res.location.js": {
+      "filepath": "test/res.location.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "77299279+GroophyLifefor@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "77299279+GroophyLifefor@users.noreply.github.com": 1
+      },
+      "firstChanged": 1771089936,
+      "lastChanged": 1771089936,
+      "changeTimeline": [
+        1771089936
+      ]
+    },
+    "examples/search/index.js": {
+      "filepath": "examples/search/index.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "viniciusbrun.dev@gmail.com"
+      ],
+      "authorChanges": {
+        "viniciusbrun.dev@gmail.com": 1
+      },
+      "firstChanged": 1769915543,
+      "lastChanged": 1769915543,
+      "changeTimeline": [
+        1769915543
+      ]
+    },
+    "test/utils.js": {
+      "filepath": "test/utils.js",
+      "totalChanges": 3,
+      "uniqueAuthors": [
+        "77799760+Ayoub-Mabrouk@users.noreply.github.com",
+        "successoruno@gmail.com",
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "77799760+Ayoub-Mabrouk@users.noreply.github.com": 1,
+        "successoruno@gmail.com": 1,
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1769914418,
+      "changeTimeline": [
+        1769914418,
+        1768616842,
+        1751073036
+      ]
+    },
+    "lib/application.js": {
+      "filepath": "lib/application.js",
+      "totalChanges": 2,
+      "uniqueAuthors": [
+        "104684660+AkaHarshit@users.noreply.github.com",
+        "48478887+Tacit1@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "104684660+AkaHarshit@users.noreply.github.com": 1,
+        "48478887+Tacit1@users.noreply.github.com": 1
+      },
+      "firstChanged": 1763941936,
+      "lastChanged": 1769914277,
+      "changeTimeline": [
+        1769914277,
+        1763941936
+      ]
+    },
+    "test/app.render.js": {
+      "filepath": "test/app.render.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "104684660+AkaHarshit@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "104684660+AkaHarshit@users.noreply.github.com": 1
+      },
+      "firstChanged": 1769914277,
+      "lastChanged": 1769914277,
+      "changeTimeline": [
+        1769914277
+      ]
+    },
+    "lib/response.js": {
+      "filepath": "lib/response.js",
+      "totalChanges": 4,
+      "uniqueAuthors": [
+        "bjohansebas@gmail.com",
+        "78245731+Bernice55231@users.noreply.github.com",
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "bjohansebas@gmail.com": 2,
+        "78245731+Bernice55231@users.noreply.github.com": 1,
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1768834613,
+      "changeTimeline": [
+        1768834613,
+        1768577341,
+        1752549490,
+        1751073036
+      ]
+    },
+    "benchmarks/Makefile": {
+      "filepath": "benchmarks/Makefile",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1768689382,
+      "lastChanged": 1768689382,
+      "changeTimeline": [
+        1768689382
+      ]
+    },
+    "benchmarks/README.md": {
+      "filepath": "benchmarks/README.md",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1768689382,
+      "lastChanged": 1768689382,
+      "changeTimeline": [
+        1768689382
+      ]
+    },
+    "benchmarks/middleware.js": {
+      "filepath": "benchmarks/middleware.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1768689382,
+      "lastChanged": 1768689382,
+      "changeTimeline": [
+        1768689382
+      ]
+    },
+    "benchmarks/run": {
+      "filepath": "benchmarks/run",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1768689382,
+      "lastChanged": 1768689382,
+      "changeTimeline": [
+        1768689382
+      ]
+    },
+    "lib/request.js": {
+      "filepath": "lib/request.js",
+      "totalChanges": 3,
+      "uniqueAuthors": [
+        "marcosmol204@gmail.com",
+        "52112750+Abdel-Monaam-Aouini@users.noreply.github.com",
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "marcosmol204@gmail.com": 1,
+        "52112750+Abdel-Monaam-Aouini@users.noreply.github.com": 1,
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1755788729,
+      "lastChanged": 1768598379,
+      "changeTimeline": [
+        1768598379,
+        1767796894,
+        1755788729
+      ]
+    },
+    "test/res.redirect.js": {
+      "filepath": "test/res.redirect.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "78245731+Bernice55231@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "78245731+Bernice55231@users.noreply.github.com": 1
+      },
+      "firstChanged": 1768577341,
+      "lastChanged": 1768577341,
+      "changeTimeline": [
+        1768577341
+      ]
+    },
+    "test/req.acceptsCharsets.js": {
+      "filepath": "test/req.acceptsCharsets.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "52112750+Abdel-Monaam-Aouini@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "52112750+Abdel-Monaam-Aouini@users.noreply.github.com": 1
+      },
+      "firstChanged": 1767796894,
+      "lastChanged": 1767796894,
+      "changeTimeline": [
+        1767796894
+      ]
+    },
+    "SECURITY.md": {
+      "filepath": "SECURITY.md",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "ulisesgascongonzalez@gmail.com"
+      ],
+      "authorChanges": {
+        "ulisesgascongonzalez@gmail.com": 1
+      },
+      "firstChanged": 1749806967,
+      "lastChanged": 1749806967,
+      "changeTimeline": [
+        1749806967
+      ]
+    },
+    "lib/utils.js": {
+      "filepath": "lib/utils.js",
+      "totalChanges": 4,
+      "uniqueAuthors": [
+        "ulisesgascongonzalez@gmail.com",
+        "ctcpip@users.noreply.github.com",
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "ulisesgascongonzalez@gmail.com": 1,
+        "ctcpip@users.noreply.github.com": 1,
+        "meshivam81@gmail.com": 2
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1764613989,
+      "changeTimeline": [
+        1764613989,
+        1764605561,
+        1751509990,
+        1751073036
+      ]
+    },
+    "test/req.query.js": {
+      "filepath": "test/req.query.js",
+      "totalChanges": 2,
+      "uniqueAuthors": [
+        "ulisesgascongonzalez@gmail.com",
+        "ctcpip@users.noreply.github.com"
+      ],
+      "authorChanges": {
+        "ulisesgascongonzalez@gmail.com": 1,
+        "ctcpip@users.noreply.github.com": 1
+      },
+      "firstChanged": 1764605561,
+      "lastChanged": 1764613989,
+      "changeTimeline": [
+        1764613989,
+        1764605561
+      ]
+    },
+    "test/req.protocol.js": {
+      "filepath": "test/req.protocol.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "bjohansebas@gmail.com"
+      ],
+      "authorChanges": {
+        "bjohansebas@gmail.com": 1
+      },
+      "firstChanged": 1755788729,
+      "lastChanged": 1755788729,
+      "changeTimeline": [
+        1755788729
+      ]
+    },
+    ".gitignore": {
+      "filepath": ".gitignore",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1755695916,
+      "lastChanged": 1755695916,
+      "changeTimeline": [
+        1755695916
+      ]
+    },
+    "test/res.append.js": {
+      "filepath": "test/res.append.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "mountdisk@icloud.com"
+      ],
+      "authorChanges": {
+        "mountdisk@icloud.com": 1
+      },
+      "firstChanged": 1751640451,
+      "lastChanged": 1751640451,
+      "changeTimeline": [
+        1751640451
+      ]
+    },
+    ".eslintrc.yml": {
+      "filepath": ".eslintrc.yml",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/express.json.js": {
+      "filepath": "test/express.json.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/express.raw.js": {
+      "filepath": "test/express.raw.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/express.static.js": {
+      "filepath": "test/express.static.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/express.text.js": {
+      "filepath": "test/express.text.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/express.urlencoded.js": {
+      "filepath": "test/express.urlencoded.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/res.attachment.js": {
+      "filepath": "test/res.attachment.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/res.download.js": {
+      "filepath": "test/res.download.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/res.send.js": {
+      "filepath": "test/res.send.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/res.sendFile.js": {
+      "filepath": "test/res.sendFile.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    },
+    "test/support/utils.js": {
+      "filepath": "test/support/utils.js",
+      "totalChanges": 1,
+      "uniqueAuthors": [
+        "meshivam81@gmail.com"
+      ],
+      "authorChanges": {
+        "meshivam81@gmail.com": 1
+      },
+      "firstChanged": 1751073036,
+      "lastChanged": 1751073036,
+      "changeTimeline": [
+        1751073036
+      ]
+    }
+  },
+  "lastActiveByAuthor": {}
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "label": "lifetime-analysis",
+    "command": [
+      "node",
+      "/home/sushantv/git-archaeologist/dist/index.js",
+      "analyze",
+      "/home/sushantv/react",
+      "--json"
+    ],
+    "cwd": "/home/sushantv/git-archaeologist",
+    "exitCode": 0,
+    "signal": null,
+    "stdoutFile": "lifetime-analysis.json",
+    "stderrFile": "lifetime-analysis.stderr.txt"
+  },
+  {
+    "label": "recent-analysis",
+    "command": [
+      "node",
+      "/home/sushantv/git-archaeologist/dist/index.js",
+      "analyze",
+      "/home/sushantv/react",
+      "--since",
+      "2025-06-13T00:00:00Z",
+      "--json"
+    ],
+    "cwd": "/home/sushantv/git-archaeologist",
+    "exitCode": 0,
+    "signal": null,
+    "stdoutFile": "recent-analysis.json",
+    "stderrFile": "recent-analysis.stderr.txt"
+  },
+  {
+    "label": "lifetime-risk",
+    "command": [
+      "node",
+      "/home/sushantv/git-archaeologist/dist/index.js",
+      "risk",
+      "/home/sushantv/react",
+      "--all"
+    ],
+    "cwd": "/home/sushantv/git-archaeologist",
+    "exitCode": 0,
+    "signal": null,
+    "stdoutFile": "lifetime-risk.txt",
+    "stderrFile": "lifetime-risk.stderr.txt"
+  },
+  {
+    "label": "recent-risk",
+    "command": [
+      "node",
+      "/home/sushantv/git-archaeologist/dist/index.js",
+      "risk",
+      "/home/sushantv/react",
+      "--all",
+      "--since",
+      "2025-06-13T00:00:00Z"
+    ],
+    "cwd": "/home/sushantv/git-archaeologist",
+    "exitCode": 0,
+    "signal": null,
+    "stdoutFile": "recent-risk.txt",
+    "stderrFile": "recent-risk.stderr.txt"
+  }
+]

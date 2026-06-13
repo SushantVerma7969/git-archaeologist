@@ -1,0 +1,13 @@
+{
+  "repository": "react",
+  "repositoryPath": "/home/sushantv/react",
+  "requestedRepositorySha": "900ae094d85b11c67d53dd14af50a2bda5db4495",
+  "repositorySha": "900ae094d85b11c67d53dd14af50a2bda5db4495",
+  "repositoryStatus": "",
+  "toolSha": "935d91e0e5e8561a419e4a8b597156958208145e",
+  "toolVersion": "1.9.2",
+  "nodeVersion": "v24.13.1",
+  "gitVersion": "git version 2.43.0",
+  "executionDate": "2026-06-13T07:25:34.293Z",
+  "cutoffDate": "2025-06-13T00:00:00Z"
+}

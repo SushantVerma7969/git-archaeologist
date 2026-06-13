@@ -1,0 +1,17 @@
+{
+  "label": "recent-analysis",
+  "command": [
+    "node",
+    "/home/sushantv/git-archaeologist/dist/index.js",
+    "analyze",
+    "/home/sushantv/express",
+    "--since",
+    "2025-06-13T00:00:00Z",
+    "--json"
+  ],
+  "cwd": "/home/sushantv/git-archaeologist",
+  "exitCode": 0,
+  "signal": null,
+  "stdoutFile": "recent-analysis.json",
+  "stderrFile": "recent-analysis.stderr.txt"
+}
