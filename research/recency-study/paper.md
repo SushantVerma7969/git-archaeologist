@@ -92,6 +92,16 @@ VS Code `test` is another emerging-concentration case. It has 5201 lifetime touc
 
 Smaller emerging-concentration cases include docker-compose `(root)` and React `scripts`, both with 113 recent touches. Docker-compose `(root)` has lifetime concentration of 0.45666666666666667 and recent concentration of 0.504424778761062, with bus factor changing from 2 to 1. React `scripts` has lifetime concentration of 0.31092436974789917 and recent concentration of 0.584070796460177, also with bus factor changing from 2 to 1.
 
+Persistent concentration is the dominant eligible category in the dataset, accounting for 144 of 249 eligible scopes (57.83%). The following examples illustrate large scopes that remain concentrated in both lifetime and recent windows.
+
+Node.js `deps` is the largest persistent-concentration scope by lifetime touches. It has 41849 lifetime touches and 41849 recent touches. Its concentration remains stable at 0.8433415374321968 in both windows, its bus factor remains 1, and the top identity remains René.
+
+Spring Boot `spring-boot-project` is another large persistent-concentration scope. It has 36672 lifetime touches and 19078 recent touches. Its lifetime concentration is 0.5074171029668412 and its recent concentration is 0.5217528042771779. Its bus factor remains 1 and the top identity remains Stéphane Nicoll.
+
+TensorFlow `tensorflow` provides a highly concentrated example. It has 28842 lifetime touches and 28842 recent touches. Its concentration remains 0.9445600166423965 in both windows, its bus factor remains 1, and the top identity remains Dmitri Latushko.
+
+These examples differ from the historical-concentration and emerging-concentration case studies because the concentration pattern remains stable across both windows. They illustrate the dominant category observed in the eligible-scope dataset.
+
 ## 7. Threats To Validity
 
 The study measures commit-touch concentration, not ownership, expertise, maintainership, or organizational responsibility. Commit activity is an observable historical signal, but it should not be interpreted as a complete account of responsibility or knowledge.
