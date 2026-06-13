@@ -110,30 +110,33 @@ function registerRiskCommand(program) {
                 const contributors = sorted.length;
                 const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
                 let level;
-                let reason;
+                let concentrationExplanation;
                 if (bf.busFactor === 1 && concentration >= 80) {
                     level = 'HIGH';
-                    reason = `Single dominant maintainer (${topOwner}) with limited contributor redundancy.`;
+                    concentrationExplanation =
+                        'Historical activity is highly concentrated in a single contributor identity.';
                 }
                 else if (bf.busFactor === 1 || (bf.busFactor === 2 && concentration >= 50)) {
                     level = 'MEDIUM';
-                    reason = bf.busFactor === 1
-                        ? `Ownership concentrated in ${topOwner}, but other contributors exist.`
-                        : `Ownership concentrated across a small group led by ${topOwner}.`;
+                    concentrationExplanation = bf.busFactor === 1
+                        ? 'Historical activity is concentrated enough that one identity accounts for at least half of file touches.'
+                        : 'Historical activity is concentrated across a small number of contributor identities.';
                 }
                 else {
                     level = 'LOW';
-                    reason = `Ownership reasonably distributed across ${contributors} contributors.`;
+                    concentrationExplanation =
+                        `Historical activity is distributed across ${contributors} contributor identities.`;
                 }
+                const whyClassified = [
+                    `One contributor identity accounts for ${concentration}% of historical file touches.`,
+                    `Bus Factor is ${bf.busFactor}.`,
+                    concentrationExplanation,
+                ];
                 const ownerEmail = nameToEmail.get(topOwner);
                 const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
                 let lastActive;
                 if (lastActiveTs !== undefined) {
                     lastActive = (0, activity_1.formatTimeAgo)(lastActiveTs);
-                    const monthsAgo = (Date.now() / 1000 - lastActiveTs) / (86400 * 30);
-                    if (monthsAgo > 18) {
-                        reason += ` Dominant owner last committed ${lastActive}.`;
-                    }
                 }
                 risks.push({
                     scope: folder,
@@ -141,9 +144,10 @@ function registerRiskCommand(program) {
                     busFactor: bf.busFactor,
                     concentration,
                     contributors,
+                    totalFileTouches: total,
                     topOwner,
                     filesAtRisk: bf.filesAtRisk,
-                    reason,
+                    whyClassified,
                     lastActive,
                 });
             }
@@ -154,6 +158,7 @@ function registerRiskCommand(program) {
             console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
             console.log(` ${chalk_1.default.bold.white('⛏  git-arch risk')} — ${chalk_1.default.grey(resolvedPath.split('/').pop())}`);
             console.log(chalk_1.default.grey('  Maintenance risk map — not an ownership leaderboard'));
+            console.log(chalk_1.default.grey(`  Analysis window: ${since ? `since ${since}` : 'all available history'}`));
             console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
             if (shown.length === 0) {
                 console.log(chalk_1.default.green('  ✓ No high or medium risk areas found.\n'));
@@ -162,16 +167,32 @@ function registerRiskCommand(program) {
                 const color = r.level === 'HIGH' ? chalk_1.default.red : r.level === 'MEDIUM' ? chalk_1.default.yellow : chalk_1.default.green;
                 console.log(color.bold(`  ${r.level} RISK`));
                 console.log(`  ${chalk_1.default.cyan(r.scope)}`);
-                console.log(`  Bus Factor: ${chalk_1.default.bold(String(r.busFactor))}   Ownership Concentration: ${chalk_1.default.bold(r.concentration + '%')}   Contributors: ${r.contributors}   Files: ${r.filesAtRisk}`);
+                console.log(`  Historical commit-touch concentration: ${chalk_1.default.bold(r.concentration + '%')}`);
+                console.log(`  Bus Factor: ${chalk_1.default.bold(String(r.busFactor))}`);
+                console.log(`  Historical file paths: ${r.filesAtRisk}`);
+                console.log(`  Contributor identities: ${r.contributors}`);
+                console.log(`  Total file-touch evidence: ${r.totalFileTouches}`);
+                console.log();
+                console.log(`  Top historical contributor: ${chalk_1.default.cyan(r.topOwner)}`);
                 if (r.lastActive) {
-                    console.log(`  Owner: ${chalk_1.default.cyan(r.topOwner)}   Last active: ${chalk_1.default.bold(r.lastActive)}`);
+                    console.log();
+                    console.log(chalk_1.default.grey('  Activity context:'));
+                    console.log(`  Latest analyzed activity: ${chalk_1.default.bold(r.lastActive)}`);
                 }
-                console.log(chalk_1.default.grey(`  Reason: ${r.reason}`));
+                console.log();
+                console.log(chalk_1.default.grey('  Why classified:'));
+                for (const explanation of r.whyClassified) {
+                    console.log(chalk_1.default.grey(`    * ${explanation}`));
+                }
                 console.log();
             }
             if (!options.all && lowCount > 0) {
                 console.log(chalk_1.default.grey(`  ${lowCount} additional scope(s) marked LOW risk — use --all to show them.\n`));
             }
+            console.log(chalk_1.default.grey('  Based on commit touches.'));
+            console.log(chalk_1.default.grey('  Contributor identities are Git email addresses.'));
+            console.log(chalk_1.default.grey('  These signals do not prove ownership, expertise, or maintainership.'));
+            console.log();
             console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
         }
         catch (err) {

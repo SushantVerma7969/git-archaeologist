@@ -25,9 +25,10 @@ interface ScopeRisk {
   busFactor: number;
   concentration: number;
   contributors: number;
+  totalFileTouches: number;
   topOwner: string;
   filesAtRisk: number;
-  reason: string;
+  whyClassified: string[];
   lastActive?: string;
 }
 
@@ -84,30 +85,34 @@ export function registerRiskCommand(program: Command): void {
           const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
 
           let level: ScopeRisk['level'];
-          let reason: string;
+          let concentrationExplanation: string;
 
           if (bf.busFactor === 1 && concentration >= 80) {
             level = 'HIGH';
-            reason = `Single dominant maintainer (${topOwner}) with limited contributor redundancy.`;
+            concentrationExplanation =
+              'Historical activity is highly concentrated in a single contributor identity.';
           } else if (bf.busFactor === 1 || (bf.busFactor === 2 && concentration >= 50)) {
             level = 'MEDIUM';
-            reason = bf.busFactor === 1
-              ? `Ownership concentrated in ${topOwner}, but other contributors exist.`
-              : `Ownership concentrated across a small group led by ${topOwner}.`;
+            concentrationExplanation = bf.busFactor === 1
+              ? 'Historical activity is concentrated enough that one identity accounts for at least half of file touches.'
+              : 'Historical activity is concentrated across a small number of contributor identities.';
           } else {
             level = 'LOW';
-            reason = `Ownership reasonably distributed across ${contributors} contributors.`;
+            concentrationExplanation =
+              `Historical activity is distributed across ${contributors} contributor identities.`;
           }
+
+          const whyClassified = [
+            `One contributor identity accounts for ${concentration}% of historical file touches.`,
+            `Bus Factor is ${bf.busFactor}.`,
+            concentrationExplanation,
+          ];
 
           const ownerEmail = nameToEmail.get(topOwner);
           const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
           let lastActive: string | undefined;
           if (lastActiveTs !== undefined) {
             lastActive = formatTimeAgo(lastActiveTs);
-            const monthsAgo = (Date.now() / 1000 - lastActiveTs) / (86400 * 30);
-            if (monthsAgo > 18) {
-              reason += ` Dominant owner last committed ${lastActive}.`;
-            }
           }
 
           risks.push({
@@ -116,9 +121,10 @@ export function registerRiskCommand(program: Command): void {
             busFactor: bf.busFactor,
             concentration,
             contributors,
+            totalFileTouches: total,
             topOwner,
             filesAtRisk: bf.filesAtRisk,
-            reason,
+            whyClassified,
             lastActive,
           });
         }
@@ -132,6 +138,7 @@ export function registerRiskCommand(program: Command): void {
         console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
         console.log(` ${chalk.bold.white('⛏  git-arch risk')} — ${chalk.grey(resolvedPath.split('/').pop())}`);
         console.log(chalk.grey('  Maintenance risk map — not an ownership leaderboard'));
+        console.log(chalk.grey(`  Analysis window: ${since ? `since ${since}` : 'all available history'}`));
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
 
         if (shown.length === 0) {
@@ -142,11 +149,23 @@ export function registerRiskCommand(program: Command): void {
           const color = r.level === 'HIGH' ? chalk.red : r.level === 'MEDIUM' ? chalk.yellow : chalk.green;
           console.log(color.bold(`  ${r.level} RISK`));
           console.log(`  ${chalk.cyan(r.scope)}`);
-          console.log(`  Bus Factor: ${chalk.bold(String(r.busFactor))}   Ownership Concentration: ${chalk.bold(r.concentration + '%')}   Contributors: ${r.contributors}   Files: ${r.filesAtRisk}`);
+          console.log(`  Historical commit-touch concentration: ${chalk.bold(r.concentration + '%')}`);
+          console.log(`  Bus Factor: ${chalk.bold(String(r.busFactor))}`);
+          console.log(`  Historical file paths: ${r.filesAtRisk}`);
+          console.log(`  Contributor identities: ${r.contributors}`);
+          console.log(`  Total file-touch evidence: ${r.totalFileTouches}`);
+          console.log();
+          console.log(`  Top historical contributor: ${chalk.cyan(r.topOwner)}`);
           if (r.lastActive) {
-            console.log(`  Owner: ${chalk.cyan(r.topOwner)}   Last active: ${chalk.bold(r.lastActive)}`);
+            console.log();
+            console.log(chalk.grey('  Activity context:'));
+            console.log(`  Latest analyzed activity: ${chalk.bold(r.lastActive)}`);
           }
-          console.log(chalk.grey(`  Reason: ${r.reason}`));
+          console.log();
+          console.log(chalk.grey('  Why classified:'));
+          for (const explanation of r.whyClassified) {
+            console.log(chalk.grey(`    * ${explanation}`));
+          }
           console.log();
         }
 
@@ -154,6 +173,10 @@ export function registerRiskCommand(program: Command): void {
           console.log(chalk.grey(`  ${lowCount} additional scope(s) marked LOW risk — use --all to show them.\n`));
         }
 
+        console.log(chalk.grey('  Based on commit touches.'));
+        console.log(chalk.grey('  Contributor identities are Git email addresses.'));
+        console.log(chalk.grey('  These signals do not prove ownership, expertise, or maintainership.'));
+        console.log();
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
