@@ -4,8 +4,55 @@ const test = require('node:test');
 const {
   buildRiskExplanation,
   buildScopeRisks,
+  buildTemporalScopeRisks,
   classifyScopeRisk,
 } = require('../dist/riskExplanation');
+
+function makeStats(scope, totals) {
+  const entries = Object.entries(totals);
+  const files = ['a.ts', 'b.ts', 'c.ts'];
+  return files.map((file, index) => {
+    const authorChanges = new Map(
+      entries.map(([email, count]) => [email, index === 0 ? count : 0])
+    );
+    return [
+      `${scope}/${file}`,
+      {
+        filepath: `${scope}/${file}`,
+        totalChanges: index === 0 ? entries.reduce((sum, [, count]) => sum + count, 0) : 0,
+        uniqueAuthors: new Set(entries.map(([email]) => email)),
+        authorChanges,
+        firstChanged: 1,
+        lastChanged: 2,
+        changeTimeline: [],
+      },
+    ];
+  });
+}
+
+function makeResult(scopes) {
+  return {
+    repoPath: '/repo',
+    repoName: 'repo',
+    analyzedAt: new Date(),
+    totalCommits: 1,
+    totalFiles: scopes.length * 3,
+    totalAuthors: 3,
+    dateRange: { from: new Date(), to: new Date() },
+    cursedFiles: [],
+    ownership: [],
+    busFactor: scopes.map((scope) => ({
+      scope: scope.scope,
+      busFactor: scope.busFactor,
+      atRiskAuthors: ['a@example.com'],
+      filesAtRisk: scope.filesAtRisk ?? 3,
+      warning: 'fixture',
+    })),
+    coupling: [],
+    fileStats: new Map(scopes.flatMap((scope) => makeStats(scope.scope, scope.totals))),
+    lastActiveByAuthor: new Map(),
+  };
+}
 
 test('classifyScopeRisk preserves HIGH threshold boundary', () => {
   assert.equal(classifyScopeRisk(1, 80), 'HIGH');
@@ -145,4 +192,33 @@ test('buildScopeRisks reuses existing values and keeps whyClassified available',
     'Top contributor owns 84% of touches',
   ]);
   assert.equal(risk.whyClassified.length, 3);
+});
+
+test('buildTemporalScopeRisks applies protocol categories from concentration status', () => {
+  const lifetimeResult = makeResult([
+    { scope: 'persistent', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
+    { scope: 'historical', busFactor: 1, totals: { 'a@example.com': 60, 'b@example.com': 40 } },
+    { scope: 'emerging', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
+    { scope: 'distributed', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
+    { scope: 'inactive', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
+    { scope: 'thin', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
+  ]);
+  const recentResult = makeResult([
+    { scope: 'persistent', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
+    { scope: 'historical', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
+    { scope: 'emerging', busFactor: 1, totals: { 'a@example.com': 60, 'b@example.com': 40 } },
+    { scope: 'distributed', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
+    { scope: 'thin', busFactor: 1, filesAtRisk: 1, totals: { 'a@example.com': 9 } },
+  ]);
+
+  const categories = new Map(
+    buildTemporalScopeRisks(lifetimeResult, recentResult).map((risk) => [risk.scope, risk.category])
+  );
+
+  assert.equal(categories.get('persistent'), 'Persistent concentration');
+  assert.equal(categories.get('historical'), 'Historical concentration');
+  assert.equal(categories.get('emerging'), 'Emerging concentration');
+  assert.equal(categories.get('distributed'), 'Persistently distributed');
+  assert.equal(categories.get('inactive'), 'No recent activity');
+  assert.equal(categories.get('thin'), 'Insufficient recent evidence');
 });
