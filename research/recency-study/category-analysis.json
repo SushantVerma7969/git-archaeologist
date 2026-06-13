@@ -1,0 +1,107 @@
+{
+  "source": "research/recency-study/master-recency-study.json",
+  "formulas": {
+    "scope_count": "count(rows where row.category == category)",
+    "mean": "sum(non-null numeric field values) / count(non-null numeric field values)",
+    "median": "sort(non-null numeric field values); odd n => middle value; even n => average of two middle values",
+    "percentage_of_all_scopes": "scope_count / total_scope_count * 100",
+    "eligible_scope_denominator": "count(rows where category is not No recent activity and not Insufficient recent evidence)",
+    "percentage_of_eligible_scopes": "scope_count / eligible_scope_denominator * 100 for eligible categories; null for excluded categories"
+  },
+  "totals": {
+    "total_scopes": 359,
+    "eligible_scopes": 249
+  },
+  "categories": {
+    "Persistent concentration": {
+      "scope_count": 144,
+      "percentage_of_all_scopes": 40.11,
+      "percentage_of_eligible_scopes": 57.83,
+      "median_recent_touches": 206.5,
+      "mean_recent_touches": 1939.76,
+      "median_lifetime_touches": 254,
+      "mean_lifetime_touches": 2430.86,
+      "median_recent_identities": 6.5,
+      "median_lifetime_identities": 7,
+      "median_recent_concentration": 0.7748,
+      "median_lifetime_concentration": 0.7815,
+      "median_recent_bus_factor": 1,
+      "median_lifetime_bus_factor": 1
+    },
+    "Historical concentration": {
+      "scope_count": 10,
+      "percentage_of_all_scopes": 2.79,
+      "percentage_of_eligible_scopes": 4.02,
+      "median_recent_touches": 60.5,
+      "mean_recent_touches": 312.5,
+      "median_lifetime_touches": 1354,
+      "mean_lifetime_touches": 1375.6,
+      "median_recent_identities": 13.5,
+      "median_lifetime_identities": 40.5,
+      "median_recent_concentration": 0.3649,
+      "median_lifetime_concentration": 0.6275,
+      "median_recent_bus_factor": 2,
+      "median_lifetime_bus_factor": 1
+    },
+    "Emerging concentration": {
+      "scope_count": 12,
+      "percentage_of_all_scopes": 3.34,
+      "percentage_of_eligible_scopes": 4.82,
+      "median_recent_touches": 45,
+      "mean_recent_touches": 446.25,
+      "median_lifetime_touches": 269,
+      "mean_lifetime_touches": 7024.75,
+      "median_recent_identities": 8.5,
+      "median_lifetime_identities": 29.5,
+      "median_recent_concentration": 0.631,
+      "median_lifetime_concentration": 0.3524,
+      "median_recent_bus_factor": 1,
+      "median_lifetime_bus_factor": 2
+    },
+    "Persistently distributed": {
+      "scope_count": 83,
+      "percentage_of_all_scopes": 23.12,
+      "percentage_of_eligible_scopes": 33.33,
+      "median_recent_touches": 172,
+      "mean_recent_touches": 1624.63,
+      "median_lifetime_touches": 827,
+      "mean_lifetime_touches": 13651.84,
+      "median_recent_identities": 23,
+      "median_lifetime_identities": 53,
+      "median_recent_concentration": 0.3333,
+      "median_lifetime_concentration": 0.3033,
+      "median_recent_bus_factor": 2,
+      "median_lifetime_bus_factor": 3
+    },
+    "No recent activity": {
+      "scope_count": 69,
+      "percentage_of_all_scopes": 19.22,
+      "percentage_of_eligible_scopes": null,
+      "median_recent_touches": 0,
+      "mean_recent_touches": 0,
+      "median_lifetime_touches": 111,
+      "mean_lifetime_touches": 2046.72,
+      "median_recent_identities": 0,
+      "median_lifetime_identities": 10,
+      "median_recent_concentration": 0,
+      "median_lifetime_concentration": 0.6635,
+      "median_recent_bus_factor": 0,
+      "median_lifetime_bus_factor": 1
+    },
+    "Insufficient recent evidence": {
+      "scope_count": 41,
+      "percentage_of_all_scopes": 11.42,
+      "percentage_of_eligible_scopes": null,
+      "median_recent_touches": 4,
+      "mean_recent_touches": 4.2,
+      "median_lifetime_touches": 13,
+      "mean_lifetime_touches": 238.85,
+      "median_recent_identities": 1,
+      "median_lifetime_identities": 4,
+      "median_recent_concentration": 1,
+      "median_lifetime_concentration": 0.7344,
+      "median_recent_bus_factor": 1,
+      "median_lifetime_bus_factor": 1
+    }
+  }
+}
