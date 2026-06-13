@@ -68,6 +68,23 @@ export interface ScopeRisk {
   lastActive?: string;
 }
 
+export type TemporalRiskCategory =
+  | 'Persistent concentration'
+  | 'Historical concentration'
+  | 'Emerging concentration'
+  | 'Persistently distributed'
+  | 'No recent activity'
+  | 'Insufficient recent evidence';
+
+export interface TemporalScopeRisk {
+  scope: string;
+  category: TemporalRiskCategory;
+  lifetime: ScopeRisk;
+  recent?: ScopeRisk;
+  recentTouches: number;
+  summary: string;
+}
+
 export interface CouplingPair {
   fileA: string;
   fileB: string;
