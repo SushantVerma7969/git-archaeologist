@@ -4,7 +4,6 @@ exports.classifyScopeRisk = classifyScopeRisk;
 exports.buildRiskExplanation = buildRiskExplanation;
 exports.buildScopeRisks = buildScopeRisks;
 exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
-const botFilter_1 = require("./utils/botFilter");
 const activity_1 = require("./utils/activity");
 function classifyScopeRisk(busFactor, concentration) {
     if (busFactor === 1 && concentration >= 80) {
@@ -40,8 +39,18 @@ function buildRiskExplanation(input) {
         summary: `Knowledge appears distributed across ${input.contributors} contributor identities.`,
     };
 }
+function buildNonBotEmailSet(result) {
+    const emails = new Set();
+    for (const o of result.ownership) {
+        for (const c of o.contributors) {
+            emails.add(c.email);
+        }
+    }
+    return emails;
+}
 function buildScopeRisks(result, options = {}) {
     const minFilesAtRisk = options.minFilesAtRisk ?? 3;
+    const nonBotEmails = buildNonBotEmailSet(result);
     const folderAuthorChanges = new Map();
     for (const [, stats] of result.fileStats) {
         const parts = stats.filepath.split('/');
@@ -50,7 +59,7 @@ function buildScopeRisks(result, options = {}) {
             folderAuthorChanges.set(folder, new Map());
         const authorTotals = folderAuthorChanges.get(folder);
         for (const [email, count] of stats.authorChanges) {
-            if ((0, botFilter_1.isBot)(email, email))
+            if (!nonBotEmails.has(email))
                 continue;
             authorTotals.set(email, (authorTotals.get(email) ?? 0) + count);
         }
@@ -107,14 +116,14 @@ function buildScopeRisks(result, options = {}) {
     const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
     return risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
 }
-function countNonBotTouchesByScope(result) {
+function countNonBotTouchesByScope(result, nonBotEmails) {
     const touches = new Map();
     for (const [, stats] of result.fileStats) {
         const parts = stats.filepath.split('/');
         const folder = parts.length > 1 ? parts[0] : '(root)';
         let total = 0;
         for (const [email, count] of stats.authorChanges) {
-            if ((0, botFilter_1.isBot)(email, email))
+            if (!nonBotEmails.has(email))
                 continue;
             total += count;
         }
@@ -158,7 +167,7 @@ function buildTemporalScopeRisks(lifetimeResult, recentResult) {
     const lifetimeRisks = buildScopeRisks(lifetimeResult);
     const recentRisks = buildScopeRisks(recentResult, { minFilesAtRisk: 0 });
     const recentByScope = new Map(recentRisks.map((risk) => [risk.scope, risk]));
-    const recentTouchesByScope = countNonBotTouchesByScope(recentResult);
+    const recentTouchesByScope = countNonBotTouchesByScope(recentResult, buildNonBotEmailSet(recentResult));
     const categoryOrder = {
         'Persistent concentration': 0,
         'Historical concentration': 1,
