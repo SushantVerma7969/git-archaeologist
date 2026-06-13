@@ -63,10 +63,60 @@ function registerRiskCommand(program) {
         .description('Identify maintenance risk areas — risk map, not a leaderboard')
         .option('-s, --since <date>', 'Only analyze commits after this date')
         .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
+        .option('--temporal', 'Compare lifetime risk with the last 12 months')
         .action(async (repoPath, options) => {
         const resolvedPath = path.resolve(repoPath ?? '.');
         const since = options.since ? parseSince(options.since) : undefined;
         try {
+            if (options.temporal) {
+                if (options.since) {
+                    console.error(chalk_1.default.red('\n  ✖  Error: ') + '--since cannot be used with --temporal. Temporal risk uses a fixed 12-month recent window.');
+                    process.exit(1);
+                }
+                const recentSince = parseSince('12m');
+                const lifetimeResult = await (0, orchestrator_1.analyze)(resolvedPath);
+                const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince);
+                const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
+                console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
+                console.log(` ${chalk_1.default.bold.white('⛏  git-arch risk --temporal')} — ${chalk_1.default.grey(resolvedPath.split('/').pop())}`);
+                console.log(chalk_1.default.grey('  Lifetime vs recent ownership concentration'));
+                console.log(chalk_1.default.grey(`  Recent window: since ${recentSince} (12 months)`));
+                console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
+                if (temporalRisks.length === 0) {
+                    console.log(chalk_1.default.green('  ✓ No eligible lifetime scopes found.\n'));
+                }
+                for (const r of temporalRisks) {
+                    const color = r.category === 'Persistent concentration' || r.category === 'Emerging concentration'
+                        ? chalk_1.default.red
+                        : r.category === 'Historical concentration'
+                            ? chalk_1.default.yellow
+                            : chalk_1.default.green;
+                    console.log(color.bold(`  ${r.category}`));
+                    console.log(`  ${chalk_1.default.cyan(r.scope)}`);
+                    console.log(`  Lifetime: ${chalk_1.default.bold(r.lifetime.level)} risk, `
+                        + `${chalk_1.default.bold(r.lifetime.concentration + '%')} concentration, `
+                        + `bus factor ${chalk_1.default.bold(String(r.lifetime.busFactor))}`);
+                    if (r.category === 'No recent activity' || r.category === 'Insufficient recent evidence') {
+                        console.log(`  Recent:   ${chalk_1.default.bold(String(r.recentTouches))} non-bot file touches`);
+                    }
+                    else if (r.recent) {
+                        console.log(`  Recent:   ${chalk_1.default.bold(r.recent.level)} risk, `
+                            + `${chalk_1.default.bold(r.recent.concentration + '%')} concentration, `
+                            + `bus factor ${chalk_1.default.bold(String(r.recent.busFactor))}`);
+                    }
+                    else {
+                        console.log(`  Recent:   ${chalk_1.default.bold(String(r.recentTouches))} non-bot file touches`);
+                    }
+                    console.log(chalk_1.default.grey(`  ${r.summary}`));
+                    console.log();
+                }
+                console.log(chalk_1.default.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));
+                console.log(chalk_1.default.grey('  Recent scopes with 1-9 non-bot touches are marked insufficient recent evidence.'));
+                console.log(chalk_1.default.grey('  These signals do not prove ownership, expertise, or maintainership.'));
+                console.log();
+                console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
+                return;
+            }
             const result = await (0, orchestrator_1.analyze)(resolvedPath, since);
             const risks = (0, riskExplanation_1.buildScopeRisks)(result);
             const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');
