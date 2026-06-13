@@ -42,6 +42,24 @@ export interface BusFactor {
     filesAtRisk: number;
     warning: string;
 }
+export type RiskLevel = 'HIGH' | 'MEDIUM' | 'LOW';
+export interface RiskExplanation {
+    reasons: string[];
+    summary: string;
+}
+export interface ScopeRisk {
+    scope: string;
+    level: RiskLevel;
+    busFactor: number;
+    concentration: number;
+    contributors: number;
+    totalFileTouches: number;
+    topOwner: string;
+    filesAtRisk: number;
+    whyClassified: string[];
+    explanation: RiskExplanation;
+    lastActive?: string;
+}
 export interface CouplingPair {
     fileA: string;
     fileB: string;
