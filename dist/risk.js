@@ -40,8 +40,7 @@ exports.registerRiskCommand = registerRiskCommand;
 const chalk_1 = __importDefault(require("chalk"));
 const path = __importStar(require("path"));
 const orchestrator_1 = require("./core/orchestrator");
-const botFilter_1 = require("./utils/botFilter");
-const activity_1 = require("./utils/activity");
+const riskExplanation_1 = require("./riskExplanation");
 function parseSince(input) {
     const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
     if (match) {
@@ -69,90 +68,7 @@ function registerRiskCommand(program) {
         const since = options.since ? parseSince(options.since) : undefined;
         try {
             const result = await (0, orchestrator_1.analyze)(resolvedPath, since);
-            // Aggregate per top-level folder: total changes per author
-            const folderAuthorChanges = new Map();
-            for (const [, stats] of result.fileStats) {
-                const parts = stats.filepath.split('/');
-                const folder = parts.length > 1 ? parts[0] : '(root)';
-                if (!folderAuthorChanges.has(folder))
-                    folderAuthorChanges.set(folder, new Map());
-                const authorTotals = folderAuthorChanges.get(folder);
-                for (const [email, count] of stats.authorChanges) {
-                    if ((0, botFilter_1.isBot)(email, email))
-                        continue;
-                    authorTotals.set(email, (authorTotals.get(email) ?? 0) + count);
-                }
-            }
-            const bfMap = new Map(result.busFactor.map((b) => [b.scope, b]));
-            const risks = [];
-            // Build a name -> email map from ownership contributor data,
-            // so we can look up lastActiveByAuthor (keyed by email) for a
-            // given display name (as stored in atRiskAuthors).
-            const nameToEmail = new Map();
-            for (const o of result.ownership) {
-                for (const c of o.contributors) {
-                    if (!nameToEmail.has(c.name))
-                        nameToEmail.set(c.name, c.email);
-                }
-            }
-            for (const [folder, authorTotals] of folderAuthorChanges) {
-                const bf = bfMap.get(folder);
-                if (!bf)
-                    continue;
-                if (bf.filesAtRisk < 3)
-                    continue; // skip tiny/noise scopes
-                const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
-                if (total === 0)
-                    continue;
-                const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
-                const topShare = sorted[0][1] / total;
-                const concentration = Math.round(topShare * 1000) / 10;
-                const contributors = sorted.length;
-                const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
-                let level;
-                let concentrationExplanation;
-                if (bf.busFactor === 1 && concentration >= 80) {
-                    level = 'HIGH';
-                    concentrationExplanation =
-                        'Historical activity is highly concentrated in a single contributor identity.';
-                }
-                else if (bf.busFactor === 1 || (bf.busFactor === 2 && concentration >= 50)) {
-                    level = 'MEDIUM';
-                    concentrationExplanation = bf.busFactor === 1
-                        ? 'Historical activity is concentrated enough that one identity accounts for at least half of file touches.'
-                        : 'Historical activity is concentrated across a small number of contributor identities.';
-                }
-                else {
-                    level = 'LOW';
-                    concentrationExplanation =
-                        `Historical activity is distributed across ${contributors} contributor identities.`;
-                }
-                const whyClassified = [
-                    `One contributor identity accounts for ${concentration}% of historical file touches.`,
-                    `Bus Factor is ${bf.busFactor}.`,
-                    concentrationExplanation,
-                ];
-                const ownerEmail = nameToEmail.get(topOwner);
-                const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
-                let lastActive;
-                if (lastActiveTs !== undefined) {
-                    lastActive = (0, activity_1.formatTimeAgo)(lastActiveTs);
-                }
-                risks.push({
-                    scope: folder,
-                    level,
-                    busFactor: bf.busFactor,
-                    concentration,
-                    contributors,
-                    totalFileTouches: total,
-                    topOwner,
-                    filesAtRisk: bf.filesAtRisk,
-                    whyClassified,
-                    lastActive,
-                });
-            }
-            const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
-            risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
+            const risks = (0, riskExplanation_1.buildScopeRisks)(result);
             const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');
             const lowCount = risks.filter((r) => r.level === 'LOW').length;
             console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
@@ -180,10 +96,13 @@ function registerRiskCommand(program) {
                     console.log(`  Latest analyzed activity: ${chalk_1.default.bold(r.lastActive)}`);
                 }
                 console.log();
-                console.log(chalk_1.default.grey('  Why classified:'));
-                for (const explanation of r.whyClassified) {
-                    console.log(chalk_1.default.grey(`    * ${explanation}`));
+                console.log(chalk_1.default.grey('  Why:'));
+                for (const reason of r.explanation.reasons) {
+                    console.log(chalk_1.default.grey(`    * ${reason}`));
                 }
+                console.log();
+                console.log(chalk_1.default.grey('  Interpretation:'));
+                console.log(chalk_1.default.grey(`    ${r.explanation.summary}`));
                 console.log();
             }
             if (!options.all && lowCount > 0) {

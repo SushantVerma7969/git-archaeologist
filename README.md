@@ -30,14 +30,25 @@ HIGH RISK
 lib
 Bus Factor: 1   Ownership Concentration: 100%   Contributors: 12   Files: 24
 Owner: Douglas Christopher Wilson   Last active: 14 months ago
-Reason: Single dominant maintainer (Douglas Christopher Wilson) with limited contributor
-redundancy. Dominant owner last committed 14 months ago.
+
+Why:
+  * Bus factor is 1
+  * Top contributor owns 100% of touches
+
+Interpretation:
+  Knowledge remains concentrated in a single contributor.
 
 MEDIUM RISK
 api
 Bus Factor: 1   Ownership Concentration: 65.3%   Contributors: 9   Files: 31
 Owner: Douglas Christopher Wilson   Last active: 6 days ago
-Reason: Ownership concentrated in Douglas Christopher Wilson, but other contributors exist.
+
+Why:
+  * Bus factor is 1
+  * Top contributor owns 65.3% of touches
+
+Interpretation:
+  One contributor still accounts for enough history to create continuity risk.
 ```
 
 ## Why ownership concentration alone is misleading
@@ -65,7 +76,9 @@ Same concentration, roughly 65–70%. One has had no single contributor with sus
 
 **Owner Activity** — when did that dominant contributor last commit anywhere in the repo? This is what separates Express `lib/` (65%, owner gone 2 years) from Vue 3 `packages/` (70%, owner active 4 months ago).
 
-**HIGH / MEDIUM / LOW** — concentration + bus factor + activity combined. HIGH means one inactive owner with little redundancy. Run `--all` to see every scope.
+**HIGH / MEDIUM / LOW** — classified from ownership concentration and bus factor. Owner activity is shown as context so you can tell active concentration from abandoned concentration. Run `--all` to see every scope.
+
+**Explainable risk output** — `git-arch risk` explains each scope with structured reasons and a short interpretation. The explanations reuse the same bus-factor and concentration values already computed by the risk command; they do not run additional analysis or change the risk thresholds.
 
 ## Known limitations
 
