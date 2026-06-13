@@ -42,6 +42,32 @@ export interface BusFactor {
     filesAtRisk: number;
     warning: string;
 }
+export type RiskLevel = 'HIGH' | 'MEDIUM' | 'LOW';
+export interface RiskExplanation {
+    reasons: string[];
+    summary: string;
+}
+export interface ScopeRisk {
+    scope: string;
+    level: RiskLevel;
+    busFactor: number;
+    concentration: number;
+    contributors: number;
+    totalFileTouches: number;
+    topOwner: string;
+    filesAtRisk: number;
+    explanation: RiskExplanation;
+    lastActive?: string;
+}
+export type TemporalRiskCategory = 'Persistent concentration' | 'Historical concentration' | 'Emerging concentration' | 'Persistently distributed' | 'No recent activity' | 'Insufficient recent evidence';
+export interface TemporalScopeRisk {
+    scope: string;
+    category: TemporalRiskCategory;
+    lifetime: ScopeRisk;
+    recent?: ScopeRisk;
+    recentTouches: number;
+    summary: string;
+}
 export interface CouplingPair {
     fileA: string;
     fileB: string;
