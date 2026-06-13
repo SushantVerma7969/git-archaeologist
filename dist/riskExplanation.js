@@ -40,27 +40,6 @@ function buildRiskExplanation(input) {
         summary: `Knowledge appears distributed across ${input.contributors} contributor identities.`,
     };
 }
-function buildWhyClassified(input) {
-    let concentrationExplanation;
-    if (input.level === 'HIGH') {
-        concentrationExplanation =
-            'Historical activity is highly concentrated in a single contributor identity.';
-    }
-    else if (input.level === 'MEDIUM') {
-        concentrationExplanation = input.busFactor === 1
-            ? 'Historical activity is concentrated enough that one identity accounts for at least half of file touches.'
-            : 'Historical activity is concentrated across a small number of contributor identities.';
-    }
-    else {
-        concentrationExplanation =
-            `Historical activity is distributed across ${input.contributors} contributor identities.`;
-    }
-    return [
-        `One contributor identity accounts for ${input.concentration}% of historical file touches.`,
-        `Bus Factor is ${input.busFactor}.`,
-        concentrationExplanation,
-    ];
-}
 function buildScopeRisks(result, options = {}) {
     const minFilesAtRisk = options.minFilesAtRisk ?? 3;
     const folderAuthorChanges = new Map();
@@ -121,7 +100,6 @@ function buildScopeRisks(result, options = {}) {
             totalFileTouches: total,
             topOwner,
             filesAtRisk: bf.filesAtRisk,
-            whyClassified: buildWhyClassified(explanationInput),
             explanation: buildRiskExplanation(explanationInput),
             lastActive,
         });

@@ -108,7 +108,7 @@ test('buildRiskExplanation emits MEDIUM and LOW summaries', () => {
   );
 });
 
-test('buildScopeRisks reuses existing values and keeps whyClassified available', () => {
+test('buildScopeRisks reuses existing values and explanation', () => {
   const result = {
     repoPath: '/repo',
     repoName: 'repo',
@@ -191,7 +191,6 @@ test('buildScopeRisks reuses existing values and keeps whyClassified available',
     'Bus factor is 1',
     'Top contributor owns 84% of touches',
   ]);
-  assert.equal(risk.whyClassified.length, 3);
 });
 
 test('buildTemporalScopeRisks applies protocol categories from concentration status', () => {
