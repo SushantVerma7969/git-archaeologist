@@ -80,6 +80,8 @@ Same concentration, roughly 65–70%. One has had no single contributor with sus
 
 **Explainable risk output** — `git-arch risk` explains each scope with structured reasons and a short interpretation. The explanations reuse the same bus-factor and concentration values already computed by the risk command; they do not run additional analysis or change the risk thresholds.
 
+**Temporal classification** — `git-arch risk --temporal` compares lifetime risk with the last 12 months. HIGH and MEDIUM are treated as concentrated, LOW is treated as distributed, and scopes with fewer than 10 recent non-bot touches are marked as insufficient recent evidence.
+
 ## Known limitations
 
 - Commit authorship ≠ knowledge ownership. Someone can deeply understand code they rarely commit to.
@@ -101,6 +103,7 @@ npm install -g git-archaeologist
 ```bash
 git-arch risk /path/to/repo                    # ownership/maintenance risk map (start here)
 git-arch risk /path/to/repo --all              # show every scope, including LOW risk
+git-arch risk /path/to/repo --temporal         # compare lifetime vs last 12 months
 git-arch analyze /path/to/repo                 # full analysis: curse scores, coupling, ownership
 git-arch analyze /path/to/repo --since 90d     # only last 90 days of commits
 git-arch analyze /path/to/repo --since 2y      # only last 2 years

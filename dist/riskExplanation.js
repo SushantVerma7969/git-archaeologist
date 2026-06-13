@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.classifyScopeRisk = classifyScopeRisk;
 exports.buildRiskExplanation = buildRiskExplanation;
 exports.buildScopeRisks = buildScopeRisks;
+exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
 const botFilter_1 = require("./utils/botFilter");
 const activity_1 = require("./utils/activity");
 function classifyScopeRisk(busFactor, concentration) {
@@ -13,6 +14,9 @@ function classifyScopeRisk(busFactor, concentration) {
         return 'MEDIUM';
     }
     return 'LOW';
+}
+function isConcentrated(level) {
+    return level === 'HIGH' || level === 'MEDIUM';
 }
 function buildRiskExplanation(input) {
     const reasons = [
@@ -57,7 +61,8 @@ function buildWhyClassified(input) {
         concentrationExplanation,
     ];
 }
-function buildScopeRisks(result) {
+function buildScopeRisks(result, options = {}) {
+    const minFilesAtRisk = options.minFilesAtRisk ?? 3;
     const folderAuthorChanges = new Map();
     for (const [, stats] of result.fileStats) {
         const parts = stats.filepath.split('/');
@@ -84,7 +89,7 @@ function buildScopeRisks(result) {
         const bf = bfMap.get(folder);
         if (!bf)
             continue;
-        if (bf.filesAtRisk < 3)
+        if (bf.filesAtRisk < minFilesAtRisk)
             continue;
         const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
         if (total === 0)
@@ -123,5 +128,84 @@ function buildScopeRisks(result) {
     }
     const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
     return risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
+}
+function countNonBotTouchesByScope(result) {
+    const touches = new Map();
+    for (const [, stats] of result.fileStats) {
+        const parts = stats.filepath.split('/');
+        const folder = parts.length > 1 ? parts[0] : '(root)';
+        let total = 0;
+        for (const [email, count] of stats.authorChanges) {
+            if ((0, botFilter_1.isBot)(email, email))
+                continue;
+            total += count;
+        }
+        touches.set(folder, (touches.get(folder) ?? 0) + total);
+    }
+    return touches;
+}
+function classifyTemporalRisk(lifetime, recent, recentTouches = 0) {
+    if (recentTouches === 0) {
+        return 'No recent activity';
+    }
+    if (recentTouches < 10 || recent === undefined) {
+        return 'Insufficient recent evidence';
+    }
+    const lifetimeConcentrated = isConcentrated(lifetime.level);
+    const recentConcentrated = isConcentrated(recent.level);
+    if (lifetimeConcentrated && recentConcentrated) {
+        return 'Persistent concentration';
+    }
+    if (lifetimeConcentrated && !recentConcentrated) {
+        return 'Historical concentration';
+    }
+    if (!lifetimeConcentrated && recentConcentrated) {
+        return 'Emerging concentration';
+    }
+    return 'Persistently distributed';
+}
+function buildTemporalSummary(lifetime, recent, category) {
+    if (category === 'No recent activity') {
+        return 'This scope has lifetime history but no non-bot touches in the recent window.';
+    }
+    if (category === 'Insufficient recent evidence') {
+        return 'This scope has recent activity, but fewer than 10 non-bot touches in the recent window.';
+    }
+    const recentLabel = recent
+        ? `${recent.level} risk, ${recent.concentration}% concentration`
+        : 'no comparable recent risk';
+    return `Lifetime is ${lifetime.level} risk at ${lifetime.concentration}% concentration; recent is ${recentLabel}.`;
+}
+function buildTemporalScopeRisks(lifetimeResult, recentResult) {
+    const lifetimeRisks = buildScopeRisks(lifetimeResult);
+    const recentRisks = buildScopeRisks(recentResult, { minFilesAtRisk: 0 });
+    const recentByScope = new Map(recentRisks.map((risk) => [risk.scope, risk]));
+    const recentTouchesByScope = countNonBotTouchesByScope(recentResult);
+    const categoryOrder = {
+        'Persistent concentration': 0,
+        'Historical concentration': 1,
+        'Emerging concentration': 2,
+        'Persistently distributed': 3,
+        'No recent activity': 4,
+        'Insufficient recent evidence': 5,
+    };
+    return lifetimeRisks
+        .map((lifetime) => {
+        const recent = recentByScope.get(lifetime.scope);
+        const recentTouches = recentTouchesByScope.get(lifetime.scope) ?? 0;
+        const category = classifyTemporalRisk(lifetime, recent, recentTouches);
+        return {
+            scope: lifetime.scope,
+            category,
+            lifetime,
+            recent,
+            recentTouches,
+            summary: buildTemporalSummary(lifetime, recent, category),
+        };
+    })
+        .sort((a, b) => {
+        return categoryOrder[a.category] - categoryOrder[b.category]
+            || b.lifetime.concentration - a.lifetime.concentration;
+    });
 }
 //# sourceMappingURL=riskExplanation.js.map
