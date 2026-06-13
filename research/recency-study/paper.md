@@ -108,6 +108,10 @@ Historical paths may include deleted or renamed files, and renamed files may be 
 
 Repository snapshots may end on different dates even though the recent-period cutoff is fixed. The fixed cutoff makes the recent window comparable by start date, but the available endpoint depends on each checked-out repository snapshot.
 
+The eligible-scope dataset may not be representative of all repository scopes. Repositories with little recent activity contribute more no-recent-activity and insufficient-evidence scopes, while more actively maintained repositories contribute a larger share of eligible scopes. As a result, eligible-scope percentages describe scopes with sufficient recent activity under this protocol rather than all repository scopes uniformly.
+
+One case-study row (Golang `test`, recent top identity) displays an email address rather than a display name because the parser falls back to email identifiers when display-name metadata is unavailable. This affects presentation only and does not affect concentration, bus-factor, risk, or category calculations.
+
 ## 8. Discussion
 
 The main empirical result is that persistent concentration dominates eligible scopes in this dataset. More than half of eligible scopes are concentrated in both lifetime and recent windows. This pattern is especially visible in repositories such as TensorFlow, Angular, Spring Boot, Elasticsearch, Svelte, and Next.js, each of which has a high percentage of persistent-concentration scopes among eligible scopes.
