@@ -59,7 +59,7 @@ The concentration signal appears genuine, although it is based on a small amount
 
 This remains a valid Emerging Concentration example, but should be presented with the context that the recent window contains relatively few commits.
 
-## Vite / src
+## Vitest / src
 
 Survey result:
 
@@ -75,25 +75,25 @@ src/
 
 to
 
-packages/vite/src/
+packages/vitest/src/
 
 Evidence:
 
 Commit:
 
-cb9f750e8
+d6ff0ccb
 
-refactor: re-organize into monorepo
+refactor: move to monorepo
 
 Examples from the migration:
 
-- src/client -> packages/vite/src/client
-- src/hmrPayload.ts -> packages/vite/src/hmrPayload.ts
-- src/node -> packages/vite/src/node
+- src/constants.ts -> packages/vitest/src/constants.ts
+- src/node/cli.ts -> packages/vitest/src/node/cli.ts
+- src/runtime -> packages/vitest/src/runtime
+- src/types -> packages/vitest/src/types
 
 Conclusion:
 
 The reported "No recent activity" result reflects path-level inactivity rather than subsystem inactivity.
 
-This is a confirmed scope-stability limitation caused by repository reorganization.
-
+This is a second confirmed scope-stability limitation caused by repository reorganization.
