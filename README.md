@@ -2,11 +2,11 @@
 
 [![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
 
-**Find out who actually owns your code, and whether that's still true.**
+**Find maintenance risk in your git history before it turns into a handoff problem.**
 
-git-archaeologist reads your git history and tells you which parts of your codebase are concentrated in one person's hands — and, critically, whether that person is still around. A directory that's 70% owned by someone who committed last week is a completely different situation than one that's 70% owned by someone who hasn't committed in two years. Most ownership tools can't tell you which one you're looking at. This one can.
+git-archaeologist reads commit history and shows where maintenance knowledge is concentrated: which folders have a low bus factor, which contributor owns most of the history, and whether that contributor is still active. A directory that's 70% touched by someone who committed last week is different from one that's 70% touched by someone who hasn't committed in two years.
 
-[Quick Start](#quick-start) · [Concepts](#concepts) · [Commands](#commands) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
+[Quick Start](#quick-start) · [Example output](#example-output) · [Concepts](#concepts) · [Commands](#commands) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 ---
 
@@ -16,7 +16,7 @@ git-archaeologist reads your git history and tells you which parts of your codeb
 npx git-archaeologist risk .
 ```
 
-Works on any git repository. No install required.
+Run it from the root of any git repository. No install required.
 
 ## Example output
 
@@ -51,7 +51,7 @@ Interpretation:
   One contributor still accounts for enough history to create continuity risk.
 ```
 
-## Why ownership concentration alone is misleading
+## Why owner activity matters
 
 We ran `git-arch risk` on two well-known projects and found nearly identical ownership numbers — with completely different stories underneath.
 
@@ -66,26 +66,42 @@ We ran `git-arch risk` on two well-known projects and found nearly identical own
 - 384 contributors total
 - Evan You committed **4 months ago**
 
-Same concentration, roughly 65–70%. One has had no single contributor with sustained recent involvement; the other has its original dominant contributor still actively committing. The number alone can't tell you which — that's why `git-arch risk` reports **Ownership Concentration** and **Owner Activity** together.
+Same concentration, roughly 65–70%. One has no single contributor with sustained recent involvement; the other has its original dominant contributor still committing. The number alone can't tell you which.
+
+**State of OSS Maintainability 2026** — notes from running git-archaeologist across major OSS repositories. [Read the full report](https://sushantverma7969.github.io/git-archaeologist/)
+
+See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 ## Concepts
 
-**Ownership Concentration** — percent of a folder's commits from its biggest contributor. High isn't inherently bad on its own.
+**Ownership Concentration** — percent of a folder's commit touches from its biggest contributor. High concentration is not inherently bad; it depends on recency and redundancy.
 
-**Bus Factor** — computed per-folder, not per-repo. A repo-wide bus factor of 5 means nothing if your most critical module is bus factor 1.
+**Bus Factor** — computed per folder, not only per repo. A repo-wide bus factor of 5 can still hide a critical module with bus factor 1.
 
-**Owner Activity** — when did that dominant contributor last commit anywhere in the repo? This is what separates Express `lib/` (65%, owner gone 2 years) from Vue 3 `packages/` (70%, owner active 4 months ago).
+**Owner Activity** — when the dominant contributor last committed anywhere in the repo. This separates active concentration from abandoned concentration.
 
 **HIGH / MEDIUM / LOW** — classified from ownership concentration and bus factor. Owner activity is shown as context so you can tell active concentration from abandoned concentration. Run `--all` to see every scope.
 
-**Explainable risk output** — `git-arch risk` explains each scope with structured reasons and a short interpretation. The explanations reuse the same bus-factor and concentration values already computed by the risk command; they do not run additional analysis or change the risk thresholds.
+**Explainable Risk Output** — `git-arch risk` explains each scope with structured reasons and a short interpretation. The explanations reuse the same bus-factor and concentration values used by the risk command; they do not run additional analysis or change the thresholds.
 
-**Temporal classification** — `git-arch risk --temporal` compares lifetime risk with the last 12 months. HIGH and MEDIUM are treated as concentrated, LOW is treated as distributed, and scopes with fewer than 10 recent non-bot touches are marked as insufficient recent evidence.
+## Temporal classification
+
+`git-arch risk --temporal` compares lifetime risk with the last 12 months. This helps separate old concentration that has spread out from new concentration that is only visible recently.
+
+- **Persistent concentration** — concentrated over lifetime history and still concentrated recently
+- **Historical concentration** — concentrated over lifetime history, but distributed recently
+- **Emerging concentration** — distributed over lifetime history, but concentrated recently
+- **Persistently distributed** — distributed in both windows
+- **No recent activity** — lifetime history exists, but there are no recent non-bot touches
+- **Insufficient recent evidence** — fewer than 10 recent non-bot touches
+
+For this comparison, HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.
 
 ## Known limitations
 
 - Commit authorship ≠ knowledge ownership. Someone can deeply understand code they rarely commit to.
-- **Owner Activity Status helps here** — but it only sees commits, not reviews, PR approvals, or informal triage.
+- Contributors using multiple Git emails may appear as separate identities, which can affect ownership concentration and bus-factor calculations.
+- Owner activity helps here, but it only sees commits, not reviews, PR approvals, or informal triage.
 - Squash merges can distort concentration scores.
 - PR reviewers and approvers are not currently considered (see Roadmap).
 - Git history is one signal among several — use it as a starting point for questions, not a final verdict.
@@ -100,21 +116,33 @@ npm install -g git-archaeologist
 
 ## Commands
 
+Maintenance risk:
+
 ```bash
-git-arch risk /path/to/repo                    # ownership/maintenance risk map (start here)
-git-arch risk /path/to/repo --all              # show every scope, including LOW risk
+git-arch risk /path/to/repo                    # ownership, bus factor, and owner activity
+git-arch risk /path/to/repo --all              # include LOW risk scopes
 git-arch risk /path/to/repo --temporal         # compare lifetime vs last 12 months
-git-arch analyze /path/to/repo                 # full analysis: curse scores, coupling, ownership
-git-arch analyze /path/to/repo --since 90d     # only last 90 days of commits
-git-arch analyze /path/to/repo --since 2y      # only last 2 years
-git-arch analyze /path/to/repo --html          # dark-themed interactive report
-git-arch cursed --top 10                       # just the danger ranking
-git-arch analyze /path/to/repo --json          # pipe into other tools
-git-arch blame lib/response.js /path/to/repo   # deep dive on one file
-git-arch trend /path/to/repo                   # which files are getting more dangerous
-git-arch blast lib/response.js /path/to/repo   # what else breaks when you touch this file
-git-arch ownership /path/to/repo               # who owns what — folder breakdown + bus factor
-git-arch pr-risk /path/to/repo                 # score your changes before pushing
+git-arch ownership /path/to/repo               # folder ownership and bus factor
+```
+
+History analysis:
+
+```bash
+git-arch analyze /path/to/repo                 # curse scores, coupling, and ownership
+git-arch analyze /path/to/repo --since 90d     # analyze commits from the last 90 days
+git-arch analyze /path/to/repo --since 2y      # analyze commits from the last 2 years
+git-arch analyze /path/to/repo --html          # generate an interactive HTML report
+git-arch analyze /path/to/repo --json          # write JSON for scripts or other tools
+git-arch cursed --top 10                       # show the top risky files
+git-arch trend /path/to/repo                   # show files getting riskier over time
+```
+
+File and PR checks:
+
+```bash
+git-arch blame lib/response.js /path/to/repo   # explain risk for one file
+git-arch blast lib/response.js /path/to/repo   # show files coupled to this file
+git-arch pr-risk /path/to/repo                 # score local changes before pushing
 ```
 
 ## Deeper analysis: curse score & coupling
@@ -145,9 +173,9 @@ curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rat
 
 The exponential decay on age means old chaos that stabilized doesn't show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config are automatically excluded.
 
-## Why not `git log`?
+## Why not `git log` or ownership-only tools?
 
-`git log` tells you what happened. `git-archaeologist` tells you where the risk is.
+`git log` tells you what happened. Ownership-only tools tell you who touched code most. `git-archaeologist` adds bus factor, owner activity, temporal classification, and file-level history signals.
 
 - Finds bus-factor-1 modules automatically across every folder
 - Pairs ownership concentration with owner activity to distinguish healthy concentration from abandonment
@@ -157,7 +185,7 @@ The exponential decay on age means old chaos that stabilized doesn't show up. Th
 
 ## GitHub Action (advanced)
 
-For automatic curse-score analysis on every push or PR:
+For automatic curse-score analysis on every push or PR. The Action does not currently report `git-arch risk` owner-activity or temporal-risk findings.
 
 ```yaml
 # .github/workflows/git-archaeologist.yml
@@ -182,19 +210,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-`fetch-depth: 0` is required — without full history the analysis is incomplete. The Action currently reports curse-score findings (most dangerous files); it does not yet run the `risk` ownership/activity analysis.
-
-## Demo & deep dives
-
-[![git-archaeologist demo](https://img.youtube.com/vi/NKVN00Dj6YA/maxresdefault.jpg)](https://youtu.be/NKVN00Dj6YA)
-
-> 2-minute demo running git-archaeologist on the Express.js repository.
-
-![HTML report — interactive risk heatmap](./preview.png)
-
-**State of OSS Maintainability 2026** — we analyzed 26 major OSS repositories (438,904 files). 26/26 had at least one bus-factor-1 module. [Read the full report](https://sushantverma7969.github.io/git-archaeologist/)
-
-See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
+`fetch-depth: 0` is required — without full history the analysis is incomplete. The Action reports curse-score findings for risky files; risk/owner-activity reporting is CLI-only for now.
 
 ## Requirements
 
@@ -209,12 +225,12 @@ npm install && npm run build
 node dist/index.js analyze /any/repo
 ```
 
-## License
-
-[MIT](LICENSE)
-
 ## Roadmap
 
 - [ ] PR reviewer/approver data
 - [ ] Full history mode — remove commit window cap
 - [ ] Extend GitHub Action to report `risk`/Owner Activity findings, not just curse score
+
+## License
+
+[MIT](LICENSE)
