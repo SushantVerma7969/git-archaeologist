@@ -31,6 +31,27 @@ function makeStats(scope, totals) {
 }
 
 function makeResult(scopes) {
+  const ownership = scopes.flatMap((scope) => {
+    const contributors = Object.keys(scope.totals)
+      .filter((email) => !scope.botEmails?.includes(email))
+      .map((email) => ({
+        name: scope.names?.[email] ?? email,
+        email,
+        changes: scope.totals[email],
+        percent: 0,
+      }));
+
+    return contributors.length === 0
+      ? []
+      : [{
+        filepath: `${scope.scope}/a.ts`,
+        owner: contributors[0].name,
+        ownerEmail: contributors[0].email,
+        ownershipPercent: 0,
+        contributors,
+      }];
+  });
+
   return {
     repoPath: '/repo',
     repoName: 'repo',
@@ -40,7 +61,7 @@ function makeResult(scopes) {
     totalAuthors: 3,
     dateRange: { from: new Date(), to: new Date() },
     cursedFiles: [],
-    ownership: [],
+    ownership,
     busFactor: scopes.map((scope) => ({
       scope: scope.scope,
       busFactor: scope.busFactor,
@@ -108,7 +129,7 @@ test('buildRiskExplanation emits MEDIUM and LOW summaries', () => {
   );
 });
 
-test('buildScopeRisks reuses existing values and keeps whyClassified available', () => {
+test('buildScopeRisks reuses existing values and explanation', () => {
   const result = {
     repoPath: '/repo',
     repoName: 'repo',
@@ -191,7 +212,31 @@ test('buildScopeRisks reuses existing values and keeps whyClassified available',
     'Bus factor is 1',
     'Top contributor owns 84% of touches',
   ]);
-  assert.equal(risk.whyClassified.length, 3);
+});
+
+test('buildScopeRisks excludes name-only bots through ownership-filtered identities', () => {
+  const result = makeResult([
+    {
+      scope: 'deps',
+      busFactor: 1,
+      totals: {
+        'renovate@example.com': 90,
+        'ada@example.com': 10,
+      },
+      names: {
+        'renovate@example.com': 'renovate',
+        'ada@example.com': 'Ada',
+      },
+      botEmails: ['renovate@example.com'],
+    },
+  ]);
+
+  const [risk] = buildScopeRisks(result);
+
+  assert.equal(risk.scope, 'deps');
+  assert.equal(risk.concentration, 100);
+  assert.equal(risk.totalFileTouches, 10);
+  assert.equal(risk.contributors, 1);
 });
 
 test('buildTemporalScopeRisks applies protocol categories from concentration status', () => {
@@ -221,4 +266,24 @@ test('buildTemporalScopeRisks applies protocol categories from concentration sta
   assert.equal(categories.get('distributed'), 'Persistently distributed');
   assert.equal(categories.get('inactive'), 'No recent activity');
   assert.equal(categories.get('thin'), 'Insufficient recent evidence');
+});
+
+test('buildTemporalScopeRisks treats bot-only recent touches as no recent activity', () => {
+  const lifetimeResult = makeResult([
+    { scope: 'deps', busFactor: 1, totals: { 'ada@example.com': 20 } },
+  ]);
+  const recentResult = makeResult([
+    {
+      scope: 'deps',
+      busFactor: 1,
+      totals: { 'renovate@example.com': 20 },
+      names: { 'renovate@example.com': 'renovate' },
+      botEmails: ['renovate@example.com'],
+    },
+  ]);
+
+  const [risk] = buildTemporalScopeRisks(lifetimeResult, recentResult);
+
+  assert.equal(risk.category, 'No recent activity');
+  assert.equal(risk.recentTouches, 0);
 });

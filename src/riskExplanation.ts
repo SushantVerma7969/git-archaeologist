@@ -6,7 +6,6 @@ import {
   TemporalRiskCategory,
   TemporalScopeRisk,
 } from './types';
-import { isBot } from './utils/botFilter';
 import { formatTimeAgo } from './utils/activity';
 
 interface ExplanationInput {
@@ -56,34 +55,23 @@ export function buildRiskExplanation(input: ExplanationInput): RiskExplanation {
   };
 }
 
-function buildWhyClassified(input: ExplanationInput): string[] {
-  let concentrationExplanation: string;
-
-  if (input.level === 'HIGH') {
-    concentrationExplanation =
-      'Historical activity is highly concentrated in a single contributor identity.';
-  } else if (input.level === 'MEDIUM') {
-    concentrationExplanation = input.busFactor === 1
-      ? 'Historical activity is concentrated enough that one identity accounts for at least half of file touches.'
-      : 'Historical activity is concentrated across a small number of contributor identities.';
-  } else {
-    concentrationExplanation =
-      `Historical activity is distributed across ${input.contributors} contributor identities.`;
-  }
-
-  return [
-    `One contributor identity accounts for ${input.concentration}% of historical file touches.`,
-    `Bus Factor is ${input.busFactor}.`,
-    concentrationExplanation,
-  ];
-}
-
 interface ScopeRiskOptions {
   minFilesAtRisk?: number;
 }
 
+function buildNonBotEmailSet(result: AnalysisResult): Set<string> {
+  const emails = new Set<string>();
+  for (const o of result.ownership) {
+    for (const c of o.contributors) {
+      emails.add(c.email);
+    }
+  }
+  return emails;
+}
+
 export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOptions = {}): ScopeRisk[] {
   const minFilesAtRisk = options.minFilesAtRisk ?? 3;
+  const nonBotEmails = buildNonBotEmailSet(result);
   const folderAuthorChanges = new Map<string, Map<string, number>>();
   for (const [, stats] of result.fileStats) {
     const parts = stats.filepath.split('/');
@@ -91,7 +79,7 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
     if (!folderAuthorChanges.has(folder)) folderAuthorChanges.set(folder, new Map());
     const authorTotals = folderAuthorChanges.get(folder)!;
     for (const [email, count] of stats.authorChanges) {
-      if (isBot(email, email)) continue;
+      if (!nonBotEmails.has(email)) continue;
       authorTotals.set(email, (authorTotals.get(email) ?? 0) + count);
     }
   }
@@ -142,7 +130,6 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
       totalFileTouches: total,
       topOwner,
       filesAtRisk: bf.filesAtRisk,
-      whyClassified: buildWhyClassified(explanationInput),
       explanation: buildRiskExplanation(explanationInput),
       lastActive,
     });
@@ -152,7 +139,7 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
   return risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
 }
 
-function countNonBotTouchesByScope(result: AnalysisResult): Map<string, number> {
+function countNonBotTouchesByScope(result: AnalysisResult, nonBotEmails: Set<string>): Map<string, number> {
   const touches = new Map<string, number>();
 
   for (const [, stats] of result.fileStats) {
@@ -161,7 +148,7 @@ function countNonBotTouchesByScope(result: AnalysisResult): Map<string, number> 
     let total = 0;
 
     for (const [email, count] of stats.authorChanges) {
-      if (isBot(email, email)) continue;
+      if (!nonBotEmails.has(email)) continue;
       total += count;
     }
 
@@ -218,7 +205,7 @@ export function buildTemporalScopeRisks(
   const lifetimeRisks = buildScopeRisks(lifetimeResult);
   const recentRisks = buildScopeRisks(recentResult, { minFilesAtRisk: 0 });
   const recentByScope = new Map(recentRisks.map((risk) => [risk.scope, risk]));
-  const recentTouchesByScope = countNonBotTouchesByScope(recentResult);
+  const recentTouchesByScope = countNonBotTouchesByScope(recentResult, buildNonBotEmailSet(recentResult));
 
   const categoryOrder: Record<TemporalRiskCategory, number> = {
     'Persistent concentration': 0,

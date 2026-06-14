@@ -63,7 +63,6 @@ export interface ScopeRisk {
   totalFileTouches: number;
   topOwner: string;
   filesAtRisk: number;
-  whyClassified: string[];
   explanation: RiskExplanation;
   lastActive?: string;
 }
