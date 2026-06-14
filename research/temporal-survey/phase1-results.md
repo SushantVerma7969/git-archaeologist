@@ -262,3 +262,29 @@ The survey produced observed examples of:
 The survey also surfaced operational limits on very large repositories, with TypeScript, Rust, and Next.js exceeding the selected runtime cap.
 
 The purpose of Phase 1 was not to validate the model statistically. The goal was to determine whether the temporal categories produced distinct and believable outputs when applied to repositories outside the development set.
+
+
+## Methodological Limitations
+
+### Scope Stability
+
+Repository reorganizations can invalidate path-based temporal comparisons.
+
+Confirmed examples:
+
+* Vite
+* Vitest
+
+### Scalability
+
+The current implementation parses complete git histories into memory.
+
+No sampling, timeout, or repository-size limits were identified.
+
+Very large repositories may therefore be impractical to analyze.
+
+### Interpretation
+
+Concentration signals represent commit-touch patterns only.
+
+They do not prove ownership, expertise, or maintainership.
