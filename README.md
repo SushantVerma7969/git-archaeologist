@@ -97,14 +97,12 @@ See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 For this comparison, HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.
 
-## Known limitations
+## Known Limitations
 
-- Commit authorship ≠ knowledge ownership. Someone can deeply understand code they rarely commit to.
-- Contributors using multiple Git emails may appear as separate identities, which can affect ownership concentration and bus-factor calculations.
-- Owner activity helps here, but it only sees commits, not reviews, PR approvals, or informal triage.
-- Squash merges can distort concentration scores.
-- PR reviewers and approvers are not currently considered (see Roadmap).
-- Git history is one signal among several — use it as a starting point for questions, not a final verdict.
+- Commit authorship is not the same as knowledge ownership.
+- Multiple Git identities may affect ownership calculations.
+- PR reviews and approvals are not currently analyzed.
+- Results should be used as investigation signals, not final judgments.
 
 ## Install
 
@@ -250,12 +248,6 @@ cd git-archaeologist
 npm install && npm run build
 npm test
 ```
-
-## Roadmap
-
-- [ ] PR reviewer/approver data
-- [ ] Full history mode — remove commit window cap
-- [ ] Extend GitHub Action to report `risk`/Owner Activity findings, not just curse score
 
 ## License
 
