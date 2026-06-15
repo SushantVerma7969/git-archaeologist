@@ -68,7 +68,7 @@ We ran `git-arch risk` on two well-known projects and found nearly identical own
 
 Same concentration, roughly 65–70%. One has no single contributor with sustained recent involvement; the other has its original dominant contributor still committing. The number alone can't tell you which.
 
-**State of OSS Maintainability 2026** — notes from running git-archaeologist across major OSS repositories. [Read the full report](https://sushantverma7969.github.io/git-archaeologist/)
+**State of OSS Maintainability 2026** — notes from running git-archaeologist across major OSS repositories. See [Research data](#research--validation) below.
 
 See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
@@ -212,17 +212,43 @@ jobs:
 
 `fetch-depth: 0` is required — without full history the analysis is incomplete. The Action reports curse-score findings for risky files; risk/owner-activity reporting is CLI-only for now.
 
+## Research & Validation
+
+### Does curse score predict bugs?
+
+We tested whether the curse score actually identifies risky files. Result: **11 out of 11 top cursed files had confirmed bug history** across Express, React, and Vue.
+
+- [Curse Score Validation Study](RESEARCH.md) — methodology and results
+- [Repository Risk Benchmark 2026](BENCHMARKS.md) — 7-repo analysis finding universal bus factor 1 modules
+
+### Full Research
+
+Extensive analysis of git history patterns, temporal ownership dynamics, and methodology:
+
+- [Recency Study Phase 1](research/recency-study/) — Temporal risk classification across 25+ repositories
+- [Raw Analysis Data](research/) — Complete git-arch outputs for 25 major OSS projects (JSON + CSV)
+- [Study Protocol](research/recency-study-protocol.md) — Reproducible methodology and limitations
+- [Methodology Audit](research/ownership-metric-audit.md) — Known issues and potential biases
+
 ## Requirements
 
 Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Development setup (clone, build, test)
+- Code structure overview
+- How to make changes and submit PRs
+- Testing standards
+- Research contribution guidelines
+
+Quick start:
 ```bash
 git clone https://github.com/SushantVerma7969/git-archaeologist.git
 cd git-archaeologist
 npm install && npm run build
-node dist/index.js analyze /any/repo
+npm test
 ```
 
 ## Roadmap
