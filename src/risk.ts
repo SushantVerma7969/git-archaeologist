@@ -25,7 +25,13 @@ export function registerRiskCommand(program: Command): void {
     .option('-s, --since <date>', 'Only analyze commits after this date')
     .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
     .option('--temporal', 'Compare lifetime risk with the last 12 months')
-    .action(async (repoPath: string | undefined, options: { since?: string; all?: boolean; temporal?: boolean }) => {
+    .option('-j, --json', 'Output risk report as JSON')
+    .action(async (repoPath: string | undefined, options: {
+  since?: string;
+  all?: boolean;
+  temporal?: boolean;
+  json?: boolean;
+}) => {
       const resolvedPath = path.resolve(repoPath ?? '.');
       const since = options.since ? parseSince(options.since) : undefined;
 
@@ -37,9 +43,22 @@ export function registerRiskCommand(program: Command): void {
           }
 
           const recentSince = parseSince('12m');
-          const lifetimeResult = await analyze(resolvedPath);
-          const recentResult = await analyze(resolvedPath, recentSince);
+          const lifetimeResult = await analyze(
+  resolvedPath,
+  undefined,
+  options.json === true
+);
+          const recentResult = await analyze(
+  resolvedPath,
+  recentSince,
+  options.json === true
+);
           const temporalRisks = buildTemporalScopeRisks(lifetimeResult, recentResult);
+          
+          if (options.json) {
+  console.log(JSON.stringify(temporalRisks, null, 2));
+  return;
+}
 
           console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
           console.log(` ${chalk.bold.white('⛏  git-arch risk --temporal')} — ${chalk.grey(resolvedPath.split('/').pop())}`);
@@ -88,10 +107,18 @@ export function registerRiskCommand(program: Command): void {
           return;
         }
 
-        const result = await analyze(resolvedPath, since);
+        const result = await analyze(
+  resolvedPath,
+  since,
+  options.json === true
+);
         const risks = buildScopeRisks(result);
 
         const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');
+        if (options.json) {
+  console.log(JSON.stringify(shown, null, 2));
+  return;
+}
         const lowCount = risks.filter((r) => r.level === 'LOW').length;
 
         console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));

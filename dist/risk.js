@@ -64,6 +64,7 @@ function registerRiskCommand(program) {
         .option('-s, --since <date>', 'Only analyze commits after this date')
         .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
         .option('--temporal', 'Compare lifetime risk with the last 12 months')
+        .option('-j, --json', 'Output risk report as JSON')
         .action(async (repoPath, options) => {
         const resolvedPath = path.resolve(repoPath ?? '.');
         const since = options.since ? parseSince(options.since) : undefined;
@@ -74,9 +75,13 @@ function registerRiskCommand(program) {
                     process.exit(1);
                 }
                 const recentSince = parseSince('12m');
-                const lifetimeResult = await (0, orchestrator_1.analyze)(resolvedPath);
-                const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince);
+                const lifetimeResult = await (0, orchestrator_1.analyze)(resolvedPath, undefined, options.json === true);
+                const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
+                if (options.json) {
+                    console.log(JSON.stringify(temporalRisks, null, 2));
+                    return;
+                }
                 console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
                 console.log(` ${chalk_1.default.bold.white('⛏  git-arch risk --temporal')} — ${chalk_1.default.grey(resolvedPath.split('/').pop())}`);
                 console.log(chalk_1.default.grey('  Lifetime vs recent ownership concentration'));
@@ -117,9 +122,13 @@ function registerRiskCommand(program) {
                 console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
                 return;
             }
-            const result = await (0, orchestrator_1.analyze)(resolvedPath, since);
+            const result = await (0, orchestrator_1.analyze)(resolvedPath, since, options.json === true);
             const risks = (0, riskExplanation_1.buildScopeRisks)(result);
             const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');
+            if (options.json) {
+                console.log(JSON.stringify(shown, null, 2));
+                return;
+            }
             const lowCount = risks.filter((r) => r.level === 'LOW').length;
             console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
             console.log(` ${chalk_1.default.bold.white('⛏  git-arch risk')} — ${chalk_1.default.grey(resolvedPath.split('/').pop())}`);

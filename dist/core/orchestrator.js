@@ -10,30 +10,44 @@ const curseScorer_1 = require("../analyzers/curseScorer");
 const ownershipAnalyzer_1 = require("../analyzers/ownershipAnalyzer");
 const busFactorAnalyzer_1 = require("../analyzers/busFactorAnalyzer");
 const activity_1 = require("../utils/activity");
-async function analyze(repoPath, since) {
-    const spinner = (0, ora_1.default)({ text: 'Validating repository...', color: 'magenta' }).start();
+async function analyze(repoPath, since, silent = false) {
+    const spinner = silent
+        ? null
+        : (0, ora_1.default)({ text: 'Validating repository...', color: 'magenta' }).start();
     try {
         // Step 1 — validate
         (0, gitParser_1.validateRepo)(repoPath);
         const repoName = (0, gitParser_1.getRepoName)(repoPath);
         const totalCommits = (0, gitParser_1.getTotalCommitCount)(repoPath, since);
         const sinceLabel = since ? ` (since ${since})` : '';
-        spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
+        if (spinner) {
+            spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
+        }
         // Step 2 — parse all commits
         const commits = (0, gitParser_1.parseCommits)(repoPath, since);
-        spinner.text = 'Building file statistics...';
+        if (spinner) {
+            spinner.text = 'Building file statistics...';
+        }
         // Step 3 — build per-file stats
         const fileStats = (0, gitParser_1.buildFileStats)(commits);
         // Step 4 — build author name lookup
         const authorNameMap = (0, ownershipAnalyzer_1.buildAuthorNameMap)(commits);
-        spinner.text = 'Scoring cursed files...';
+        if (spinner) {
+            spinner.text = 'Scoring cursed files...';
+        }
         // Step 5 — run all analyzers
         const cursedFiles = (0, curseScorer_1.scoreCursedFiles)(fileStats);
-        spinner.text = 'Analyzing ownership...';
+        if (spinner) {
+            spinner.text = 'Analyzing ownership...';
+        }
         const ownership = (0, ownershipAnalyzer_1.analyzeOwnership)(fileStats, authorNameMap);
-        spinner.text = 'Calculating bus factor...';
+        if (spinner) {
+            spinner.text = 'Calculating bus factor...';
+        }
         const busFactor = (0, busFactorAnalyzer_1.analyzeBusFactor)(fileStats, authorNameMap);
-        spinner.text = 'Detecting implicit coupling...';
+        if (spinner) {
+            spinner.text = 'Detecting implicit coupling...';
+        }
         const coupling = (0, busFactorAnalyzer_1.analyzeCoupling)(commits);
         // Step 6 — collect date range
         const allTimestamps = commits.map((c) => c.timestamp);
@@ -42,7 +56,9 @@ async function analyze(repoPath, since) {
         // Step 7 — count unique authors
         const allAuthors = new Set(commits.map((c) => c.authorEmail));
         const lastActiveByAuthor = (0, activity_1.buildLastActiveMap)(commits);
-        spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
+        if (spinner) {
+            spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
+        }
         return {
             repoPath,
             repoName,
@@ -63,7 +79,9 @@ async function analyze(repoPath, since) {
         };
     }
     catch (err) {
-        spinner.fail('Analysis failed');
+        if (spinner) {
+            spinner.fail('Analysis failed');
+        }
         throw err;
     }
 }

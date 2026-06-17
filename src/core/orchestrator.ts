@@ -12,8 +12,14 @@ import { analyzeOwnership, buildAuthorNameMap } from '../analyzers/ownershipAnal
 import { analyzeBusFactor, analyzeCoupling } from '../analyzers/busFactorAnalyzer';
 import { buildLastActiveMap } from '../utils/activity';
 
-export async function analyze(repoPath: string, since?: string): Promise<AnalysisResult> {
-  const spinner = ora({ text: 'Validating repository...', color: 'magenta' }).start();
+export async function analyze(
+  repoPath: string,
+  since?: string,
+  silent = false
+): Promise<AnalysisResult> {
+  const spinner = silent
+  ? null
+  : ora({ text: 'Validating repository...', color: 'magenta' }).start();
 
   try {
     // Step 1 — validate
@@ -21,11 +27,15 @@ export async function analyze(repoPath: string, since?: string): Promise<Analysi
     const repoName = getRepoName(repoPath);
     const totalCommits = getTotalCommitCount(repoPath, since);
     const sinceLabel = since ? ` (since ${since})` : '';
-    spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
+    if (spinner) {
+  spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
+}
 
     // Step 2 — parse all commits
     const commits = parseCommits(repoPath, since);
-    spinner.text = 'Building file statistics...';
+    if (spinner) {
+  spinner.text = 'Building file statistics...';
+}
 
     // Step 3 — build per-file stats
     const fileStats = buildFileStats(commits);
@@ -33,18 +43,26 @@ export async function analyze(repoPath: string, since?: string): Promise<Analysi
     // Step 4 — build author name lookup
     const authorNameMap = buildAuthorNameMap(commits);
 
-    spinner.text = 'Scoring cursed files...';
+    if (spinner) {
+  spinner.text = 'Scoring cursed files...';
+}
 
     // Step 5 — run all analyzers
     const cursedFiles = scoreCursedFiles(fileStats);
 
-    spinner.text = 'Analyzing ownership...';
+    if (spinner) {
+  spinner.text = 'Analyzing ownership...';
+}
     const ownership = analyzeOwnership(fileStats, authorNameMap);
 
-    spinner.text = 'Calculating bus factor...';
+    if (spinner) {
+  spinner.text = 'Calculating bus factor...';
+}
     const busFactor = analyzeBusFactor(fileStats, authorNameMap);
 
-    spinner.text = 'Detecting implicit coupling...';
+    if (spinner) {
+  spinner.text = 'Detecting implicit coupling...';
+}
     const coupling = analyzeCoupling(commits);
 
     // Step 6 — collect date range
@@ -56,7 +74,9 @@ export async function analyze(repoPath: string, since?: string): Promise<Analysi
     const allAuthors = new Set(commits.map((c) => c.authorEmail));
     const lastActiveByAuthor = buildLastActiveMap(commits);
 
-    spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
+    if (spinner) {
+  spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
+}
 
     return {
       repoPath,
@@ -77,7 +97,9 @@ export async function analyze(repoPath: string, since?: string): Promise<Analysi
       lastActiveByAuthor,
     };
   } catch (err) {
-    spinner.fail('Analysis failed');
+    if (spinner) {
+  spinner.fail('Analysis failed');
+}
     throw err;
   }
 }
