@@ -1,3 +1,4 @@
+import { generateHtmlReport } from './output/htmlReport';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
@@ -26,11 +27,13 @@ export function registerRiskCommand(program: Command): void {
     .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
     .option('--temporal', 'Compare lifetime risk with the last 12 months')
     .option('-j, --json', 'Output risk report as JSON')
+    .option('--html <file>', 'Write report as HTML')
     .action(async (repoPath: string | undefined, options: {
   since?: string;
   all?: boolean;
   temporal?: boolean;
   json?: boolean;
+  html?: string;
 }) => {
       const resolvedPath = path.resolve(repoPath ?? '.');
       const since = options.since ? parseSince(options.since) : undefined;
@@ -123,6 +126,17 @@ console.log();
   since,
   options.json === true
 );
+if (options.html) {
+  generateHtmlReport(result, options.html);
+
+  console.log(
+    chalk.green(
+      `✔ HTML report written to ${options.html}`
+    )
+  );
+
+  return;
+}
         const risks = buildScopeRisks(result);
 
         const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');

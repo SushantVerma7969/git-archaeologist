@@ -37,6 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRiskCommand = registerRiskCommand;
+const htmlReport_1 = require("./output/htmlReport");
 const chalk_1 = __importDefault(require("chalk"));
 const path = __importStar(require("path"));
 const orchestrator_1 = require("./core/orchestrator");
@@ -65,6 +66,7 @@ function registerRiskCommand(program) {
         .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
         .option('--temporal', 'Compare lifetime risk with the last 12 months')
         .option('-j, --json', 'Output risk report as JSON')
+        .option('--html <file>', 'Write report as HTML')
         .action(async (repoPath, options) => {
         const resolvedPath = path.resolve(repoPath ?? '.');
         const since = options.since ? parseSince(options.since) : undefined;
@@ -131,6 +133,11 @@ function registerRiskCommand(program) {
                 return;
             }
             const result = await (0, orchestrator_1.analyze)(resolvedPath, since, options.json === true);
+            if (options.html) {
+                (0, htmlReport_1.generateHtmlReport)(result, options.html);
+                console.log(chalk_1.default.green(`✔ HTML report written to ${options.html}`));
+                return;
+            }
             const risks = (0, riskExplanation_1.buildScopeRisks)(result);
             const shown = options.all ? risks : risks.filter((r) => r.level !== 'LOW');
             if (options.json) {
