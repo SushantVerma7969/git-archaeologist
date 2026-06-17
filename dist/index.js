@@ -40,6 +40,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const chalk_1 = __importDefault(require("chalk"));
 const path = __importStar(require("path"));
+const package_json_1 = __importDefault(require("../package.json"));
 const orchestrator_1 = require("./core/orchestrator");
 const terminalRenderer_1 = require("./output/terminalRenderer");
 const htmlReport_1 = require("./output/htmlReport");
@@ -72,7 +73,7 @@ program
     .name('git-arch')
     .description(chalk_1.default.hex('#A78BFA')('⛏  Git Archaeologist') +
     ' — uncover history, ownership & tech debt in any git repo')
-    .version('1.10.1');
+    .version(package_json_1.default.version);
 program
     .command('analyze [repoPath]')
     .alias('a')

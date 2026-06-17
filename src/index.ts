@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
+import packageJson from '../package.json';
 import { analyze } from './core/orchestrator';
 import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
@@ -37,7 +38,7 @@ program
     chalk.hex('#A78BFA')('⛏  Git Archaeologist') +
     ' — uncover history, ownership & tech debt in any git repo'
   )
-  .version('1.10.1');
+  .version(packageJson.version);
 
 program
   .command('analyze [repoPath]')
