@@ -1,4 +1,5 @@
-export interface CommitRecord {
+ import type { Recommendation } from './recommendations';
+ export interface CommitRecord {
   hash: string;
   authorEmail: string;
   authorName: string;
@@ -65,6 +66,8 @@ export interface ScopeRisk {
   filesAtRisk: number;
   explanation: RiskExplanation;
   lastActive?: string;
+
+  recommendations?: Recommendation[];
 }
 
 export type TemporalRiskCategory =
@@ -82,6 +85,8 @@ export interface TemporalScopeRisk {
   recent?: ScopeRisk;
   recentTouches: number;
   summary: string;
+
+  recommendations?: Recommendation[];
 }
 
 export interface CouplingPair {

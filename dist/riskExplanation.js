@@ -5,6 +5,7 @@ exports.buildRiskExplanation = buildRiskExplanation;
 exports.buildScopeRisks = buildScopeRisks;
 exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
 const activity_1 = require("./utils/activity");
+const recommendations_1 = require("./recommendations");
 function classifyScopeRisk(busFactor, concentration) {
     if (busFactor === 1 && concentration >= 80) {
         return 'HIGH';
@@ -100,6 +101,7 @@ function buildScopeRisks(result, options = {}) {
         if (lastActiveTs !== undefined) {
             lastActive = (0, activity_1.formatTimeAgo)(lastActiveTs);
         }
+        const recommendations = (0, recommendations_1.buildRiskRecommendations)(level, bf.busFactor, lastActive);
         risks.push({
             scope: folder,
             level,
@@ -110,6 +112,7 @@ function buildScopeRisks(result, options = {}) {
             topOwner,
             filesAtRisk: bf.filesAtRisk,
             explanation: buildRiskExplanation(explanationInput),
+            recommendations,
             lastActive,
         });
     }
@@ -188,6 +191,7 @@ function buildTemporalScopeRisks(lifetimeResult, recentResult) {
             recent,
             recentTouches,
             summary: buildTemporalSummary(lifetime, recent, category),
+            recommendations: (0, recommendations_1.buildTemporalRecommendations)(category),
         };
     })
         .sort((a, b) => {

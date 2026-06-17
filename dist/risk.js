@@ -113,6 +113,14 @@ function registerRiskCommand(program) {
                         console.log(`  Recent:   ${chalk_1.default.bold(String(r.recentTouches))} non-bot file touches`);
                     }
                     console.log(chalk_1.default.grey(`  ${r.summary}`));
+                    if (r.recommendations && r.recommendations.length > 0) {
+                        console.log();
+                        console.log(chalk_1.default.grey('  Recommended actions:'));
+                        for (const rec of r.recommendations) {
+                            console.log(chalk_1.default.cyan(`    • ${rec.title}`));
+                            console.log(chalk_1.default.grey(`      ${rec.action}`));
+                        }
+                    }
                     console.log();
                 }
                 console.log(chalk_1.default.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));
@@ -161,6 +169,14 @@ function registerRiskCommand(program) {
                 }
                 console.log(chalk_1.default.grey('  Interpretation:'));
                 console.log(chalk_1.default.grey(`    ${r.explanation.summary}`));
+                if (r.recommendations && r.recommendations.length > 0) {
+                    console.log();
+                    console.log(chalk_1.default.grey('  Recommended actions:'));
+                    for (const rec of r.recommendations) {
+                        console.log(chalk_1.default.cyan(`    • ${rec.title}`));
+                        console.log(chalk_1.default.grey(`      ${rec.action}`));
+                    }
+                }
                 if (r.lastActive) {
                     console.log();
                     const inactive = r.lastActive.includes('year') ||

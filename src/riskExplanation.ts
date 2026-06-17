@@ -7,6 +7,10 @@ import {
   TemporalScopeRisk,
 } from './types';
 import { formatTimeAgo } from './utils/activity';
+import {
+  buildRiskRecommendations,
+  buildTemporalRecommendations,
+} from './recommendations';
 
 interface ExplanationInput {
   level: RiskLevel;
@@ -120,19 +124,25 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
     if (lastActiveTs !== undefined) {
       lastActive = formatTimeAgo(lastActiveTs);
     }
+const recommendations = buildRiskRecommendations(
+  level,
+  bf.busFactor,
+  lastActive
+);
 
     risks.push({
-      scope: folder,
-      level,
-      busFactor: bf.busFactor,
-      concentration,
-      contributors,
-      totalFileTouches: total,
-      topOwner,
-      filesAtRisk: bf.filesAtRisk,
-      explanation: buildRiskExplanation(explanationInput),
-      lastActive,
-    });
+  scope: folder,
+  level,
+  busFactor: bf.busFactor,
+  concentration,
+  contributors,
+  totalFileTouches: total,
+  topOwner,
+  filesAtRisk: bf.filesAtRisk,
+  explanation: buildRiskExplanation(explanationInput),
+  recommendations,
+  lastActive,
+});
   }
 
   const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
@@ -223,13 +233,14 @@ export function buildTemporalScopeRisks(
       const category = classifyTemporalRisk(lifetime, recent, recentTouches);
 
       return {
-        scope: lifetime.scope,
-        category,
-        lifetime,
-        recent,
-        recentTouches,
-        summary: buildTemporalSummary(lifetime, recent, category),
-      };
+  scope: lifetime.scope,
+  category,
+  lifetime,
+  recent,
+  recentTouches,
+  summary: buildTemporalSummary(lifetime, recent, category),
+  recommendations: buildTemporalRecommendations(category),
+};
     })
     .sort((a, b) => {
       return categoryOrder[a.category] - categoryOrder[b.category]

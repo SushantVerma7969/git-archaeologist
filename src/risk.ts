@@ -96,7 +96,18 @@ export function registerRiskCommand(program: Command): void {
               console.log(`  Recent:   ${chalk.bold(String(r.recentTouches))} non-bot file touches`);
             }
             console.log(chalk.grey(`  ${r.summary}`));
-            console.log();
+
+if (r.recommendations && r.recommendations.length > 0) {
+  console.log();
+  console.log(chalk.grey('  Recommended actions:'));
+
+  for (const rec of r.recommendations) {
+    console.log(chalk.cyan(`    • ${rec.title}`));
+    console.log(chalk.grey(`      ${rec.action}`));
+  }
+}
+
+console.log();
           }
 
           console.log(chalk.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));
@@ -154,6 +165,15 @@ export function registerRiskCommand(program: Command): void {
           }
           console.log(chalk.grey('  Interpretation:'));
           console.log(chalk.grey(`    ${r.explanation.summary}`));
+          if (r.recommendations && r.recommendations.length > 0) {
+  console.log();
+  console.log(chalk.grey('  Recommended actions:'));
+
+  for (const rec of r.recommendations) {
+    console.log(chalk.cyan(`    • ${rec.title}`));
+    console.log(chalk.grey(`      ${rec.action}`));
+  }
+}
 
           if (r.lastActive) {
           console.log();
