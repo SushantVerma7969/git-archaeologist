@@ -125,10 +125,33 @@ export function registerRiskCommand(program: Command): void {
           for (const reason of r.explanation.reasons) {
             console.log(chalk.grey(`    * ${reason}`));
           }
-          console.log();
           console.log(chalk.grey('  Interpretation:'));
           console.log(chalk.grey(`    ${r.explanation.summary}`));
+
+          if (r.lastActive) {
           console.log();
+
+          const inactive =
+          r.lastActive.includes('year') ||
+          r.lastActive.includes('years');
+
+  if (inactive) {
+    console.log(
+      chalk.yellow(
+        `    Historical concentration may not reflect current maintainership (${r.lastActive}).`
+      )
+    );
+  } else {
+    console.log(
+      chalk.green(
+        `    Dominant contributor remains active (${r.lastActive}).`
+      )
+    );
+  }
+console.log();
+}
+
+
         }
 
         if (!options.all && lowCount > 0) {
