@@ -150,10 +150,20 @@ function registerRiskCommand(program) {
                 for (const reason of r.explanation.reasons) {
                     console.log(chalk_1.default.grey(`    * ${reason}`));
                 }
-                console.log();
                 console.log(chalk_1.default.grey('  Interpretation:'));
                 console.log(chalk_1.default.grey(`    ${r.explanation.summary}`));
-                console.log();
+                if (r.lastActive) {
+                    console.log();
+                    const inactive = r.lastActive.includes('year') ||
+                        r.lastActive.includes('years');
+                    if (inactive) {
+                        console.log(chalk_1.default.yellow(`    Historical concentration may not reflect current maintainership (${r.lastActive}).`));
+                    }
+                    else {
+                        console.log(chalk_1.default.green(`    Dominant contributor remains active (${r.lastActive}).`));
+                    }
+                    console.log();
+                }
             }
             if (!options.all && lowCount > 0) {
                 console.log(chalk_1.default.grey(`  ${lowCount} additional scope(s) marked LOW risk — use --all to show them.\n`));
