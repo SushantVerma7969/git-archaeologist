@@ -11,30 +11,30 @@ export function buildRiskRecommendations(
   const recommendations: Recommendation[] = [];
 
   if (busFactor === 1) {
-    recommendations.push({
-      title: 'Increase knowledge sharing',
-      action:
-        'Ensure at least one additional contributor reviews and understands this scope.',
-    });
-  }
+  recommendations.push({
+    title: 'Continuity risk',
+    action:
+      'Would development continue smoothly if the dominant contributor became unavailable?',
+  });
+}
 
   if (
     lastActive &&
     (lastActive.includes('year') || lastActive.includes('years'))
   ) {
     recommendations.push({
-      title: 'Verify active ownership',
-      action:
-        'Historical ownership may not reflect current maintainership. Confirm who currently owns this area.',
-    });
+  title: 'Current reality',
+  action:
+    'Does historical concentration still reflect how this area is maintained today?',
+});
   }
 
   if (level === 'HIGH') {
     recommendations.push({
-      title: 'Require additional review',
-      action:
-        'Changes in this scope should receive review from multiple contributors.',
-    });
+  title: 'Shared understanding',
+  action:
+    'Is responsibility for this scope shared beyond what commit history can reveal?',
+});
   }
 
   return recommendations;
@@ -50,54 +50,54 @@ export function buildTemporalRecommendations(
 ): Recommendation[] {
   switch (category) {
     case 'Persistent concentration':
-      return [
-        {
-          title: 'Schedule knowledge transfer',
-          action:
-            'Ownership remains concentrated over time. Share knowledge before this becomes a continuity risk.',
-        },
-        {
-          title: 'Require secondary reviewer',
-          action:
-            'Ensure at least one additional contributor reviews changes in this area.',
-        },
-      ];
+  return [
+    {
+      title: 'Continuity risk',
+      action:
+        'Would development continue smoothly if key contributors became unavailable?',
+    },
+    {
+      title: 'Shared understanding',
+      action:
+        'Is responsibility for this area shared beyond what commit history can reveal?',
+    },
+  ];
 
     case 'Historical concentration':
-      return [
-        {
-          title: 'Verify current maintainer',
-          action:
-            'Historical ownership may no longer reflect active ownership.',
-        },
-      ];
+  return [
+    {
+      title: 'Current reality',
+action:
+  'Does historical concentration still reflect how this area is maintained today?',
+    },
+  ];
 
     case 'Emerging concentration':
-      return [
-        {
-          title: 'Broaden contributor involvement',
-          action:
-            'Recent work is becoming concentrated. Encourage additional contributors before dependency forms.',
-        },
-      ];
+  return [
+    {
+      title: 'Concentration trend',
+action:
+  'Is concentration increasing recently, or does this reflect a temporary burst of activity?',
+    },
+  ];
 
     case 'No recent activity':
-      return [
-        {
-          title: 'Treat ownership as historical',
-          action:
-            'Recent activity is absent. Use ownership data cautiously.',
-        },
-      ];
+  return [
+    {
+      title: 'Project status',
+      action:
+        'Is this area intentionally stable, dormant, or maintained through activity not visible in Git history?',
+    },
+  ];
 
     case 'Insufficient recent evidence':
-      return [
-        {
-          title: 'Collect more activity data',
-          action:
-            'Recent activity is too limited to draw strong conclusions.',
-        },
-      ];
+  return [
+    {
+      title: 'Limited evidence',
+      action:
+        'Is there enough recent activity to support a meaningful interpretation of concentration patterns?',
+    },
+  ];
 
     default:
       return [];

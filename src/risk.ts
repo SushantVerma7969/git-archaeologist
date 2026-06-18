@@ -117,7 +117,7 @@ if (options.html) {
 
 if (r.recommendations && r.recommendations.length > 0) {
   console.log();
-  console.log(chalk.grey('  Recommended actions:'));
+  console.log(chalk.grey('  Questions to investigate:'));
 
   for (const rec of r.recommendations) {
     console.log(chalk.cyan(`    • ${rec.title}`));
@@ -196,7 +196,7 @@ if (options.html) {
           console.log(chalk.grey(`    ${r.explanation.summary}`));
           if (r.recommendations && r.recommendations.length > 0) {
   console.log();
-  console.log(chalk.grey('  Recommended actions:'));
+  console.log(chalk.grey('  Questions to investigate:'));
 
   for (const rec of r.recommendations) {
     console.log(chalk.cyan(`    • ${rec.title}`));

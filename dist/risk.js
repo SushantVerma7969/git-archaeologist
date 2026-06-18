@@ -122,7 +122,7 @@ function registerRiskCommand(program) {
                     console.log(chalk_1.default.grey(`  ${r.summary}`));
                     if (r.recommendations && r.recommendations.length > 0) {
                         console.log();
-                        console.log(chalk_1.default.grey('  Recommended actions:'));
+                        console.log(chalk_1.default.grey('  Questions to investigate:'));
                         for (const rec of r.recommendations) {
                             console.log(chalk_1.default.cyan(`    • ${rec.title}`));
                             console.log(chalk_1.default.grey(`      ${rec.action}`));
@@ -183,7 +183,7 @@ function registerRiskCommand(program) {
                 console.log(chalk_1.default.grey(`    ${r.explanation.summary}`));
                 if (r.recommendations && r.recommendations.length > 0) {
                     console.log();
-                    console.log(chalk_1.default.grey('  Recommended actions:'));
+                    console.log(chalk_1.default.grey('  Questions to investigate:'));
                     for (const rec of r.recommendations) {
                         console.log(chalk_1.default.cyan(`    • ${rec.title}`));
                         console.log(chalk_1.default.grey(`      ${rec.action}`));
