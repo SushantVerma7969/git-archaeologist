@@ -57,6 +57,21 @@ export function registerRiskCommand(program: Command): void {
   options.json === true
 );
           const temporalRisks = buildTemporalScopeRisks(lifetimeResult, recentResult);
+if (options.html) {
+  generateHtmlReport(
+    lifetimeResult,
+    options.html,
+    temporalRisks
+  );
+
+  console.log(
+    chalk.green(
+      `✔ HTML report written to ${options.html}`
+    )
+  );
+
+  return;
+}
           
           if (options.json) {
   console.log(JSON.stringify(temporalRisks, null, 2));

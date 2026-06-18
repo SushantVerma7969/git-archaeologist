@@ -31,7 +31,11 @@ function buildTree(result: AnalysisResult): TreeNode {
   return { name: result.repoName, children: Array.from(fm.entries()).map(([f, files]) => ({ name: f, children: files })) };
 }
 
-export function generateHtmlReport(result: AnalysisResult, outputPath: string): void {
+export function generateHtmlReport(
+  result: AnalysisResult,
+  outputPath: string,
+  temporalRisks?: any[]
+): void {
   const from = result.dateRange.from.toISOString().split('T')[0];
   const to   = result.dateRange.to.toISOString().split('T')[0];
   const maxS = Math.max(1, ...result.cursedFiles.map(f => f.curseScore));
@@ -209,6 +213,39 @@ window.hl=function(fp){
 
 };
 <\/script>
+${temporalRisks && temporalRisks.length > 0 ? `
+<h2>Temporal Risk Analysis</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scope</th>
+      <th>Category</th>
+      <th>Lifetime</th>
+      <th>Recent</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${temporalRisks.map(r => `
+      <tr>
+        <td>${r.scope}</td>
+        <td>${r.category}</td>
+        <td>
+          ${r.lifetime.level}
+          (${r.lifetime.concentration}%)
+        </td>
+        <td>
+          ${
+            r.recent
+              ? `${r.recent.level} (${r.recent.concentration}%)`
+              : `${r.recentTouches} touches`
+          }
+        </td>
+      </tr>
+    `).join('')}
+  </tbody>
+</table>
+` : ''}
 </body>
 </html>`;
 

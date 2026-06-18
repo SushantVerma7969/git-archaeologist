@@ -80,6 +80,11 @@ function registerRiskCommand(program) {
                 const lifetimeResult = await (0, orchestrator_1.analyze)(resolvedPath, undefined, options.json === true);
                 const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
+                if (options.html) {
+                    (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks);
+                    console.log(chalk_1.default.green(`✔ HTML report written to ${options.html}`));
+                    return;
+                }
                 if (options.json) {
                     console.log(JSON.stringify(temporalRisks, null, 2));
                     return;
