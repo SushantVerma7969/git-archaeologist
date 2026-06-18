@@ -12,6 +12,7 @@ export interface FileStats {
   totalChanges: number;
   uniqueAuthors: Set<string>;
   authorChanges: Map<string, number>;
+  authorChangesByYear: Map<number, Map<string, number>>;
   firstChanged: number;
   lastChanged: number;
   changeTimeline: number[];
@@ -87,6 +88,22 @@ export interface TemporalScopeRisk {
   summary: string;
 
   recommendations?: Recommendation[];
+}
+
+export interface YearlyConcentrationPoint {
+  year: number;
+  commitCount: number;
+  concentration: number | null;
+}
+
+export interface YearlyConcentrationSeries {
+  scope: string;
+  points: YearlyConcentrationPoint[];
+  direction:
+    | 'rising'
+    | 'declining'
+    | 'stable'
+    | 'insufficient_data';
 }
 
 export interface CouplingPair {

@@ -72,6 +72,26 @@ function buildNonBotEmailSet(result: AnalysisResult): Set<string> {
   }
   return emails;
 }
+function calculateConcentration(
+  authorTotals: Map<string, number>
+): number | null {
+  const total = Array.from(authorTotals.values()).reduce(
+    (a, b) => a + b,
+    0
+  );
+
+  if (total === 0) {
+    return null;
+  }
+
+  const sorted = Array.from(authorTotals.entries()).sort(
+    (a, b) => b[1] - a[1]
+  );
+
+  const topShare = sorted[0][1] / total;
+
+  return Math.round(topShare * 1000) / 10;
+}
 
 export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOptions = {}): ScopeRisk[] {
   const minFilesAtRisk = options.minFilesAtRisk ?? 3;
@@ -104,11 +124,12 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
     if (bf.filesAtRisk < minFilesAtRisk) continue;
 
     const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
-    if (total === 0) continue;
-    const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
-    const topShare = sorted[0][1] / total;
-    const concentration = Math.round(topShare * 1000) / 10;
-    const contributors = sorted.length;
+if (total === 0) continue;
+
+const concentration = calculateConcentration(authorTotals);
+if (concentration === null) continue;
+
+const contributors = authorTotals.size;
     const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
     const level = classifyScopeRisk(bf.busFactor, concentration);
     const explanationInput = {

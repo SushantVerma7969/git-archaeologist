@@ -114,6 +114,7 @@ export function buildFileStats(commits: CommitRecord[]): Map<string, FileStats> 
           totalChanges: 0,
           uniqueAuthors: new Set(),
           authorChanges: new Map(),
+          authorChangesByYear: new Map(),
           firstChanged: commit.timestamp,
           lastChanged: commit.timestamp,
           changeTimeline: [],
@@ -127,6 +128,18 @@ export function buildFileStats(commits: CommitRecord[]): Map<string, FileStats> 
         commit.authorEmail,
         (stats.authorChanges.get(commit.authorEmail) ?? 0) + 1
       );
+      const year = new Date(commit.timestamp * 1000).getUTCFullYear();
+
+if (!stats.authorChangesByYear.has(year)) {
+  stats.authorChangesByYear.set(year, new Map());
+}
+
+const yearlyAuthors = stats.authorChangesByYear.get(year)!;
+
+yearlyAuthors.set(
+  commit.authorEmail,
+  (yearlyAuthors.get(commit.authorEmail) ?? 0) + 1
+);
       if (commit.timestamp < stats.firstChanged) stats.firstChanged = commit.timestamp;
       if (commit.timestamp > stats.lastChanged) stats.lastChanged = commit.timestamp;
       stats.changeTimeline.push(commit.timestamp);
