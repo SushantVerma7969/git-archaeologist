@@ -85,7 +85,17 @@ function registerRiskCommand(program) {
                         console.log(JSON.stringify(series, null, 2));
                         return;
                     }
-                    console.log(series);
+                    for (const s of series) {
+                        console.log();
+                        console.log(chalk_1.default.cyan.bold(s.scope));
+                        for (const p of s.points) {
+                            const value = p.concentration === null
+                                ? '-'
+                                : `${p.concentration}%`;
+                            console.log(`  ${p.year}: ${value} (${p.commitCount} touches)`);
+                        }
+                        console.log(chalk_1.default.grey(`  Trend: ${s.direction}`));
+                    }
                     return;
                 }
                 const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
