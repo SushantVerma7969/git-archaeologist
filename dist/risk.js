@@ -85,7 +85,13 @@ function registerRiskCommand(program) {
                         console.log(JSON.stringify(series, null, 2));
                         return;
                     }
+                    let displayed = 0;
                     for (const s of series) {
+                        const activeYears = s.points.filter((p) => p.commitCount > 0).length;
+                        if (activeYears < 2) {
+                            continue;
+                        }
+                        displayed++;
                         console.log();
                         console.log(chalk_1.default.cyan.bold(s.scope));
                         for (const p of s.points) {
@@ -95,6 +101,9 @@ function registerRiskCommand(program) {
                             console.log(`  ${p.year}: ${value} (${p.commitCount} touches)`);
                         }
                         console.log(chalk_1.default.grey(`  Trend: ${s.direction}`));
+                    }
+                    if (displayed === 0) {
+                        console.log(chalk_1.default.yellow('No files have enough multi-year history for trajectory analysis.'));
                     }
                     return;
                 }

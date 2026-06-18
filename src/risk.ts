@@ -65,7 +65,16 @@ if (options.series) {
     return;
   }
 
-  for (const s of series) {
+  let displayed = 0;
+
+for (const s of series) {
+  const activeYears =
+  s.points.filter((p) => p.commitCount > 0).length;
+
+if (activeYears < 2) {
+  continue;
+}
+displayed++;
   console.log();
   console.log(chalk.cyan.bold(s.scope));
 
@@ -82,6 +91,14 @@ if (options.series) {
 
   console.log(
     chalk.grey(`  Trend: ${s.direction}`)
+  );
+}
+
+if (displayed === 0) {
+  console.log(
+    chalk.yellow(
+      'No files have enough multi-year history for trajectory analysis.'
+    )
   );
 }
 
