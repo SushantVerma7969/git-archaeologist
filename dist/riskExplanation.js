@@ -225,6 +225,12 @@ function classifySeriesDirection(points) {
 function buildYearlyConcentrationSeries(result) {
     const series = [];
     for (const [, stats] of result.fileStats) {
+        if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
+            continue;
+        }
+        if (stats.filepath === 'ls') {
+            continue;
+        }
         const years = Array.from(stats.authorChangesByYear.keys()).sort((a, b) => a - b);
         if (years.length === 0) {
             series.push({

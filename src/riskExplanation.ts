@@ -100,6 +100,7 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
   const nonBotEmails = buildNonBotEmailSet(result);
   const folderAuthorChanges = new Map<string, Map<string, number>>();
   for (const [, stats] of result.fileStats) {
+  
     const parts = stats.filepath.split('/');
     const folder = parts.length > 1 ? parts[0] : '(root)';
     if (!folderAuthorChanges.has(folder)) folderAuthorChanges.set(folder, new Map());
@@ -297,9 +298,17 @@ export function buildYearlyConcentrationSeries(
   const series: YearlyConcentrationSeries[] = [];
 
   for (const [, stats] of result.fileStats) {
-    const years = Array.from(stats.authorChangesByYear.keys()).sort(
-      (a, b) => a - b
-    );
+  if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
+    continue;
+  }
+
+  if (stats.filepath === 'ls') {
+    continue;
+  }
+
+  const years = Array.from(stats.authorChangesByYear.keys()).sort(
+    (a, b) => a - b
+  );
 
     if (years.length === 0) {
       series.push({
