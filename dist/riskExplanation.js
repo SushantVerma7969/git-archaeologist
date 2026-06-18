@@ -4,6 +4,7 @@ exports.classifyScopeRisk = classifyScopeRisk;
 exports.buildRiskExplanation = buildRiskExplanation;
 exports.buildScopeRisks = buildScopeRisks;
 exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
+exports.buildYearlyConcentrationSeries = buildYearlyConcentrationSeries;
 const activity_1 = require("./utils/activity");
 const recommendations_1 = require("./recommendations");
 function classifyScopeRisk(busFactor, concentration) {
@@ -49,6 +50,15 @@ function buildNonBotEmailSet(result) {
     }
     return emails;
 }
+function calculateConcentration(authorTotals) {
+    const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
+    if (total === 0) {
+        return null;
+    }
+    const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
+    const topShare = sorted[0][1] / total;
+    return Math.round(topShare * 1000) / 10;
+}
 function buildScopeRisks(result, options = {}) {
     const minFilesAtRisk = options.minFilesAtRisk ?? 3;
     const nonBotEmails = buildNonBotEmailSet(result);
@@ -83,10 +93,10 @@ function buildScopeRisks(result, options = {}) {
         const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
         if (total === 0)
             continue;
-        const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
-        const topShare = sorted[0][1] / total;
-        const concentration = Math.round(topShare * 1000) / 10;
-        const contributors = sorted.length;
+        const concentration = calculateConcentration(authorTotals);
+        if (concentration === null)
+            continue;
+        const contributors = authorTotals.size;
         const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
         const level = classifyScopeRisk(bf.busFactor, concentration);
         const explanationInput = {
@@ -198,5 +208,21 @@ function buildTemporalScopeRisks(lifetimeResult, recentResult) {
         return categoryOrder[a.category] - categoryOrder[b.category]
             || b.lifetime.concentration - a.lifetime.concentration;
     });
+}
+function classifySeriesDirection(points) {
+    const valid = points.filter((p) => p.concentration !== null);
+    if (valid.length < 2) {
+        return 'insufficient_data';
+    }
+    const first = valid[0].concentration;
+    const last = valid[valid.length - 1].concentration;
+    const diff = last - first;
+    if (Math.abs(diff) < 10) {
+        return 'stable';
+    }
+    return diff > 0 ? 'rising' : 'declining';
+}
+function buildYearlyConcentrationSeries(result) {
+    return [];
 }
 //# sourceMappingURL=riskExplanation.js.map

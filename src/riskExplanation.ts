@@ -5,6 +5,8 @@ import {
   ScopeRisk,
   TemporalRiskCategory,
   TemporalScopeRisk,
+  YearlyConcentrationPoint,
+  YearlyConcentrationSeries,
 } from './types';
 import { formatTimeAgo } from './utils/activity';
 import {
@@ -267,4 +269,30 @@ export function buildTemporalScopeRisks(
       return categoryOrder[a.category] - categoryOrder[b.category]
         || b.lifetime.concentration - a.lifetime.concentration;
     });
+}
+function classifySeriesDirection(
+  points: YearlyConcentrationPoint[]
+): 'rising' | 'declining' | 'stable' | 'insufficient_data' {
+  const valid = points.filter((p) => p.concentration !== null);
+
+  if (valid.length < 2) {
+    return 'insufficient_data';
+  }
+
+  const first = valid[0].concentration!;
+  const last = valid[valid.length - 1].concentration!;
+
+  const diff = last - first;
+
+  if (Math.abs(diff) < 10) {
+    return 'stable';
+  }
+
+  return diff > 0 ? 'rising' : 'declining';
+}
+
+export function buildYearlyConcentrationSeries(
+  result: AnalysisResult
+): YearlyConcentrationSeries[] {
+  return [];
 }
