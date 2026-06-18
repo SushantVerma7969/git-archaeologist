@@ -3,7 +3,11 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
 import { analyze } from './core/orchestrator';
-import { buildScopeRisks, buildTemporalScopeRisks } from './riskExplanation';
+import {
+  buildScopeRisks,
+  buildTemporalScopeRisks,
+  buildYearlyConcentrationSeries,
+} from './riskExplanation';
 
 function parseSince(input: string): string {
   const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
@@ -26,12 +30,14 @@ export function registerRiskCommand(program: Command): void {
     .option('-s, --since <date>', 'Only analyze commits after this date')
     .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
     .option('--temporal', 'Compare lifetime risk with the last 12 months')
+    .option('--series', 'Show yearly concentration trajectory')
     .option('-j, --json', 'Output risk report as JSON')
     .option('--html <file>', 'Write report as HTML')
     .action(async (repoPath: string | undefined, options: {
   since?: string;
   all?: boolean;
   temporal?: boolean;
+  series?: boolean;
   json?: boolean;
   html?: string;
 }) => {
@@ -51,6 +57,20 @@ export function registerRiskCommand(program: Command): void {
   undefined,
   options.json === true
 );
+if (options.series) {
+  const series = buildYearlyConcentrationSeries(lifetimeResult);
+
+  if (options.json) {
+    console.log(JSON.stringify(series, null, 2));
+    return;
+  }
+
+  console.log(series);
+  return;
+}
+
+
+
           const recentResult = await analyze(
   resolvedPath,
   recentSince,

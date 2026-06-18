@@ -294,5 +294,57 @@ function classifySeriesDirection(
 export function buildYearlyConcentrationSeries(
   result: AnalysisResult
 ): YearlyConcentrationSeries[] {
-  return [];
+  const series: YearlyConcentrationSeries[] = [];
+
+  for (const [, stats] of result.fileStats) {
+    const years = Array.from(stats.authorChangesByYear.keys()).sort(
+      (a, b) => a - b
+    );
+
+    if (years.length === 0) {
+      series.push({
+        scope: stats.filepath,
+        points: [],
+        direction: 'insufficient_data',
+      });
+      continue;
+    }
+
+    const firstYear = years[0];
+    const currentYear = new Date().getUTCFullYear();
+
+    const points: YearlyConcentrationPoint[] = [];
+
+    for (let year = firstYear; year <= currentYear; year++) {
+      const authorTotals = stats.authorChangesByYear.get(year);
+
+      if (!authorTotals) {
+        points.push({
+          year,
+          commitCount: 0,
+          concentration: null,
+        });
+        continue;
+      }
+
+      const commitCount = Array.from(authorTotals.values()).reduce(
+        (a, b) => a + b,
+        0
+      );
+
+      points.push({
+        year,
+        commitCount,
+        concentration: calculateConcentration(authorTotals),
+      });
+    }
+
+    series.push({
+      scope: stats.filepath,
+      points,
+      direction: classifySeriesDirection(points),
+    });
+  }
+
+  return series;
 }

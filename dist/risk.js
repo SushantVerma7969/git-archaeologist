@@ -65,6 +65,7 @@ function registerRiskCommand(program) {
         .option('-s, --since <date>', 'Only analyze commits after this date')
         .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
         .option('--temporal', 'Compare lifetime risk with the last 12 months')
+        .option('--series', 'Show yearly concentration trajectory')
         .option('-j, --json', 'Output risk report as JSON')
         .option('--html <file>', 'Write report as HTML')
         .action(async (repoPath, options) => {
@@ -78,6 +79,15 @@ function registerRiskCommand(program) {
                 }
                 const recentSince = parseSince('12m');
                 const lifetimeResult = await (0, orchestrator_1.analyze)(resolvedPath, undefined, options.json === true);
+                if (options.series) {
+                    const series = (0, riskExplanation_1.buildYearlyConcentrationSeries)(lifetimeResult);
+                    if (options.json) {
+                        console.log(JSON.stringify(series, null, 2));
+                        return;
+                    }
+                    console.log(series);
+                    return;
+                }
                 const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
                 if (options.html) {
