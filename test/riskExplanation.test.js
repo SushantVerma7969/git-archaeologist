@@ -5,6 +5,7 @@ const {
   buildRiskExplanation,
   buildScopeRisks,
   buildTemporalScopeRisks,
+  buildOwnershipTransitions,
   classifyScopeRisk,
 } = require('../dist/riskExplanation');
 
@@ -286,4 +287,61 @@ test('buildTemporalScopeRisks treats bot-only recent touches as no recent activi
 
   assert.equal(risk.category, 'No recent activity');
   assert.equal(risk.recentTouches, 0);
+});
+test('buildOwnershipTransitions detects ownership handoff', () => {
+  const result = {
+    repoPath: '/repo',
+    repoName: 'repo',
+    analyzedAt: new Date(),
+    totalCommits: 1,
+    totalFiles: 1,
+    totalAuthors: 2,
+    dateRange: { from: new Date(), to: new Date() },
+    cursedFiles: [],
+    ownership: [],
+    busFactor: [],
+    coupling: [],
+    lastActiveByAuthor: new Map(),
+    fileStats: new Map([
+      ['compiler/a.ts', {
+        filepath: 'compiler/a.ts',
+        totalChanges: 100,
+        uniqueAuthors: new Set([
+          'alice@example.com',
+          'bob@example.com',
+        ]),
+        authorChanges: new Map(),
+        authorChangesByYear: new Map([
+          [2024, new Map([
+            ['alice@example.com', 10],
+            ['bob@example.com', 2],
+          ])],
+          [2025, new Map([
+            ['alice@example.com', 8],
+            ['bob@example.com', 4],
+          ])],
+          [2026, new Map([
+            ['alice@example.com', 3],
+            ['bob@example.com', 12],
+          ])],
+        ]),
+        firstChanged: 1,
+        lastChanged: 2,
+        changeTimeline: [],
+      }],
+    ]),
+  };
+
+  const transitions =
+    buildOwnershipTransitions(result);
+
+  assert.equal(transitions.length, 1);
+
+  assert.deepEqual(transitions[0], {
+    scope: 'compiler',
+    fromOwner: 'alice@example.com',
+    toOwner: 'bob@example.com',
+    fromYear: 2025,
+    toYear: 2026,
+  });
 });
