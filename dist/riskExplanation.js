@@ -264,6 +264,30 @@ function buildYearlyConcentrationSeries(result) {
 function buildOwnershipTransitions(result) {
     const transitions = [];
     const scopeData = new Map();
+    for (const [, stats] of result.fileStats) {
+        if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
+            continue;
+        }
+        if (stats.filepath === 'ls') {
+            continue;
+        }
+        const scope = stats.filepath.includes('/')
+            ? stats.filepath.split('/')[0]
+            : '(root)';
+        if (!scopeData.has(scope)) {
+            scopeData.set(scope, new Map());
+        }
+        const yearlyScopeData = scopeData.get(scope);
+        for (const [year, authors] of stats.authorChangesByYear) {
+            if (!yearlyScopeData.has(year)) {
+                yearlyScopeData.set(year, new Map());
+            }
+            const scopeAuthors = yearlyScopeData.get(year);
+            for (const [author, count] of authors) {
+                scopeAuthors.set(author, (scopeAuthors.get(author) ?? 0) + count);
+            }
+        }
+    }
     return transitions;
 }
 //# sourceMappingURL=riskExplanation.js.map
