@@ -6,6 +6,7 @@ exports.buildScopeRisks = buildScopeRisks;
 exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
 exports.buildYearlyConcentrationSeries = buildYearlyConcentrationSeries;
 const activity_1 = require("./utils/activity");
+const concentration_1 = require("./utils/concentration");
 const recommendations_1 = require("./recommendations");
 function classifyScopeRisk(busFactor, concentration) {
     if (busFactor === 1 && concentration >= 80) {
@@ -50,15 +51,6 @@ function buildNonBotEmailSet(result) {
     }
     return emails;
 }
-function calculateConcentration(authorTotals) {
-    const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
-    if (total === 0) {
-        return null;
-    }
-    const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
-    const topShare = sorted[0][1] / total;
-    return Math.round(topShare * 1000) / 10;
-}
 function buildScopeRisks(result, options = {}) {
     const minFilesAtRisk = options.minFilesAtRisk ?? 3;
     const nonBotEmails = buildNonBotEmailSet(result);
@@ -93,7 +85,7 @@ function buildScopeRisks(result, options = {}) {
         const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
         if (total === 0)
             continue;
-        const concentration = calculateConcentration(authorTotals);
+        const concentration = (0, concentration_1.calculateConcentration)(authorTotals);
         if (concentration === null)
             continue;
         const contributors = authorTotals.size;
@@ -257,7 +249,7 @@ function buildYearlyConcentrationSeries(result) {
             points.push({
                 year,
                 commitCount: Array.from(authors.values()).reduce((a, b) => a + b, 0),
-                concentration: calculateConcentration(authors),
+                concentration: (0, concentration_1.calculateConcentration)(authors),
             });
         }
         series.push({
