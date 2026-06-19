@@ -105,7 +105,13 @@ export interface YearlyConcentrationSeries {
     | 'stable'
     | 'insufficient_data';
 }
-
+export interface OwnershipTransition {
+  scope: string;
+  fromOwner: string;
+  toOwner: string;
+  fromYear: number;
+  toYear: number;
+}
 export interface CouplingPair {
   fileA: string;
   fileB: string;
@@ -128,3 +134,4 @@ export interface AnalysisResult {
   fileStats: Map<string, FileStats>;
   lastActiveByAuthor: Map<string, number>;
 }
+

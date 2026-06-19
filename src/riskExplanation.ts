@@ -7,6 +7,7 @@ import {
   TemporalScopeRisk,
   YearlyConcentrationPoint,
   YearlyConcentrationSeries,
+  OwnershipTransition,
 } from './types';
 import { formatTimeAgo } from './utils/activity';
 import { calculateConcentration } from './utils/concentration';
@@ -349,4 +350,11 @@ export function buildYearlyConcentrationSeries(
   
 
   return series;
+}
+export function buildOwnershipTransitions(
+  result: AnalysisResult
+): OwnershipTransition[] {
+  const transitions: OwnershipTransition[] = [];
+
+  return transitions;
 }

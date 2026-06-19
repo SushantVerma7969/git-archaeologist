@@ -82,6 +82,13 @@ export interface YearlyConcentrationSeries {
     points: YearlyConcentrationPoint[];
     direction: 'rising' | 'declining' | 'stable' | 'insufficient_data';
 }
+export interface OwnershipTransition {
+    scope: string;
+    fromOwner: string;
+    toOwner: string;
+    fromYear: number;
+    toYear: number;
+}
 export interface CouplingPair {
     fileA: string;
     fileB: string;

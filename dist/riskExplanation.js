@@ -5,6 +5,7 @@ exports.buildRiskExplanation = buildRiskExplanation;
 exports.buildScopeRisks = buildScopeRisks;
 exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
 exports.buildYearlyConcentrationSeries = buildYearlyConcentrationSeries;
+exports.buildOwnershipTransitions = buildOwnershipTransitions;
 const activity_1 = require("./utils/activity");
 const concentration_1 = require("./utils/concentration");
 const recommendations_1 = require("./recommendations");
@@ -259,5 +260,9 @@ function buildYearlyConcentrationSeries(result) {
         });
     }
     return series;
+}
+function buildOwnershipTransitions(result) {
+    const transitions = [];
+    return transitions;
 }
 //# sourceMappingURL=riskExplanation.js.map
