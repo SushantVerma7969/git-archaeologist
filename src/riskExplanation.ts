@@ -394,6 +394,33 @@ for (const [, stats] of result.fileStats) {
     }
   }
 }
+for (const [scope, yearlyData] of scopeData) {
+  const years = Array.from(yearlyData.keys()).sort(
+    (a, b) => a - b
+  );
+
+  const dominantOwners: {
+    year: number;
+    owner: string;
+  }[] = [];
+
+  for (const year of years) {
+    const authors = yearlyData.get(year)!;
+
+    const sorted = Array.from(authors.entries()).sort(
+      (a, b) => b[1] - a[1]
+    );
+
+    if (sorted.length === 0) {
+      continue;
+    }
+
+    dominantOwners.push({
+      year,
+      owner: sorted[0][0],
+    });
+  }
+}
 
   return transitions;
 }
