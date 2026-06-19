@@ -296,64 +296,75 @@ export function buildYearlyConcentrationSeries(
   result: AnalysisResult
 ): YearlyConcentrationSeries[] {
   const series: YearlyConcentrationSeries[] = [];
+  const scopeData = new Map<
+    string,
+    Map<number, Map<string, number>>
+  >();
 
   for (const [, stats] of result.fileStats) {
-  if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
-    continue;
-  }
-
-  if (stats.filepath === 'ls') {
-    continue;
-  }
-
-  const years = Array.from(stats.authorChangesByYear.keys()).sort(
-    (a, b) => a - b
-  );
-
-    if (years.length === 0) {
-      series.push({
-        scope: stats.filepath,
-        points: [],
-        direction: 'insufficient_data',
-      });
+    if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
       continue;
     }
 
-    const firstYear = years[0];
-    const currentYear = new Date().getUTCFullYear();
+    if (stats.filepath === 'ls') {
+      continue;
+    }
+
+    const scope = stats.filepath.includes('/')
+      ? stats.filepath.split('/')[0]
+      : '(root)';
+
+    if (!scopeData.has(scope)) {
+      scopeData.set(scope, new Map());
+    }
+
+    const yearlyScopeData = scopeData.get(scope)!;
+
+    for (const [year, authors] of stats.authorChangesByYear) {
+      if (!yearlyScopeData.has(year)) {
+        yearlyScopeData.set(year, new Map());
+      }
+
+      const scopeAuthors = yearlyScopeData.get(year)!;
+
+      for (const [author, count] of authors) {
+        scopeAuthors.set(
+          author,
+          (scopeAuthors.get(author) ?? 0) + count
+        );
+      }
+    }
+  }
+
+  for (const [scope, yearlyData] of scopeData) {
+    const years = Array.from(yearlyData.keys()).sort(
+      (a, b) => a - b
+    );
 
     const points: YearlyConcentrationPoint[] = [];
 
-    for (let year = firstYear; year <= currentYear; year++) {
-      const authorTotals = stats.authorChangesByYear.get(year);
-
-      if (!authorTotals) {
-        points.push({
-          year,
-          commitCount: 0,
-          concentration: null,
-        });
-        continue;
-      }
-
-      const commitCount = Array.from(authorTotals.values()).reduce(
-        (a, b) => a + b,
-        0
-      );
+    for (const year of years) {
+      const authors = yearlyData.get(year)!;
 
       points.push({
         year,
-        commitCount,
-        concentration: calculateConcentration(authorTotals),
+        commitCount: Array.from(authors.values()).reduce(
+          (a, b) => a + b,
+          0
+        ),
+        concentration: calculateConcentration(authors),
       });
     }
 
     series.push({
-      scope: stats.filepath,
+      scope,
       points,
       direction: classifySeriesDirection(points),
     });
   }
+
+  
+  
 
   return series;
 }
