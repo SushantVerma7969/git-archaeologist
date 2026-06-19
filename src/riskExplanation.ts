@@ -420,6 +420,22 @@ for (const [scope, yearlyData] of scopeData) {
       owner: sorted[0][0],
     });
   }
+for (let i = 1; i < dominantOwners.length; i++) {
+  const previous = dominantOwners[i - 1];
+  const current = dominantOwners[i];
+
+  if (previous.owner === current.owner) {
+    continue;
+  }
+
+  transitions.push({
+    scope,
+    fromOwner: previous.owner,
+    toOwner: current.owner,
+    fromYear: previous.year,
+    toYear: current.year,
+  });
+}
 }
 
   return transitions;
