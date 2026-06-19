@@ -354,7 +354,12 @@ export function buildYearlyConcentrationSeries(
 export function buildOwnershipTransitions(
   result: AnalysisResult
 ): OwnershipTransition[] {
-  const transitions: OwnershipTransition[] = [];
+    const transitions: OwnershipTransition[] = [];
+
+  const scopeData = new Map<
+    string,
+    Map<number, Map<string, number>>
+  >();
 
   return transitions;
 }

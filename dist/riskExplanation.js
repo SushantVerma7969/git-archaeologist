@@ -263,6 +263,7 @@ function buildYearlyConcentrationSeries(result) {
 }
 function buildOwnershipTransitions(result) {
     const transitions = [];
+    const scopeData = new Map();
     return transitions;
 }
 //# sourceMappingURL=riskExplanation.js.map
