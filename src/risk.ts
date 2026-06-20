@@ -137,7 +137,17 @@ if (options.html) {
 }
           
           if (options.json) {
-  console.log(JSON.stringify(temporalRisks, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        temporalRisks,
+        ownershipTransitions,
+      },
+      null,
+      2
+    )
+  );
+
   return;
 }
 

@@ -116,7 +116,10 @@ function registerRiskCommand(program) {
                     return;
                 }
                 if (options.json) {
-                    console.log(JSON.stringify(temporalRisks, null, 2));
+                    console.log(JSON.stringify({
+                        temporalRisks,
+                        ownershipTransitions,
+                    }, null, 2));
                     return;
                 }
                 console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
