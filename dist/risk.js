@@ -109,6 +109,7 @@ function registerRiskCommand(program) {
                 }
                 const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
+                const ownershipTransitions = (0, riskExplanation_1.buildOwnershipTransitions)(lifetimeResult);
                 if (options.html) {
                     (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks);
                     console.log(chalk_1.default.green(`✔ HTML report written to ${options.html}`));
@@ -158,6 +159,15 @@ function registerRiskCommand(program) {
                         }
                     }
                     console.log();
+                }
+                if (ownershipTransitions.length > 0) {
+                    console.log(chalk_1.default.magenta.bold('  Ownership Transitions'));
+                    for (const t of ownershipTransitions) {
+                        console.log(`  ${chalk_1.default.cyan(t.scope)}`);
+                        console.log(`    ${t.fromOwner} → ${t.toOwner}`);
+                        console.log(`    ${t.fromYear} → ${t.toYear}`);
+                        console.log();
+                    }
                 }
                 console.log(chalk_1.default.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));
                 console.log(chalk_1.default.grey('  Recent scopes with 1-9 non-bot touches are marked insufficient recent evidence.'));

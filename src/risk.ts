@@ -7,6 +7,7 @@ import {
   buildScopeRisks,
   buildTemporalScopeRisks,
   buildYearlyConcentrationSeries,
+  buildOwnershipTransitions,
 } from './riskExplanation';
 
 function parseSince(input: string): string {
@@ -112,7 +113,13 @@ return;
   recentSince,
   options.json === true
 );
-          const temporalRisks = buildTemporalScopeRisks(lifetimeResult, recentResult);
+          const temporalRisks = buildTemporalScopeRisks(
+  lifetimeResult,
+  recentResult
+);
+
+const ownershipTransitions =
+  buildOwnershipTransitions(lifetimeResult);
 if (options.html) {
   generateHtmlReport(
     lifetimeResult,
@@ -183,7 +190,27 @@ if (r.recommendations && r.recommendations.length > 0) {
 
 console.log();
           }
+if (ownershipTransitions.length > 0) {
+  console.log(
+    chalk.magenta.bold('  Ownership Transitions')
+  );
 
+  for (const t of ownershipTransitions) {
+    console.log(
+      `  ${chalk.cyan(t.scope)}`
+    );
+
+    console.log(
+      `    ${t.fromOwner} → ${t.toOwner}`
+    );
+
+    console.log(
+      `    ${t.fromYear} → ${t.toYear}`
+    );
+
+    console.log();
+  }
+}
           console.log(chalk.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));
           console.log(chalk.grey('  Recent scopes with 1-9 non-bot touches are marked insufficient recent evidence.'));
           console.log(chalk.grey('  These signals do not prove ownership, expertise, or maintainership.'));
