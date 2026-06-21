@@ -215,10 +215,14 @@ if (ownershipTransitions.length > 0) {
     );
 
     console.log(
-      `    ${t.fromYear} → ${t.toYear}`
-    );
+  `    ${t.fromYear} → ${t.toYear}`
+);
 
-    console.log();
+console.log(
+  chalk.grey(`    ${t.explanation}`)
+);
+
+console.log();
   }
 }
           console.log(chalk.grey('  HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.'));

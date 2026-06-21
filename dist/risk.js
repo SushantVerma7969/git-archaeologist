@@ -169,6 +169,7 @@ function registerRiskCommand(program) {
                         console.log(`  ${chalk_1.default.cyan(t.scope)}`);
                         console.log(`    ${t.fromOwner} → ${t.toOwner}`);
                         console.log(`    ${t.fromYear} → ${t.toYear}`);
+                        console.log(chalk_1.default.grey(`    ${t.explanation}`));
                         console.log();
                     }
                 }
