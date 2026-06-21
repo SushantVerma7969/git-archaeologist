@@ -400,9 +400,10 @@ for (const [scope, yearlyData] of scopeData) {
   );
 
   const dominantOwners: {
-    year: number;
-    owner: string;
-  }[] = [];
+  year: number;
+  owner: string;
+  share: number;
+}[] = [];
 
   for (const year of years) {
     const authors = yearlyData.get(year)!;
@@ -415,27 +416,55 @@ for (const [scope, yearlyData] of scopeData) {
       continue;
     }
 
-    dominantOwners.push({
-      year,
-      owner: sorted[0][0],
-    });
+    const total = Array.from(authors.values()).reduce(
+  (a, b) => a + b,
+  0
+);
+
+const share =
+  total === 0
+    ? 0
+    : (sorted[0][1] / total) * 100;
+
+dominantOwners.push({
+  year,
+  owner: sorted[0][0],
+  share,
+});
   }
 for (let i = 1; i < dominantOwners.length; i++) {
   const previous = dominantOwners[i - 1];
   const current = dominantOwners[i];
 
+  let severity: 'LOW' | 'MEDIUM' | 'HIGH';
+
+if (current.share >= 80) {
+  severity = 'HIGH';
+} else if (current.share >= 50) {
+  severity = 'MEDIUM';
+} else {
+  severity = 'LOW';
+}
+
   if (previous.owner === current.owner) {
     continue;
   }
 
-  transitions.push({
+  const explanation =
+  severity === 'HIGH'
+    ? 'Ownership shifted and remains highly concentrated in a single contributor.'
+    : severity === 'MEDIUM'
+      ? 'Ownership shifted and responsibility is concentrated across a small contributor group.'
+      : 'Ownership shifted while work remained relatively distributed.';
+
+transitions.push({
   scope,
   fromOwner: previous.owner,
   toOwner: current.owner,
   fromYear: previous.year,
   toYear: current.year,
-  explanation:
-    'Ownership appears to have shifted between contributors. This may indicate a maintainer handoff, team change, or redistribution of work.',
+  severity,
+  explanation,
 });
 }
 }

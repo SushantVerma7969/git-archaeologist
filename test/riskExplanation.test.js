@@ -343,7 +343,8 @@ test('buildOwnershipTransitions detects ownership handoff', () => {
   toOwner: 'bob@example.com',
   fromYear: 2025,
   toYear: 2026,
+  severity: 'HIGH',
   explanation:
-    'Ownership appears to have shifted between contributors. This may indicate a maintainer handoff, team change, or redistribution of work.',
+    'Ownership shifted and remains highly concentrated in a single contributor.',
 });
 });

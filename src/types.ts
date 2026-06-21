@@ -111,6 +111,7 @@ export interface OwnershipTransition {
   toOwner: string;
   fromYear: number;
   toYear: number;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
   explanation: string;
 }
 export interface CouplingPair {

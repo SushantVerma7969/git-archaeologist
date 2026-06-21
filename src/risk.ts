@@ -211,8 +211,12 @@ if (ownershipTransitions.length > 0) {
     );
 
     console.log(
-      `    ${t.fromOwner} → ${t.toOwner}`
-    );
+  `    [${t.severity}]`
+);
+
+console.log(
+  `    ${t.fromOwner} → ${t.toOwner}`
+);
 
     console.log(
   `    ${t.fromYear} → ${t.toYear}`

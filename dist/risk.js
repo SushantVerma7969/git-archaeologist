@@ -167,6 +167,7 @@ function registerRiskCommand(program) {
                     console.log(chalk_1.default.magenta.bold('  Ownership Transitions'));
                     for (const t of ownershipTransitions) {
                         console.log(`  ${chalk_1.default.cyan(t.scope)}`);
+                        console.log(`    [${t.severity}]`);
                         console.log(`    ${t.fromOwner} → ${t.toOwner}`);
                         console.log(`    ${t.fromYear} → ${t.toYear}`);
                         console.log(chalk_1.default.grey(`    ${t.explanation}`));
