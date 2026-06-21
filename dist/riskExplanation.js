@@ -314,6 +314,7 @@ function buildOwnershipTransitions(result) {
                 toOwner: current.owner,
                 fromYear: previous.year,
                 toYear: current.year,
+                explanation: 'Ownership appears to have shifted between contributors. This may indicate a maintainer handoff, team change, or redistribution of work.',
             });
         }
     }

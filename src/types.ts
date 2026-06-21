@@ -111,6 +111,7 @@ export interface OwnershipTransition {
   toOwner: string;
   fromYear: number;
   toYear: number;
+  explanation: string;
 }
 export interface CouplingPair {
   fileA: string;

@@ -429,12 +429,14 @@ for (let i = 1; i < dominantOwners.length; i++) {
   }
 
   transitions.push({
-    scope,
-    fromOwner: previous.owner,
-    toOwner: current.owner,
-    fromYear: previous.year,
-    toYear: current.year,
-  });
+  scope,
+  fromOwner: previous.owner,
+  toOwner: current.owner,
+  fromYear: previous.year,
+  toYear: current.year,
+  explanation:
+    'Ownership appears to have shifted between contributors. This may indicate a maintainer handoff, team change, or redistribution of work.',
+});
 }
 }
 
