@@ -338,10 +338,12 @@ test('buildOwnershipTransitions detects ownership handoff', () => {
   assert.equal(transitions.length, 1);
 
   assert.deepEqual(transitions[0], {
-    scope: 'compiler',
-    fromOwner: 'alice@example.com',
-    toOwner: 'bob@example.com',
-    fromYear: 2025,
-    toYear: 2026,
-  });
+  scope: 'compiler',
+  fromOwner: 'alice@example.com',
+  toOwner: 'bob@example.com',
+  fromYear: 2025,
+  toYear: 2026,
+  explanation:
+    'Ownership appears to have shifted between contributors. This may indicate a maintainer handoff, team change, or redistribution of work.',
+});
 });
