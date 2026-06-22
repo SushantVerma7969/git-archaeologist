@@ -145,7 +145,7 @@ function registerRiskCommand(program) {
                         : r.category === 'Historical concentration'
                             ? chalk_1.default.yellow
                             : chalk_1.default.green;
-                    console.log(color.bold(`  ${r.category}`));
+                    console.log(color.bold(`  ${r.category} [${r.trend.toUpperCase()}]`));
                     console.log(`  ${chalk_1.default.cyan(r.scope)}`);
                     console.log(`  Lifetime: ${chalk_1.default.bold(r.lifetime.level)} risk, `
                         + `${chalk_1.default.bold(r.lifetime.concentration + '%')} concentration, `

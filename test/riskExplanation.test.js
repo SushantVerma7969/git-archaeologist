@@ -23,6 +23,7 @@ function makeStats(scope, totals) {
         totalChanges: index === 0 ? entries.reduce((sum, [, count]) => sum + count, 0) : 0,
         uniqueAuthors: new Set(entries.map(([email]) => email)),
         authorChanges,
+        authorChangesByYear: new Map(),
         firstChanged: 1,
         lastChanged: 2,
         changeTimeline: [],

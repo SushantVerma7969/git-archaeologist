@@ -203,7 +203,11 @@ console.log();
                 : r.category === 'Historical concentration'
                   ? chalk.yellow
                   : chalk.green;
-            console.log(color.bold(`  ${r.category}`));
+            console.log(
+  color.bold(
+    `  ${r.category} [${r.trend.toUpperCase()}]`
+  )
+);
             console.log(`  ${chalk.cyan(r.scope)}`);
             console.log(
               `  Lifetime: ${chalk.bold(r.lifetime.level)} risk, `

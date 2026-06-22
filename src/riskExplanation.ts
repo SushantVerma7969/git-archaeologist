@@ -240,12 +240,16 @@ export function buildTemporalScopeRisks(
       const recentTouches = recentTouchesByScope.get(lifetime.scope) ?? 0;
       const category = classifyTemporalRisk(lifetime, recent, recentTouches);
 
-      return {
+      const series = buildYearlyConcentrationSeries(lifetimeResult)
+  .find((s) => s.scope === lifetime.scope);
+
+return {
   scope: lifetime.scope,
   category,
   lifetime,
   recent,
   recentTouches,
+  trend: series?.direction ?? 'insufficient_data',
   summary: buildTemporalSummary(lifetime, recent, category),
   recommendations: buildTemporalRecommendations(category),
 };
