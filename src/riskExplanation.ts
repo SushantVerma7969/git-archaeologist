@@ -8,6 +8,7 @@ import {
   YearlyConcentrationPoint,
   YearlyConcentrationSeries,
   OwnershipTransition,
+  EvolutionSummary,
 } from './types';
 import { formatTimeAgo } from './utils/activity';
 import { calculateConcentration } from './utils/concentration';
@@ -470,4 +471,37 @@ transitions.push({
 }
 
   return transitions;
+}
+export function buildEvolutionSummary(
+  temporalRisks: TemporalScopeRisk[],
+  ownershipTransitions: OwnershipTransition[]
+): EvolutionSummary {
+  return {
+    ownershipTransitions: ownershipTransitions.length,
+
+    highSeverityTransitions:
+      ownershipTransitions.filter(
+        (t) => t.severity === 'HIGH'
+      ).length,
+
+    emergingConcentration:
+      temporalRisks.filter(
+        (r) => r.category === 'Emerging concentration'
+      ).length,
+
+    historicalConcentration:
+      temporalRisks.filter(
+        (r) => r.category === 'Historical concentration'
+      ).length,
+
+    persistentConcentration:
+      temporalRisks.filter(
+        (r) => r.category === 'Persistent concentration'
+      ).length,
+
+    distributedScopes:
+      temporalRisks.filter(
+        (r) => r.category === 'Persistently distributed'
+      ).length,
+  };
 }

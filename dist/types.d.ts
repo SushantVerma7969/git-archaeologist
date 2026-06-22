@@ -91,6 +91,14 @@ export interface OwnershipTransition {
     severity: 'LOW' | 'MEDIUM' | 'HIGH';
     explanation: string;
 }
+export interface EvolutionSummary {
+    ownershipTransitions: number;
+    highSeverityTransitions: number;
+    emergingConcentration: number;
+    historicalConcentration: number;
+    persistentConcentration: number;
+    distributedScopes: number;
+}
 export interface CouplingPair {
     fileA: string;
     fileB: string;

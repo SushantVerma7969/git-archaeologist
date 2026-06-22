@@ -110,6 +110,7 @@ function registerRiskCommand(program) {
                 const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
                 const ownershipTransitions = (0, riskExplanation_1.buildOwnershipTransitions)(lifetimeResult);
+                const evolutionSummary = (0, riskExplanation_1.buildEvolutionSummary)(temporalRisks, ownershipTransitions);
                 if (options.html) {
                     (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks);
                     console.log(chalk_1.default.green(`✔ HTML report written to ${options.html}`));
@@ -117,6 +118,7 @@ function registerRiskCommand(program) {
                 }
                 if (options.json) {
                     console.log(JSON.stringify({
+                        evolutionSummary,
                         temporalRisks,
                         ownershipTransitions,
                     }, null, 2));
@@ -127,6 +129,13 @@ function registerRiskCommand(program) {
                 console.log(chalk_1.default.grey('  Lifetime vs recent ownership concentration'));
                 console.log(chalk_1.default.grey(`  Recent window: since ${recentSince} (12 months)`));
                 console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
+                console.log(chalk_1.default.bold.cyan('  Repository Evolution Summary'));
+                console.log(chalk_1.default.grey(`  • ${evolutionSummary.ownershipTransitions} ownership transitions detected`));
+                console.log(chalk_1.default.grey(`  • ${evolutionSummary.highSeverityTransitions} high-severity transitions`));
+                console.log(chalk_1.default.grey(`  • ${evolutionSummary.emergingConcentration} scopes became more concentrated`));
+                console.log(chalk_1.default.grey(`  • ${evolutionSummary.historicalConcentration} scopes became less concentrated`));
+                console.log(chalk_1.default.grey(`  • ${evolutionSummary.distributedScopes} scopes remained distributed`));
+                console.log();
                 if (temporalRisks.length === 0) {
                     console.log(chalk_1.default.green('  ✓ No eligible lifetime scopes found.\n'));
                 }

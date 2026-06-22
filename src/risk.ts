@@ -8,6 +8,7 @@ import {
   buildTemporalScopeRisks,
   buildYearlyConcentrationSeries,
   buildOwnershipTransitions,
+  buildEvolutionSummary,
 } from './riskExplanation';
 
 function parseSince(input: string): string {
@@ -120,6 +121,11 @@ return;
 
 const ownershipTransitions =
   buildOwnershipTransitions(lifetimeResult);
+const evolutionSummary =
+  buildEvolutionSummary(
+    temporalRisks,
+    ownershipTransitions
+  );
 if (options.html) {
   generateHtmlReport(
     lifetimeResult,
@@ -140,6 +146,7 @@ if (options.html) {
   console.log(
     JSON.stringify(
       {
+        evolutionSummary,
         temporalRisks,
         ownershipTransitions,
       },
@@ -156,6 +163,34 @@ if (options.html) {
           console.log(chalk.grey('  Lifetime vs recent ownership concentration'));
           console.log(chalk.grey(`  Recent window: since ${recentSince} (12 months)`));
           console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
+
+          console.log(chalk.bold.cyan('  Repository Evolution Summary'));
+console.log(
+  chalk.grey(
+    `  • ${evolutionSummary.ownershipTransitions} ownership transitions detected`
+  )
+);
+console.log(
+  chalk.grey(
+    `  • ${evolutionSummary.highSeverityTransitions} high-severity transitions`
+  )
+);
+console.log(
+  chalk.grey(
+    `  • ${evolutionSummary.emergingConcentration} scopes became more concentrated`
+  )
+);
+console.log(
+  chalk.grey(
+    `  • ${evolutionSummary.historicalConcentration} scopes became less concentrated`
+  )
+);
+console.log(
+  chalk.grey(
+    `  • ${evolutionSummary.distributedScopes} scopes remained distributed`
+  )
+);
+console.log();
 
           if (temporalRisks.length === 0) {
             console.log(chalk.green('  ✓ No eligible lifetime scopes found.\n'));

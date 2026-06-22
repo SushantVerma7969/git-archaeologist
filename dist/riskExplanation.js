@@ -6,6 +6,7 @@ exports.buildScopeRisks = buildScopeRisks;
 exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
 exports.buildYearlyConcentrationSeries = buildYearlyConcentrationSeries;
 exports.buildOwnershipTransitions = buildOwnershipTransitions;
+exports.buildEvolutionSummary = buildEvolutionSummary;
 const activity_1 = require("./utils/activity");
 const concentration_1 = require("./utils/concentration");
 const recommendations_1 = require("./recommendations");
@@ -340,5 +341,15 @@ function buildOwnershipTransitions(result) {
         }
     }
     return transitions;
+}
+function buildEvolutionSummary(temporalRisks, ownershipTransitions) {
+    return {
+        ownershipTransitions: ownershipTransitions.length,
+        highSeverityTransitions: ownershipTransitions.filter((t) => t.severity === 'HIGH').length,
+        emergingConcentration: temporalRisks.filter((r) => r.category === 'Emerging concentration').length,
+        historicalConcentration: temporalRisks.filter((r) => r.category === 'Historical concentration').length,
+        persistentConcentration: temporalRisks.filter((r) => r.category === 'Persistent concentration').length,
+        distributedScopes: temporalRisks.filter((r) => r.category === 'Persistently distributed').length,
+    };
 }
 //# sourceMappingURL=riskExplanation.js.map
