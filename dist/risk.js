@@ -110,6 +110,7 @@ function registerRiskCommand(program) {
                 const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
                 const ownershipTransitions = (0, riskExplanation_1.buildOwnershipTransitions)(lifetimeResult);
+                const contributorChurn = (0, riskExplanation_1.buildContributorChurn)(lifetimeResult);
                 const evolutionSummary = (0, riskExplanation_1.buildEvolutionSummary)(temporalRisks, ownershipTransitions);
                 if (options.html) {
                     (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks);
@@ -121,6 +122,7 @@ function registerRiskCommand(program) {
                         evolutionSummary,
                         temporalRisks,
                         ownershipTransitions,
+                        contributorChurn,
                     }, null, 2));
                     return;
                 }
@@ -175,6 +177,18 @@ function registerRiskCommand(program) {
                         }
                     }
                     console.log();
+                }
+                console.log();
+                if (contributorChurn.length > 0) {
+                    console.log(chalk_1.default.magenta.bold('  Contributor Churn'));
+                    console.log();
+                    for (const c of contributorChurn.slice(0, 10)) {
+                        console.log(`  ${chalk_1.default.cyan(c.scope)}`);
+                        console.log(`    Contributors: ${c.contributors}`);
+                        console.log(`    Inactive (>12 months): ${c.inactiveContributors}`);
+                        console.log(`    Churn: ${c.churnPercent}% [${c.level}]`);
+                        console.log();
+                    }
                 }
                 if (ownershipTransitions.length > 0) {
                     console.log(chalk_1.default.magenta.bold('  Ownership Transitions'));

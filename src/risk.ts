@@ -9,6 +9,7 @@ import {
   buildYearlyConcentrationSeries,
   buildOwnershipTransitions,
   buildEvolutionSummary,
+  buildContributorChurn,
 } from './riskExplanation';
 
 function parseSince(input: string): string {
@@ -121,6 +122,9 @@ return;
 
 const ownershipTransitions =
   buildOwnershipTransitions(lifetimeResult);
+  const contributorChurn =
+  buildContributorChurn(lifetimeResult);
+
 const evolutionSummary =
   buildEvolutionSummary(
     temporalRisks,
@@ -145,11 +149,12 @@ if (options.html) {
           if (options.json) {
   console.log(
     JSON.stringify(
-      {
-        evolutionSummary,
-        temporalRisks,
-        ownershipTransitions,
-      },
+       {
+  evolutionSummary,
+  temporalRisks,
+  ownershipTransitions,
+  contributorChurn,
+},
       null,
       2
     )
@@ -248,6 +253,37 @@ if (r.recommendations && r.recommendations.length > 0) {
 
 console.log();
           }
+console.log();
+
+
+
+if (contributorChurn.length > 0) {
+  console.log(
+    chalk.magenta.bold('  Contributor Churn')
+  );
+
+  console.log();
+
+  for (const c of contributorChurn.slice(0, 10)) {
+    console.log(`  ${chalk.cyan(c.scope)}`);
+
+    console.log(
+      `    Contributors: ${c.contributors}`
+    );
+
+    console.log(
+      `    Inactive (>12 months): ${c.inactiveContributors}`
+    );
+
+    console.log(
+      `    Churn: ${c.churnPercent}% [${c.level}]`
+    );
+
+    console.log();
+  }
+}
+
+
 if (ownershipTransitions.length > 0) {
   console.log(
     chalk.magenta.bold('  Ownership Transitions')

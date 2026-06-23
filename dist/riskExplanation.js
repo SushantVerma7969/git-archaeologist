@@ -7,6 +7,7 @@ exports.buildTemporalScopeRisks = buildTemporalScopeRisks;
 exports.buildYearlyConcentrationSeries = buildYearlyConcentrationSeries;
 exports.buildOwnershipTransitions = buildOwnershipTransitions;
 exports.buildEvolutionSummary = buildEvolutionSummary;
+exports.buildContributorChurn = buildContributorChurn;
 const activity_1 = require("./utils/activity");
 const concentration_1 = require("./utils/concentration");
 const recommendations_1 = require("./recommendations");
@@ -358,5 +359,60 @@ function buildEvolutionSummary(temporalRisks, ownershipTransitions) {
         persistentConcentration: temporalRisks.filter((r) => r.category === 'Persistent concentration').length,
         distributedScopes: temporalRisks.filter((r) => r.category === 'Persistently distributed').length,
     };
+}
+function buildContributorChurn(result) {
+    const now = Date.now() / 1000;
+    const twelveMonths = 365 * 24 * 60 * 60;
+    const nonBotEmails = buildNonBotEmailSet(result);
+    const scopeContributors = new Map();
+    for (const [, stats] of result.fileStats) {
+        const parts = stats.filepath.split('/');
+        const scope = parts.length > 1 ? parts[0] : '(root)';
+        if (!scopeContributors.has(scope)) {
+            scopeContributors.set(scope, new Set());
+        }
+        const contributors = scopeContributors.get(scope);
+        for (const email of stats.uniqueAuthors) {
+            if (!nonBotEmails.has(email)) {
+                continue;
+            }
+            contributors.add(email);
+        }
+    }
+    const churn = [];
+    for (const [scope, contributors] of scopeContributors) {
+        if (contributors.size === 0) {
+            continue;
+        }
+        let inactiveContributors = 0;
+        for (const email of contributors) {
+            const lastActive = result.lastActiveByAuthor.get(email);
+            if (lastActive !== undefined &&
+                now - lastActive > twelveMonths) {
+                inactiveContributors++;
+            }
+        }
+        const churnPercent = Number((inactiveContributors /
+            contributors.size *
+            100).toFixed(1));
+        let level;
+        if (churnPercent >= 50) {
+            level = 'HIGH';
+        }
+        else if (churnPercent >= 25) {
+            level = 'MEDIUM';
+        }
+        else {
+            level = 'LOW';
+        }
+        churn.push({
+            scope,
+            contributors: contributors.size,
+            inactiveContributors,
+            churnPercent,
+            level,
+        });
+    }
+    return churn.sort((a, b) => b.churnPercent - a.churnPercent);
 }
 //# sourceMappingURL=riskExplanation.js.map

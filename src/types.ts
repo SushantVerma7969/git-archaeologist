@@ -128,6 +128,13 @@ export interface EvolutionSummary {
   persistentConcentration: number;
   distributedScopes: number;
 }
+export interface ContributorChurn {
+  scope: string;
+  contributors: number;
+  inactiveContributors: number;
+  churnPercent: number;
+  level: 'LOW' | 'MEDIUM' | 'HIGH';
+}
 export interface CouplingPair {
   fileA: string;
   fileB: string;

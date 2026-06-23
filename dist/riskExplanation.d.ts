@@ -1,4 +1,4 @@
-import { AnalysisResult, RiskExplanation, RiskLevel, ScopeRisk, TemporalScopeRisk, YearlyConcentrationSeries, OwnershipTransition, EvolutionSummary } from './types';
+import { ContributorChurn, AnalysisResult, RiskExplanation, RiskLevel, ScopeRisk, TemporalScopeRisk, YearlyConcentrationSeries, OwnershipTransition, EvolutionSummary } from './types';
 interface ExplanationInput {
     level: RiskLevel;
     busFactor: number;
@@ -15,5 +15,6 @@ export declare function buildTemporalScopeRisks(lifetimeResult: AnalysisResult, 
 export declare function buildYearlyConcentrationSeries(result: AnalysisResult): YearlyConcentrationSeries[];
 export declare function buildOwnershipTransitions(result: AnalysisResult): OwnershipTransition[];
 export declare function buildEvolutionSummary(temporalRisks: TemporalScopeRisk[], ownershipTransitions: OwnershipTransition[]): EvolutionSummary;
+export declare function buildContributorChurn(result: AnalysisResult): ContributorChurn[];
 export {};
 //# sourceMappingURL=riskExplanation.d.ts.map
