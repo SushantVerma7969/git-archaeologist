@@ -9,6 +9,7 @@ import {
   buildYearlyConcentrationSeries,
   buildOwnershipTransitions,
   buildEvolutionSummary,
+  buildAbandonedScopes,
   buildContributorChurn,
 } from './riskExplanation';
 
@@ -122,8 +123,15 @@ return;
 
 const ownershipTransitions =
   buildOwnershipTransitions(lifetimeResult);
-  const contributorChurn =
+
+const contributorChurn =
   buildContributorChurn(lifetimeResult);
+
+const abandonedScopes =
+  buildAbandonedScopes(
+    buildScopeRisks(lifetimeResult),
+    contributorChurn
+  );
 
 const evolutionSummary =
   buildEvolutionSummary(
@@ -283,7 +291,41 @@ if (contributorChurn.length > 0) {
   }
 }
 
+if (abandonedScopes.length > 0) {
+  console.log(
+    chalk.magenta.bold('  Potentially Abandoned Areas')
+  );
 
+  console.log();
+
+  for (const a of abandonedScopes) {
+    console.log(
+      `  ${chalk.cyan(a.scope)}`
+    );
+
+    console.log(
+      `    [${a.severity}]`
+    );
+
+    console.log(
+      `    Owner inactive: ${a.ownerInactiveDays} days`
+    );
+
+    console.log(
+      `    Churn: ${a.churnPercent}%`
+    );
+
+    console.log(
+      `    Concentration: ${a.concentration}%`
+    );
+
+    console.log(
+      chalk.grey(`    ${a.explanation}`)
+    );
+
+    console.log();
+  }
+}
 if (ownershipTransitions.length > 0) {
   console.log(
     chalk.magenta.bold('  Ownership Transitions')

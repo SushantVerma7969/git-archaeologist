@@ -67,6 +67,7 @@ export interface ScopeRisk {
   filesAtRisk: number;
   explanation: RiskExplanation;
   lastActive?: string;
+  lastActiveDays?: number;
 
   recommendations?: Recommendation[];
 }
@@ -134,6 +135,14 @@ export interface ContributorChurn {
   inactiveContributors: number;
   churnPercent: number;
   level: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+export interface AbandonedScope {
+  scope: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  ownerInactiveDays: number;
+  churnPercent: number;
+  concentration: number;
+  explanation: string;
 }
 export interface CouplingPair {
   fileA: string;

@@ -111,6 +111,7 @@ function registerRiskCommand(program) {
                 const temporalRisks = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
                 const ownershipTransitions = (0, riskExplanation_1.buildOwnershipTransitions)(lifetimeResult);
                 const contributorChurn = (0, riskExplanation_1.buildContributorChurn)(lifetimeResult);
+                const abandonedScopes = (0, riskExplanation_1.buildAbandonedScopes)((0, riskExplanation_1.buildScopeRisks)(lifetimeResult), contributorChurn);
                 const evolutionSummary = (0, riskExplanation_1.buildEvolutionSummary)(temporalRisks, ownershipTransitions);
                 if (options.html) {
                     (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks);
@@ -187,6 +188,19 @@ function registerRiskCommand(program) {
                         console.log(`    Contributors: ${c.contributors}`);
                         console.log(`    Inactive (>12 months): ${c.inactiveContributors}`);
                         console.log(`    Churn: ${c.churnPercent}% [${c.level}]`);
+                        console.log();
+                    }
+                }
+                if (abandonedScopes.length > 0) {
+                    console.log(chalk_1.default.magenta.bold('  Potentially Abandoned Areas'));
+                    console.log();
+                    for (const a of abandonedScopes) {
+                        console.log(`  ${chalk_1.default.cyan(a.scope)}`);
+                        console.log(`    [${a.severity}]`);
+                        console.log(`    Owner inactive: ${a.ownerInactiveDays} days`);
+                        console.log(`    Churn: ${a.churnPercent}%`);
+                        console.log(`    Concentration: ${a.concentration}%`);
+                        console.log(chalk_1.default.grey(`    ${a.explanation}`));
                         console.log();
                     }
                 }

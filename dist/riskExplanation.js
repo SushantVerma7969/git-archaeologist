@@ -8,6 +8,7 @@ exports.buildYearlyConcentrationSeries = buildYearlyConcentrationSeries;
 exports.buildOwnershipTransitions = buildOwnershipTransitions;
 exports.buildEvolutionSummary = buildEvolutionSummary;
 exports.buildContributorChurn = buildContributorChurn;
+exports.buildAbandonedScopes = buildAbandonedScopes;
 const activity_1 = require("./utils/activity");
 const concentration_1 = require("./utils/concentration");
 const recommendations_1 = require("./recommendations");
@@ -103,8 +104,10 @@ function buildScopeRisks(result, options = {}) {
         const ownerEmail = nameToEmail.get(topOwner);
         const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
         let lastActive;
+        let lastActiveDays;
         if (lastActiveTs !== undefined) {
             lastActive = (0, activity_1.formatTimeAgo)(lastActiveTs);
+            lastActiveDays = Math.floor((Date.now() / 1000 - lastActiveTs) / 86400);
         }
         const recommendations = (0, recommendations_1.buildRiskRecommendations)(level, bf.busFactor, lastActive);
         risks.push({
@@ -119,9 +122,14 @@ function buildScopeRisks(result, options = {}) {
             explanation: buildRiskExplanation(explanationInput),
             recommendations,
             lastActive,
+            lastActiveDays,
         });
     }
-    const order = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+    const order = {
+        HIGH: 0,
+        MEDIUM: 1,
+        LOW: 2,
+    };
     return risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
 }
 function countNonBotTouchesByScope(result, nonBotEmails) {
@@ -414,5 +422,51 @@ function buildContributorChurn(result) {
         });
     }
     return churn.sort((a, b) => b.churnPercent - a.churnPercent);
+}
+function buildAbandonedScopes(risks, churn) {
+    const churnMap = new Map(churn.map((c) => [c.scope, c]));
+    const results = [];
+    for (const risk of risks) {
+        const scopeChurn = churnMap.get(risk.scope);
+        if (!scopeChurn ||
+            risk.lastActiveDays === undefined) {
+            continue;
+        }
+        let severity;
+        if (risk.concentration >= 50 &&
+            risk.lastActiveDays > 365 &&
+            scopeChurn.churnPercent >= 50) {
+            severity = 'HIGH';
+        }
+        else if (risk.concentration >= 40 &&
+            risk.lastActiveDays > 180 &&
+            scopeChurn.churnPercent >= 25) {
+            severity = 'MEDIUM';
+        }
+        else {
+            severity = 'LOW';
+        }
+        if (severity === 'LOW') {
+            continue;
+        }
+        results.push({
+            scope: risk.scope,
+            severity,
+            ownerInactiveDays: risk.lastActiveDays,
+            churnPercent: scopeChurn.churnPercent,
+            concentration: risk.concentration,
+            explanation: severity === 'HIGH'
+                ? 'Owner inactive for over a year and contributor churn is high.'
+                : 'Owner inactivity and contributor churn may indicate declining stewardship.',
+        });
+    }
+    return results.sort((a, b) => {
+        const order = {
+            HIGH: 0,
+            MEDIUM: 1,
+            LOW: 2,
+        };
+        return order[a.severity] - order[b.severity];
+    });
 }
 //# sourceMappingURL=riskExplanation.js.map
