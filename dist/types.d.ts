@@ -69,6 +69,7 @@ export interface TemporalScopeRisk {
     lifetime: ScopeRisk;
     recent?: ScopeRisk;
     recentTouches: number;
+    delta: number | null;
     summary: string;
     trend: 'rising' | 'declining' | 'stable' | 'insufficient_data';
     recommendations?: Recommendation[];

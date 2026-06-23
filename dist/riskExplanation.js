@@ -196,6 +196,10 @@ function buildTemporalScopeRisks(lifetimeResult, recentResult) {
             lifetime,
             recent,
             recentTouches,
+            delta: recent
+                ? Number((recent.concentration -
+                    lifetime.concentration).toFixed(1))
+                : null,
             trend: series?.direction ?? 'insufficient_data',
             summary: buildTemporalSummary(lifetime, recent, category),
             recommendations: (0, recommendations_1.buildTemporalRecommendations)(category),

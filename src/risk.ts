@@ -222,6 +222,15 @@ console.log();
                 + `${chalk.bold(r.recent.concentration + '%')} concentration, `
                 + `bus factor ${chalk.bold(String(r.recent.busFactor))}`
               );
+if (r.delta !== null) {
+  const sign = r.delta > 0 ? '+' : '';
+
+  console.log(
+    `  Delta:    ${chalk.bold(
+      `${sign}${r.delta} percentage points`
+    )}`
+  );
+}
             } else {
               console.log(`  Recent:   ${chalk.bold(String(r.recentTouches))} non-bot file touches`);
             }

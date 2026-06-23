@@ -157,6 +157,10 @@ function registerRiskCommand(program) {
                         console.log(`  Recent:   ${chalk_1.default.bold(r.recent.level)} risk, `
                             + `${chalk_1.default.bold(r.recent.concentration + '%')} concentration, `
                             + `bus factor ${chalk_1.default.bold(String(r.recent.busFactor))}`);
+                        if (r.delta !== null) {
+                            const sign = r.delta > 0 ? '+' : '';
+                            console.log(`  Delta:    ${chalk_1.default.bold(`${sign}${r.delta} percentage points`)}`);
+                        }
                     }
                     else {
                         console.log(`  Recent:   ${chalk_1.default.bold(String(r.recentTouches))} non-bot file touches`);
