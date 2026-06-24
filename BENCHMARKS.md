@@ -1,71 +1,59 @@
-# Repository Risk Report 2026
+# Repository Risk Benchmark 2026
 
-We ran git-archaeologist across 7 of the most widely-used open source repositories on GitHub.
+We ran git-archaeologist across three widely-used open-source repositories to see what its risk signals surface on real, large codebases.
 
-**Key finding: 100% of analyzed repositories have at least one module with bus factor 1 — a single person whose departure would orphan critical code.**
+**Finding: each of these projects has at least one source scope with bus factor 1 — an area where one contributor's history dominates so heavily that their departure would leave a knowledge gap.** This is common, not exceptional, and it is not by itself a problem — but it is worth knowing where those areas are.
 
 ## Results
 
-| Repository | Commits | Files | Authors | Bus Factor 1 Modules | Top Cursed File | Curse Score |
-|------------|---------|-------|---------|---------------------|-----------------|-------------|
-| expressjs/express | 1,716 | 312 | 230 | 7 | lib/response.js | 2,242 |
-| facebook/react | 2,000 | 8,686 | 149 | 4 | ReactFeatureFlags.www.js | 2,739 |
-| vuejs/vue | 2,207 | 1,197 | 354 | 12 | src/compiler/index.ts | — |
-| vuejs/core | 2,612 | 895 | 317 | 3 | runtime-core/src/renderer.ts | 3,040 |
-| microsoft/vscode | 157,334 | 41,955 | 3,050 | 15 | extHost.protocol.ts | 108,070 |
-| tensorflow/tensorflow | 509 | 36,471 | 107 | 7 | xla/service/gpu/BUILD | 1,084 |
-| kubernetes/kubernetes | 138,344 | 99,697 | 5,358 | 9 | vendor/modules.txt | 129,386 |
+All numbers from a June 2026 run against full history, git-archaeologist v1.29.0. Reproduce with `git-arch risk <repo> --all` and `git-arch analyze <repo>`.
 
-## Key Findings
+| Repository | Commits | Files | Bus-factor-1 source scopes | Top cursed file | Curse score (within-repo) |
+|------------|---------|-------|----------------------------|-----------------|---------------------------|
+| expressjs/express | 6,153 | 902 | 6 | lib/response.js | 23,507 |
+| facebook/react | 12,982 | 24,012 | 4 | forks/ReactFeatureFlags.www.js | 22,801 |
+| vuejs/core | 7,079 | 1,320 | 3 | runtime-core/src/component.ts | 11,175 |
 
-### 1. Bus factor 1 is universal
+Curse scores are a **within-repo ranking only** and are not comparable across repositories — the scale depends on each repo's size and age.
 
-Every single repository — from a 312-file Express.js to a 99,697-file Kubernetes — has modules where one person leaving would orphan critical code.
+## Findings
 
-- **VSCode** has 15 bus factor 1 modules across 41,955 files and 3,050 contributors
-- **Vue 2** has 12 bus factor 1 modules despite 354 contributors
-- **Express** has 7 — Douglas Christopher Wilson owns 69% of the entire codebase
+### 1. Bus-factor-1 scopes show up in every project
 
-### 2. The most dangerous files are always the core abstractions
+- **Express** — 6 source scopes with bus factor 1 (`lib`, `bin`, `support`, `spec`, and others). The dominant contributor across most of them is the original author, whose last commit was over a decade ago — historical concentration that current maintainers have inherited.
+- **React** — 4 (`shells`, `extension`, `eslint-rules`, `www`). Several trace to Brian Vaughn from the devtools era and are years inactive.
+- **Vue 3 Core** — 3 (`packages`, `scripts`, `packages-private`), historically dominated by Evan You.
 
-The highest curse scores consistently appear on files that sit at the center of the architecture:
+The point is not that these projects are poorly run — they are among the best-maintained in the ecosystem. It is that *commit-history concentration is a normal property of even healthy projects*, and owner-activity is what tells you whether a given concentration is active or merely historical.
 
-- `lib/response.js` in Express — the HTTP response object, touched by 53 authors
-- `ReactFeatureFlags.www.js` in React — the feature flag system controlling experimental APIs
-- `runtime-core/src/renderer.ts` in Vue 3 — the virtual DOM renderer, 26 authors
-- `extHost.protocol.ts` in VSCode — the extension host protocol, 98 authors, score 108,070
+### 2. The highest-churn files are core abstractions — or flag forks
 
-### 3. Scale does not solve ownership problems
+The top curse-scored files are the most heavily contested, heavily changed files in each repo:
 
-Kubernetes has 5,358 contributors and 138,344 commits. It still has 9 bus factor 1 modules. More contributors does not mean better distributed ownership — it often means more files that nobody fully understands.
+- `lib/response.js` in Express — the HTTP response object, touched by 80 contributors over 392 changes.
+- `runtime-core/src/component.ts` in Vue — component lifecycle, 50 contributors.
+- `forks/ReactFeatureFlags.www.js` in React — a feature-flag fork. This is an instructive false positive: it scores highest not because it is dangerous logic but because flag files change constantly by design. High churn is not the same as high risk; the score directs attention, it does not pass judgement.
 
-### 4. Curse scores scale with project age and complexity
+### 3. More contributors does not flatten concentration
 
-| Repository | Age | Curse Score Range |
-|------------|-----|------------------|
-| Express | 16 years | 127 – 2,242 |
-| Vue 3 | 5 years | 50 – 3,040 |
-| VSCode | 11 years | 1,000 – 108,070 |
-| Kubernetes | 12 years | 5,000 – 129,386 |
-
-Older projects accumulate social complexity faster than they accumulate contributors.
+React has far more contributors than Express, yet both still have single-owner source scopes. Scale adds people without automatically distributing knowledge — it often adds more areas that few people fully understand.
 
 ## Methodology
 
-Each repository was analyzed using `git-arch analyze --json`. The curse score formula:
-Changelogs, lockfiles, and CI configuration files are automatically excluded. Only source files appear in rankings.
+Each repository was analyzed with `git-arch risk --all` (for bus factor and concentration) and `git-arch analyze` (for curse scores), against full history. Tooling, config, docs, fixtures, and generated directories are excluded from risk scopes; lockfiles, changelogs, and CI files are excluded from curse rankings. Contributor identities are canonicalized across multiple emails, and GitHub `@users.noreply.github.com` addresses are treated as real contributors (not bots).
 
-Analysis was run on June 9, 2026 using git-archaeologist v1.9.1.
+These are investigation signals, not conclusions about ownership or maintainership.
 
 ## Reproduce
 
 ```bash
 npm install -g git-archaeologist
 git clone https://github.com/expressjs/express.git
+git-arch risk ./express --all
 git-arch analyze ./express
 ```
 
-Full analysis of any repository takes under 5 seconds for repos under 10,000 commits.
+A repo the size of Express analyzes in under a second; the largest repos (100k+ files) take a few minutes, most of it spent in `git log`.
 
 ---
 

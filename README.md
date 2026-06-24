@@ -21,56 +21,58 @@ Run it from the root of any git repository. No install required.
 ## Example output
 
 ```
-$ npx git-archaeologist risk .
+$ npx git-archaeologist risk ./express
 
 ⛏  git-arch risk — express
-Maintenance risk map — not an ownership leaderboard
+  Maintenance risk map — not an ownership leaderboard
+  Analysis window: all available history
 ──────────────────────────────────────────────────────────────────────
-HIGH RISK
-lib
-Bus Factor: 1   Ownership Concentration: 100%   Contributors: 12   Files: 24
-Owner: Douglas Christopher Wilson   Last active: 14 months ago
 
-Why:
-  * Bus factor is 1
-  * Top contributor owns 100% of touches
+  HIGH RISK
+  support
+  Historical commit-touch concentration: 97.2%
+  Bus Factor: 1
+  Historical file paths: 18   Contributor identities: 4
 
-Interpretation:
-  Knowledge remains concentrated in a single contributor.
+  Top historical contributor: TJ Holowaychuk
+  Latest analyzed activity: 12 years ago
 
-MEDIUM RISK
-api
-Bus Factor: 1   Ownership Concentration: 65.3%   Contributors: 9   Files: 31
-Owner: Douglas Christopher Wilson   Last active: 6 days ago
+  Why:
+    * Bus factor is 1
+    * Top contributor owns 97.2% of touches
+  Interpretation:
+    Knowledge remains concentrated in a single contributor.
 
-Why:
-  * Bus factor is 1
-  * Top contributor owns 65.3% of touches
+    Historical concentration may not reflect current maintainership (12 years ago).
 
-Interpretation:
-  One contributor still accounts for enough history to create continuity risk.
+  MEDIUM RISK
+  lib
+  Historical commit-touch concentration: 75.9%
+  Bus Factor: 1
+  Top historical contributor: TJ Holowaychuk
+  Latest analyzed activity: 12 years ago
 ```
+
+> Numbers above are from a June 2026 run against the full history of `expressjs/express`; reproduce with `npx git-archaeologist risk .` on any clone. Exact figures shift as history grows.
 
 ## Why owner activity matters
 
-We ran `git-arch risk` on two well-known projects and found nearly identical ownership numbers — with completely different stories underneath.
+We ran `git-arch risk` on two well-known projects and found similar concentration numbers — with completely different stories underneath.
 
-**Express.js — `lib/`**
-- 65.3% of changes attributed to one long-time contributor
-- 91 contributors total
-- That contributor hasn't committed anywhere in the repo for **2 years**
-- In the last 6 months, 5 different people made exactly 1 commit each — no clear successor
+**Express — `support/`**
+- 97.2% of changes attributed to one contributor (TJ Holowaychuk, the original author)
+- 389 contributors total across the repo
+- That contributor's most recent commit anywhere in the repo was **12 years ago**
+- Express has since moved under the OpenJS Foundation and is maintained by other people — but the *historical* concentration in this area still sits with someone long gone
 
-**Vue 3 — `packages/`**
-- 70.7% of changes attributed to Evan You
-- 384 contributors total
-- Evan You committed **4 months ago**
+**React — a core reconciler scope**
+- 63.6% of changes attributed to one contributor (Andrew Clark)
+- Bus factor 1, similar single-owner concentration
+- That contributor committed **2 months ago** and is still active
 
-Same concentration, roughly 65–70%. One has no single contributor with sustained recent involvement; the other has its original dominant contributor still committing. The number alone can't tell you which.
+Both are bus-factor-1, single-owner scopes. One owner has been gone for over a decade; the other is committing this quarter. The concentration number alone can't tell you which — owner activity is what separates *abandoned* concentration from *active* concentration, and it's the distinction this tool is built around.
 
-**State of OSS Maintainability 2026** — notes from running git-archaeologist across major OSS repositories. See [Research data](#research--validation) below.
-
-See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
+> Figures from a June 2026 run against the full history of each repo. Reproduce with `git-arch risk <repo> --all`. They will drift over time — that drift is the point.
 
 ## Concepts
 
@@ -157,18 +159,20 @@ git-arch pr-risk /path/to/repo                 # score local changes before push
 ```
 $ git-arch analyze ./express
 
-✔ Analysis complete — 312 files scanned
+✔ Analysis complete — 902 files scanned
 
-CURSE SCORE — top files by risk
-  1. lib/response.js        score 2242   53 authors   128 changes
-  2. lib/router/index.js    score 1891   41 authors   109 changes
-  3. lib/application.js     score 1204   38 authors    87 changes
+CURSE SCORE — top files by instability
+  1. lib/response.js      score 23507   80 authors   392 changes
+  2. lib/application.js   score  7356   41 authors   180 changes
+  3. lib/request.js       score  6207   26 authors   176 changes
 
 IMPLICIT COUPLING
-  benchmarks/Makefile ↔ benchmarks/run   co-commit rate: 100%
+  lib/response.js ↔ test/res.send.js   co-changes: 31
 ```
 
-> Run time: Express ~3 seconds · Kubernetes (99k files) ~3 minutes
+> Curse scores are a within-repo ranking, not an absolute scale — a score of 23,507 is only meaningful relative to other files in the same repository. Numbers from a June 2026 run; reproduce with `git-arch analyze .`.
+
+> Run time: Express (~900 files) under 1 second · large repos like Kubernetes (~100k files) a few minutes. Most of the cost is `git log`; the analysis itself is linear in commits.
 
 ## How scoring works
 
@@ -221,10 +225,10 @@ jobs:
 
 ### Does curse score predict bugs?
 
-We tested whether the curse score actually identifies risky files. Result: **11 out of 11 top cursed files had confirmed bug history** across Express, React, and Vue.
+In a small manual check, the top curse-scored files in Express, React, and Vue were consistently files with heavy public bug-and-fix history. This is a hand-checked correlation on a handful of files, not a controlled study — the curse score is best understood as flagging files that are *socially complex enough that bugs tend to hide there*, not as a bug predictor. The [validation write-up](RESEARCH.md) details the method and its limitations.
 
-- [Curse Score Validation Study](RESEARCH.md) — methodology and results
-- [Repository Risk Benchmark 2026](BENCHMARKS.md) — 7-repo analysis finding universal bus factor 1 modules
+- [Curse Score Validation Notes](RESEARCH.md) — method, results, and why this is correlation not prediction
+- [Repository Risk Benchmark 2026](BENCHMARKS.md) — multi-repo analysis of bus-factor-1 modules
 
 ### Full Research
 

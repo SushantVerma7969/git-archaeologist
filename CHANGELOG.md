@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.29.1] - 2026-06-24
+- Corrected all example numbers in README, BENCHMARKS, and RESEARCH to match current tool output. The previous figures predated the contributor-filtering fix (v1.29.0) and the curse-score scale, and no longer reflected reality — e.g. the README's Express ownership example and the "11 out of 11" validation claim. Numbers are now regenerated against full repo history, marked with their run date, and the validation write-up is reframed as a hand-checked correlation rather than bug prediction.
+
+
 ## [1.29.0] - 2026-06-24
 - Fixed a correctness bug where `@users.noreply.github.com` addresses were treated as bots. That address is GitHub's default for any user who keeps their email private, so the rule silently excluded real contributors from ownership, bus-factor, and churn analysis — on React it erased 212 of 1,010 real contributors (21%), including active core maintainers. Genuine automation accounts are still detected via the `[bot]` convention and a known-bot list.
 - Hardened git history parsing to use NUL-terminated output (`git log -z`), so a filename containing spaces, newlines, or resembling a timestamp can no longer be misparsed. This removed two duplicated downstream guards that had been filtering corrupt-looking paths by magic value.

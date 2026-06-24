@@ -1,76 +1,67 @@
-# Validation Research
+# Validation Notes — does the curse score point at the right files?
 
-Does the curse score actually predict which files cause bugs?
+The curse score combines change frequency, author spread, recency, churn, and acceleration into a single within-repo ranking. This note records a small, honest check of whether the files it ranks highest are the files a maintainer would actually call risky — and is explicit about what this check does *not* show.
 
-To find out, I ran git-archaeologist on three major open source repositories and cross-referenced the top cursed files against their public GitHub issue trackers.
+## What this is, and is not
+
+This is a **hand-checked correlation on a handful of files in three repositories**. It is not a controlled study, it has no holdout, and the "bug history" judgement is made by a human reading issue trackers, which is subjective. Treat everything below as a sanity check, not evidence of predictive power. The honest claim is narrow: *the top-ranked files are the heavily-contested, heavily-changed core files of each project* — which is what the score is designed to surface.
 
 ## Method
 
-1. Clone each repo with 2000 commits of history
-2. Run `git-arch analyze --json` to get curse scores
-3. Manually check each top-scored file against the repo's GitHub Issues
-4. Record whether the file has confirmed bug reports
+1. Clone the full history of each repo.
+2. Run `git-arch analyze --json` and take the top curse-scored files.
+3. For each, check whether it is a file with substantial public bug-and-fix history.
+
+Curse scores are a **within-repo ranking only**. A score of 23,507 in Express is not comparable to a score of 11,175 in Vue — the scale depends on the size and age of each repo's history. Do not compare scores across repositories.
 
 ## Results
 
-### Express.js (1,716 commits, 230 contributors)
+All numbers from a June 2026 run against full history. Reproduce with `git-arch analyze <repo> --json`.
 
-| File | Score | Authors | Bug History |
-|------|-------|---------|-------------|
-| lib/response.js | 2,243 | 53 | ✓ Most Express bug reports involve res methods |
-| lib/application.js | 609 | 22 | ✓ App configuration bugs consistently traced here |
-| lib/router/index.js | 127 | 14 | ✓ Router edge cases are the top Express issue category |
+### Express (902 files scanned)
 
-### React (2,000 commits, 149 contributors)
+| File | Curse score | Authors | Changes | Notes |
+|------|-------------|---------|---------|-------|
+| lib/response.js | 23,507 | 80 | 392 | Response methods — the densest bug-and-fix area in Express |
+| lib/application.js | 7,356 | 41 | 180 | App configuration and settings |
+| lib/request.js | 6,207 | 26 | 176 | Request parsing and proxy handling |
 
-| File | Score | Authors | Bug History |
-|------|-------|---------|-------------|
-| ReactFeatureFlags.www.js | 2,741 | 17 | ✓ Flag mismatches caused multiple production incidents documented in React RFCs |
-| ReactFiberConfigDOM.js | 1,759 | 14 | ✓ DOM reconciliation bugs consistently traced to this file |
-| ReactFiberWorkLoop.js | 1,640 | 14 | ✓ Core of React scheduler — most concurrency bugs originate here |
-| ReactFeatureFlags.js | 1,630 | 15 | ✓ Flag inconsistencies documented in multiple GitHub issues |
+### React (24,012 files scanned)
 
-### Vue 3 Core (2,612 commits, 317 contributors)
+| File | Curse score | Authors | Changes | Notes |
+|------|-------------|---------|---------|-------|
+| forks/ReactFeatureFlags.www.js | 22,801 | 52 | 497 | Feature-flag forks — historically a source of behaviour drift between builds |
+| forks/ReactFeatureFlags.test-renderer.www.js | 17,808 | 47 | 428 | Test-renderer flag fork |
+| forks/ReactFeatureFlags.native-fb.js | 16,548 | 50 | 446 | Native build flag fork |
 
-| File | Score | Authors | Bug History |
-|------|-------|---------|-------------|
-| runtime-core/src/renderer.ts | 3,041 | 26 | ✓ 200+ GitHub issues reference this file directly |
-| reactivity/src/ref.ts | 1,749 | 24 | ✓ ref() edge cases are the #1 reported issue category in Vue 3 |
-| runtime-core/src/component.ts | 1,536 | 21 | ✓ Component lifecycle bugs consistently trace here |
-| compiler-sfc/src/compileScript.ts | 970 | 17 | ✓ script setup compilation bugs — active issue area |
+Note that React's top curse files are the **feature-flag forks** — files that change constantly as flags are added and rolled out. This is a useful illustration of the score's limits: high churn does not always mean "dangerous logic." It means "changes a lot," which for flag files is expected. The score is a starting point for a human to interpret, not a verdict.
 
-## Summary
+### Vue 3 Core (1,320 files scanned)
 
-**11 out of 11 top-scored files (100%) had confirmed bug history** in their respective issue trackers.
-
-Across all three repos, the files with the highest curse scores were:
-- The files with the most open and closed bug reports
-- The files most frequently mentioned in bug fix commit messages
-- The files core maintainers publicly discuss as needing refactoring
-
-## Why the score works
-
-The curse score is not arbitrary. Each component captures a real signal:
-
-**Change frequency** — files touched more often have more opportunity to introduce bugs and regressions.
-
-**Author spread (log scale)** — more authors means less individual understanding of the full file. Logarithmic scaling prevents a single additional author from dominating the score.
-
-**Recency decay (exponential)** — a file that was chaotic five years ago but stable since is not currently dangerous. Only active instability matters.
-
-**Churn rate** — changes per year, not just total changes. A file changed 100 times in 6 months is more dangerous than one changed 100 times over a decade.
-
-**Acceleration** — a file whose change rate is increasing is more dangerous than one with the same total but a declining rate.
-
-## Limitations
-
-- This is correlation, not causation. High-curse files may attract bugs because they are core files, not because of the social factors the score measures.
-- The sample size is small (3 repos, 11 files).
-- Manual cross-referencing introduces subjectivity.
-- A rigorous study would require automated issue-to-file linking across hundreds of repos.
+| File | Curse score | Authors | Changes | Notes |
+|------|-------------|---------|---------|-------|
+| runtime-core/src/component.ts | 11,175 | 50 | 340 | Component lifecycle — a recurring issue area |
+| runtime-core/src/vnode.ts | 10,707 | 38 | 224 | Virtual-node creation and patching |
+| reactivity/src/ref.ts | 7,464 | 52 | 156 | `ref()` edge cases are a frequently reported category |
 
 ## What this suggests
 
-The curse score appears to be a useful signal for identifying files worth extra attention during code review. It does not predict bugs — it predicts which files are socially complex enough that bugs are more likely to hide there.
+The top-ranked files are, in every case, core files with heavy contributor spread and heavy change history. In Express and Vue they line up well with areas that attract bug reports. In React, the top files are flag forks — high-churn by design — which is a reminder that the score measures *social and historical complexity*, not code quality directly.
 
-That is a meaningful and useful distinction.
+So the honest framing: the curse score is a useful **attention-directing signal** — it reliably surfaces the files many hands have churned hardest — but it does **not predict bugs**, and a high score can simply mean "this file changes often for boring reasons." Always read the file's context before drawing a conclusion.
+
+## Limitations
+
+- Correlation, not causation. High-curse files may attract bugs because they are core files, not because of the factors the score measures.
+- Tiny sample (3 repos, ~9 files), no holdout, subjective bug-history judgement.
+- The React result shows a clear false-positive mode (flag forks), which a larger study would need to account for.
+- A rigorous version would require automated issue-to-file linking across hundreds of repos.
+
+## Reproducing
+
+```bash
+git clone https://github.com/expressjs/express
+git-arch analyze ./express --json | jq '.cursedFiles[:3]'
+```
+
+Run it on your own repositories — the ranking is only meaningful relative to the repo it came from.
