@@ -1,6 +1,6 @@
 # git-archaeologist
 
-[![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![CI](https://img.shields.io/github/actions/workflow/status/SushantVerma7969/git-archaeologist/ci.yml?branch=main&labelColor=1a1d27&color=a78bfa)](https://github.com/SushantVerma7969/git-archaeologist/actions/workflows/ci.yml) [![downloads](https://img.shields.io/npm/dm/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
+[![npm](https://img.shields.io/npm/v/git-archaeologist?color=a78bfa&labelColor=1a1d27)](https://www.npmjs.com/package/git-archaeologist) [![CI](https://img.shields.io/github/actions/workflow/status/SushantVerma7969/git-archaeologist/ci.yml?branch=main&labelColor=1a1d27&color=a78bfa)](https://github.com/SushantVerma7969/git-archaeologist/actions/workflows/ci.yml) [![license](https://img.shields.io/badge/license-MIT-a78bfa?labelColor=1a1d27)](LICENSE) [![node](https://img.shields.io/badge/node-%3E%3D18-a78bfa?labelColor=1a1d27)](https://nodejs.org)
 
 **Find maintenance risk in your git history before it turns into a handoff problem.**
 
@@ -165,7 +165,7 @@ IMPLICIT COUPLING
 
 > Curse scores are a within-repo ranking, not an absolute scale. A score of 23,507 is only meaningful next to the other files in the same repository. Numbers from a June 2026 run; reproduce with `git-arch analyze .`.
 
-> Run time: Express (~900 files) takes under a second. Large repos like Kubernetes (~100k files) take a few minutes. Most of the cost is `git log`; the analysis itself is linear in commits.
+> Run time: small repos like Express take under a second; very large repos take a few minutes. Most of the cost is `git log`; the analysis itself is linear in commits.
 
 ### How the score is computed
 
