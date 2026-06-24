@@ -65,9 +65,82 @@ function parseCoAuthors(
   return out;
 }
 
-export function parseCommits(repoPath: string, since?: string): CommitRecord[] {
+// Build a map from any historical path to the file's CURRENT (final) path, by
+// following git's rename detection across all of history. Without this, a file
+// renamed lib/old.js -> lib/new.js reads as two separate files, each with half
+// the history — which halves its change count and corrupts its curse score,
+// concentration, and bus factor. Folding the history onto the final path fixes
+// that.
+//
+// This is a SEPARATE, additive parse (`--name-status -M`) so the main
+// parseCommits path — and its co-author logic — is untouched. The map is then
+// applied as a path transform after the normal parse.
+export function buildRenameMap(repoPath: string, since?: string): Map<string, string> {
+  const args = ['log', '-M', '--name-status', '-z', '--pretty=format:'];
+  if (since) args.push(`--since=${since}`);
+
+  let raw: string;
+  try {
+    raw = execFileSync('git', args, {
+      cwd: repoPath,
+      stdio: 'pipe',
+      maxBuffer: 512 * 1024 * 1024,
+    }).toString();
+  } catch {
+    return new Map(); // rename detection is best-effort; never break analysis over it
+  }
+
+  // Collect raw rename edges old -> new. Tokens are NUL-separated; a rename is
+  // the triple R<sim> \0 <old> \0 <new>. Non-rename entries are <status>\0<path>
+  // and are skipped. We can't rely on whitespace; we walk tokens by shape.
+  const tokens = raw.split('\0').filter((t) => t.length > 0);
+  const edges: Array<{ from: string; to: string }> = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    // rename/copy status tokens look like R100, R087, C100 etc.
+    if (/^[RC]\d{1,3}$/.test(t) && i + 2 < tokens.length) {
+      const from = tokens[i + 1];
+      const to = tokens[i + 2];
+      edges.push({ from, to });
+      i += 2; // consume old + new
+    }
+  }
+
+  // Resolve each path to its FINAL name by following the chain forward.
+  // git log default order is newest-first, so a later edge in the stream is an
+  // OLDER rename. We resolve transitively in either direction by repeatedly
+  // collapsing from -> to until no `from` is itself the `to` of another edge.
+  const direct = new Map<string, string>();
+  for (const { from, to } of edges) {
+    // if `to` was already renamed onward, point straight at the latest target
+    direct.set(from, to);
+  }
+
+  function resolveFinal(path: string, guard = 0): string {
+    if (guard > 1000) return path; // cycle safety
+    const next = direct.get(path);
+    if (next === undefined || next === path) return path;
+    return resolveFinal(next, guard + 1);
+  }
+
+  const finalMap = new Map<string, string>();
+  for (const from of direct.keys()) {
+    finalMap.set(from, resolveFinal(from));
+  }
+  return finalMap;
+}
+
+export function parseCommits(
+  repoPath: string,
+  since?: string,
+  followRenames: boolean = true,
+): CommitRecord[] {
   const DELIMITER = '||GITARCH||';
   const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
+
+  // Map every historical path to its final name so a renamed file's history is
+  // folded onto one path instead of split across two. Built once, applied below.
+  const renameMap = followRenames ? buildRenameMap(repoPath, since) : new Map();
 
   // NUL-terminated output (`-z`) makes parsing unambiguous: git separates
   // each pathname with a NUL and each commit's path list ends with an extra
@@ -130,6 +203,9 @@ export function parseCommits(repoPath: string, since?: string): CommitRecord[] {
       .split('\0')
       .map((f) => f.trim())
       .filter((f) => f.length > 0)
+      // fold each historical path onto its final (current) name so renamed
+      // files accumulate one continuous history instead of splitting in two
+      .map((f) => renameMap.get(f) ?? f)
       .filter(
         (f) =>
           !f.startsWith('node_modules/') &&

@@ -129,6 +129,21 @@ is single-point-of-failure detection that a bad merge would distort. The full
 reasoning lives in the header comment of `src/utils/identity.ts`; a
 `.git-arch-identities` file lets a user override both directions.
 
+## Rename following
+
+Git detects when a file was renamed (`lib/old.js` → `lib/new.js`). Without
+following renames, the two paths read as two separate files, each carrying only
+half the history — which halves the change count and distorts the curse score,
+concentration, and bus factor of what is really one continuous file. The tool
+follows renames by default and folds each historical path onto the file's final
+(current) name, so the full history accumulates in one place. Rename chains
+(`a → b → c`) resolve transitively to the final name. This is built from a
+separate `git log --name-status -M` pass so the main commit/co-author parsing is
+untouched, and it is best-effort: if rename detection fails for any reason,
+analysis proceeds without it rather than breaking. The effect is invisible on
+repos that never renamed source files and meaningful on repos that reorganized —
+e.g. it unifies dozens of split histories on a repo with a restructured `src/`.
+
 ## Determinism
 
 Recency, acceleration, and activity calculations depend on "now," which makes raw
