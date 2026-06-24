@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
 import { parseCommits, validateRepo, buildFileStats } from './core/gitParser';
+import { isDisplayableSource } from './analyzers/curseScorer';
 import { scoreCursedFiles } from './analyzers/curseScorer';
 
 export function registerTrendCommand(program: Command): void {
@@ -65,6 +66,7 @@ export function registerTrendCommand(program: Command): void {
         }> = [];
 
         for (const file of allFiles) {
+          if (!isDisplayableSource(file)) continue;
           const older = olderCount.get(file) ?? 0;
           const recent = recentCount.get(file) ?? 0;
           if (older + recent < 3) continue;

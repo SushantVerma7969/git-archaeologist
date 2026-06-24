@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.32.2] - 2026-06-24
+
+### Fixed
+- **Risk, cursed, and trend no longer surface non-source files as findings.** The scope/file filters were incomplete, so directories like `media`, `logo`, `changelogs`, `benchmark`, `test`, and `_artifacts`, plus files like translated READMEs, `tsconfig.json`, lockfiles, and CI workflow YAML, could appear as top "risk", "cursed", or "trending" results. They are now excluded from these displays. Across a 30-repository sweep this removed non-source noise from the headline output of every command.
+- **`risk` no longer promotes thinly-evidenced scopes to HIGH.** A single-owner scope must now be backed by a minimum amount of commit-touch evidence before it is reported as a HIGH (headline) risk; below that it surfaces as MEDIUM rather than as a top finding. This prevents a 3-file folder touched a handful of times from being reported as the repository's top maintenance risk.
+
+### Notes
+- These are display/classification fixes only. The curse-score model is unchanged, and the published curse-score validation results are byte-for-byte identical (verified against the same repositories and cutoffs).
+
 ## [1.32.1] - 2026-06-24
 
 ### Fixed

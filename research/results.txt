@@ -1,7 +1,8 @@
-Generated 2026-06-24T04:33Z — git-archaeologist curse-score validation
+Generated 2026-06-24T18:20Z — git-archaeologist curse-score validation (n=12, validity-guarded)
 
+==== express (sweet-spot) ====
 ======================================================================
-REPO: study-express   cutoff: 2022-01-01
+REPO: rg-express   cutoff: 2022-01-01
 ======================================================================
 train commits (pre-cutoff):  5713
 test commits (post-cutoff):  440
@@ -27,84 +28,347 @@ VERDICT INPUTS:
   curse lift@50: 7.65x   raw lift@50: 3.82x
   curse advantage over baseline: 100%
 
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
+
+==== chalk (sweet-spot) ====
 ======================================================================
-REPO: study-express   cutoff: 2020-06-01
+REPO: rg-chalk   cutoff: 2021-01-01
 ======================================================================
-train commits (pre-cutoff):  5647
-test commits (post-cutoff):  506
-  of which bug-fixes:        57
-files in scorer universe:    889
-files that got a bug-fix:    71
-base rate (random pick):     8.0%
+train commits (pre-cutoff):  305
+test commits (post-cutoff):  64
+  of which bug-fixes:        4
+files in scorer universe:    51
+files that got a bug-fix:    2
+base rate (random pick):     3.9%
 
 PRECISION@K / LIFT vs random  (lift = how many x better than chance)
   K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
   ----------------------------------------------------------------
-   10 |    90%     11.27x  |    60%    7.51x |   CURSE ✓
-   20 |    90%     11.27x  |    50%    6.26x |   CURSE ✓
-   50 |    58%     7.26x  |    32%    4.01x |   CURSE ✓
-  100 |    45%     5.63x  |    28%    3.51x |   CURSE ✓
+   10 |     0%     0.00x  |    20%    5.10x |   raw
+   20 |     0%     0.00x  |    10%    2.55x |   raw
+   50 |     0%     0.00x  |     4%    1.02x |   raw
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 54%
+  top-20 Jaccard(curse, raw): 48%
+  top-50 Jaccard(curse, raw): 92%
+
+VERDICT INPUTS:
+  curse lift@50: 0.00x   raw lift@50: 1.02x
+  curse advantage over baseline: -100%
+
+VALIDITY GUARD:
+  INCONCLUSIVE — universe 51 < 150 (top-50 = 98% of repo); sample too small (buggy=2, fixCommits=4)
+  (verdict above is NOT counted; sample/universe insufficient)
+
+==== commander (sweet-spot) ====
+======================================================================
+REPO: rg-commander   cutoff: 2021-06-01
+======================================================================
+train commits (pre-cutoff):  1068
+test commits (post-cutoff):  449
+  of which bug-fixes:        18
+files in scorer universe:    302
+files that got a bug-fix:    17
+base rate (random pick):     5.6%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    20%     3.55x  |    30%    5.33x |   raw
+   20 |    10%     1.78x  |    20%    3.55x |   raw
+   50 |    12%     2.13x  |     8%    1.42x |   CURSE ✓
+  100 |     8%     1.42x  |     7%    1.24x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 18%
+  top-20 Jaccard(curse, raw): 48%
+  top-50 Jaccard(curse, raw): 67%
+
+VERDICT INPUTS:
+  curse lift@50: 2.13x   raw lift@50: 1.42x
+  curse advantage over baseline: 50%
+
+VALIDITY GUARD:
+  VALID verdict — tier: FRAGILE (reported, not headlined)
+
+==== yargs (sweet-spot) ====
+======================================================================
+REPO: rg-yargs   cutoff: 2021-01-01
+======================================================================
+train commits (pre-cutoff):  1655
+test commits (post-cutoff):  195
+  of which bug-fixes:        69
+files in scorer universe:    304
+files that got a bug-fix:    56
+base rate (random pick):     18.4%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    10%     0.54x  |    20%    1.09x |   raw
+   20 |    15%     0.81x  |    15%    0.81x |   tie
+   50 |    22%     1.19x  |    22%    1.19x |   tie
+  100 |    26%     1.41x  |    25%    1.36x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 54%
+  top-20 Jaccard(curse, raw): 54%
+  top-50 Jaccard(curse, raw): 59%
+
+VERDICT INPUTS:
+  curse lift@50: 1.19x   raw lift@50: 1.19x
+  curse advantage over baseline: 0%
+
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
+
+==== axios (high-churn) ====
+======================================================================
+REPO: rg-axios   cutoff: 2022-01-01
+======================================================================
+train commits (pre-cutoff):  1074
+test commits (post-cutoff):  1031
+  of which bug-fixes:        296
+files in scorer universe:    195
+files that got a bug-fix:    52
+base rate (random pick):     26.7%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    80%     3.00x  |   100%    3.75x |   raw
+   20 |    75%     2.81x  |    75%    2.81x |   tie
+   50 |    52%     1.95x  |    56%    2.10x |   raw
+  100 |    37%     1.39x  |    37%    1.39x |   tie
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 54%
+  top-20 Jaccard(curse, raw): 67%
+  top-50 Jaccard(curse, raw): 61%
+
+VERDICT INPUTS:
+  curse lift@50: 1.95x   raw lift@50: 2.10x
+  curse advantage over baseline: -7%
+
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
+
+==== fastify (high-churn) ====
+======================================================================
+REPO: rg-fastify   cutoff: 2022-01-01
+======================================================================
+train commits (pre-cutoff):  3067
+test commits (post-cutoff):  1678
+  of which bug-fixes:        237
+files in scorer universe:    375
+files that got a bug-fix:    149
+base rate (random pick):     39.7%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    50%     1.26x  |    70%    1.76x |   raw
+   20 |    55%     1.38x  |    65%    1.64x |   raw
+   50 |    62%     1.56x  |    64%    1.61x |   raw
+  100 |    64%     1.61x  |    62%    1.56x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 54%
+  top-20 Jaccard(curse, raw): 82%
+  top-50 Jaccard(curse, raw): 79%
+
+VERDICT INPUTS:
+  curse lift@50: 1.56x   raw lift@50: 1.61x
+  curse advantage over baseline: -3%
+
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
+
+==== node-fetch (high-churn) ====
+======================================================================
+REPO: rg-node-fetch   cutoff: 2021-01-01
+======================================================================
+train commits (pre-cutoff):  543
+test commits (post-cutoff):  96
+  of which bug-fixes:        29
+files in scorer universe:    78
+files that got a bug-fix:    11
+base rate (random pick):     14.1%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    60%     4.25x  |    50%    3.55x |   CURSE ✓
+   20 |    45%     3.19x  |    35%    2.48x |   CURSE ✓
+   50 |    18%     1.28x  |    22%    1.56x |   raw
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 54%
+  top-20 Jaccard(curse, raw): 43%
+  top-50 Jaccard(curse, raw): 67%
+
+VERDICT INPUTS:
+  curse lift@50: 1.28x   raw lift@50: 1.56x
+  curse advantage over baseline: -18%
+
+VALIDITY GUARD:
+  INCONCLUSIVE — universe 78 < 150 (top-50 = 64% of repo)
+  (verdict above is NOT counted; sample/universe insufficient)
+
+==== vite (high-churn) ====
+======================================================================
+REPO: rg-vite   cutoff: 2023-01-01
+======================================================================
+train commits (pre-cutoff):  5139
+test commits (post-cutoff):  4218
+  of which bug-fixes:        1277
+files in scorer universe:    3238
+files that got a bug-fix:    390
+base rate (random pick):     12.0%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    90%     7.47x  |    70%    5.81x |   CURSE ✓
+   20 |    95%     7.89x  |    70%    5.81x |   CURSE ✓
+   50 |    78%     6.48x  |    68%    5.65x |   CURSE ✓
+  100 |    69%     5.73x  |    61%    5.06x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 33%
+  top-20 Jaccard(curse, raw): 38%
+  top-50 Jaccard(curse, raw): 45%
+
+VERDICT INPUTS:
+  curse lift@50: 6.48x   raw lift@50: 5.65x
+  curse advantage over baseline: 15%
+
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
+
+==== lodash (monolithic) ====
+======================================================================
+REPO: rg-lodash   cutoff: 2017-01-01
+======================================================================
+train commits (pre-cutoff):  7578
+test commits (post-cutoff):  123
+  of which bug-fixes:        25
+files in scorer universe:    329
+files that got a bug-fix:    7
+base rate (random pick):     2.1%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    40%     18.80x  |    20%    9.40x |   CURSE ✓
+   20 |    30%     14.10x  |    20%    9.40x |   CURSE ✓
+   50 |    12%     5.64x  |    12%    5.64x |   tie
+  100 |     7%     3.29x  |     6%    2.82x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 43%
+  top-20 Jaccard(curse, raw): 54%
+  top-50 Jaccard(curse, raw): 72%
+
+VERDICT INPUTS:
+  curse lift@50: 5.64x   raw lift@50: 5.64x
+  curse advantage over baseline: 0%
+
+VALIDITY GUARD:
+  VALID verdict — tier: FRAGILE (reported, not headlined)
+
+==== moment (monolithic) ====
+======================================================================
+REPO: rg-moment   cutoff: 2019-01-01
+======================================================================
+train commits (pre-cutoff):  3681
+test commits (post-cutoff):  376
+  of which bug-fixes:        87
+files in scorer universe:    1243
+files that got a bug-fix:    300
+base rate (random pick):     24.1%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    30%     1.24x  |    30%    1.24x |   tie
+   20 |    35%     1.45x  |    20%    0.83x |   CURSE ✓
+   50 |    44%     1.82x  |    18%    0.75x |   CURSE ✓
+  100 |    41%     1.70x  |    17%    0.70x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 43%
+  top-20 Jaccard(curse, raw): 33%
+  top-50 Jaccard(curse, raw): 28%
+
+VERDICT INPUTS:
+  curse lift@50: 1.82x   raw lift@50: 0.75x
+  curse advantage over baseline: 144%
+
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
+
+==== underscore (monolithic) ====
+======================================================================
+REPO: rg-underscore   cutoff: 2018-01-01
+======================================================================
+train commits (pre-cutoff):  2413
+test commits (post-cutoff):  467
+  of which bug-fixes:        45
+files in scorer universe:    69
+files that got a bug-fix:    14
+base rate (random pick):     20.3%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    60%     2.96x  |    70%    3.45x |   raw
+   20 |    45%     2.22x  |    45%    2.22x |   tie
+   50 |    24%     1.18x  |    26%    1.28x |   raw
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 82%
+  top-20 Jaccard(curse, raw): 48%
+  top-50 Jaccard(curse, raw): 79%
+
+VERDICT INPUTS:
+  curse lift@50: 1.18x   raw lift@50: 1.28x
+  curse advantage over baseline: -8%
+
+VALIDITY GUARD:
+  INCONCLUSIVE — universe 69 < 150 (top-50 = 72% of repo)
+  (verdict above is NOT counted; sample/universe insufficient)
+
+==== ramda (monolithic) ====
+======================================================================
+REPO: rg-ramda   cutoff: 2019-01-01
+======================================================================
+train commits (pre-cutoff):  2747
+test commits (post-cutoff):  301
+  of which bug-fixes:        44
+files in scorer universe:    1368
+files that got a bug-fix:    63
+base rate (random pick):     4.6%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    10%     2.17x  |    10%    2.17x |   tie
+   20 |    10%     2.17x  |     5%    1.09x |   CURSE ✓
+   50 |     6%     1.30x  |     2%    0.43x |   CURSE ✓
+  100 |     6%     1.30x  |     3%    0.65x |   CURSE ✓
 
 RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
   top-10 Jaccard(curse, raw): 25%
   top-20 Jaccard(curse, raw): 25%
-  top-50 Jaccard(curse, raw): 27%
+  top-50 Jaccard(curse, raw): 37%
 
 VERDICT INPUTS:
-  curse lift@50: 7.26x   raw lift@50: 4.01x
-  curse advantage over baseline: 81%
+  curse lift@50: 1.30x   raw lift@50: 0.43x
+  curse advantage over baseline: 200%
 
-======================================================================
-REPO: study-axios   cutoff: 2021-06-01
-======================================================================
-train commits (pre-cutoff):  1008
-test commits (post-cutoff):  1097
-  of which bug-fixes:        300
-files in scorer universe:    184
-files that got a bug-fix:    45
-base rate (random pick):     24.5%
-
-PRECISION@K / LIFT vs random  (lift = how many x better than chance)
-  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
-  ----------------------------------------------------------------
-   10 |    90%     3.68x  |   100%    4.09x |   raw
-   20 |    85%     3.48x  |    80%    3.27x |   CURSE ✓
-   50 |    50%     2.04x  |    54%    2.21x |   raw
-  100 |    32%     1.31x  |    33%    1.35x |   raw
-
-RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
-  top-10 Jaccard(curse, raw): 54%
-  top-20 Jaccard(curse, raw): 60%
-  top-50 Jaccard(curse, raw): 61%
-
-VERDICT INPUTS:
-  curse lift@50: 2.04x   raw lift@50: 2.21x
-  curse advantage over baseline: -7%
-
-======================================================================
-REPO: study-lodash   cutoff: 2016-01-01
-======================================================================
-train commits (pre-cutoff):  6037
-test commits (post-cutoff):  1664
-  of which bug-fixes:        139
-files in scorer universe:    278
-files that got a bug-fix:    12
-base rate (random pick):     4.3%
-
-PRECISION@K / LIFT vs random  (lift = how many x better than chance)
-  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
-  ----------------------------------------------------------------
-   10 |    30%     6.95x  |    40%    9.27x |   raw
-   20 |    30%     6.95x  |    30%    6.95x |   tie
-   50 |    14%     3.24x  |    16%    3.71x |   raw
-  100 |     8%     1.85x  |     9%    2.08x |   raw
-
-RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
-  top-10 Jaccard(curse, raw): 43%
-  top-20 Jaccard(curse, raw): 60%
-  top-50 Jaccard(curse, raw): 79%
-
-VERDICT INPUTS:
-  curse lift@50: 3.24x   raw lift@50: 3.71x
-  curse advantage over baseline: -12%
+VALIDITY GUARD:
+  VALID verdict — tier: ROBUST (headline-eligible)
 

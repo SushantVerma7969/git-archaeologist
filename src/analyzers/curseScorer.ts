@@ -113,3 +113,39 @@ export function scoreCursedFiles(
     .sort((a, b) => b.curseScore - a.curseScore)
     .slice(0, topN);
 }
+
+// Display-only filter for the `cursed` COMMAND. Distinct from NOISE_PATTERNS
+// (which zeroes scores and is consumed by the validation harness — kept narrow
+// so the study stays apples-to-apples). This filter is applied AFTER scoring,
+// only to what a human sees, so docs/tests/benchmarks/translated-readmes don't
+// dominate the displayed ranking. It deliberately does NOT touch curseScore,
+// so research/validate.mjs is unaffected.
+const DISPLAY_NONSOURCE = [
+  /^readme([._-][a-z-]+)?\.(md|txt)$/i,
+  /(^|\/)(docs?|website|www|examples?|demos?)\//i,
+  /\.mdx?$/i,
+  /(^|\/)(test|tests|__tests__|spec|specs|e2e|cypress|integration-tests)\//i,
+  /\.(test|spec)\.[a-z]+$/i,
+  /\.test-d\.[a-z]+$/i,
+  /(^|\/)__snapshots__\//i,
+  /\.snap$/i,
+  /(^|\/)(bench|benchmark|benchmarks|perf|perf-testing|performance)\//i,
+  // dotfiles and build/tooling config — not maintained product source
+  /(^|\/)\.[^/]+$/, // any dot-prefixed file: .gitignore, .npmignore, .editorconfig
+  /(^|\/)\.[^/]+\//, // anything under a dot-prefixed dir: .github/, .circleci/
+  /\.ya?ml$/i, // CI/workflow/config YAML — not product source
+  /(^|\/)(tsconfig|jsconfig)[^/]*\.json$/i,
+  /(^|\/)(rollup|vite|vitest|jest|babel|webpack|tsup|esbuild|rspack)\.config\.[a-z]+$/i,
+  /(^|\/)(lerna|nx|turbo)\.json$/i,
+  /(^|\/)\.?size-snapshot\.json$/i,
+  /(^|\/)\.all-contributorsrc$/i,
+  // package manifests and lockfiles — high-churn, not maintained logic
+  /(^|\/)package(-lock)?\.json$/i,
+  /(^|\/)(yarn|pnpm-lock|npm-shrinkwrap)\.(lock|yaml|json)$/i,
+  /(^|\/)(jsr|deno)\.json$/i,
+  /(^|\/)AGENTS\.md$/i,
+];
+
+export function isDisplayableSource(filepath: string): boolean {
+  return !DISPLAY_NONSOURCE.some((p) => p.test(filepath));
+}

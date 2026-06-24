@@ -177,3 +177,25 @@ const c50 = precisionRecallAtK(curseRanked, Math.min(50, universe.length));
 const r50 = precisionRecallAtK(rawRanked, Math.min(50, universe.length));
 console.log(`  curse lift@50: ${c50.lift.toFixed(2)}x   raw lift@50: ${r50.lift.toFixed(2)}x`);
 console.log(`  curse advantage over baseline: ${((c50.lift / r50.lift - 1) * 100).toFixed(0)}%`);
+
+// ---- VALIDITY GUARD (added in hardening pass) ----
+// A K=50 verdict is only meaningful when the file universe is large enough that
+// "top 50" is a genuine selection, not most of the repo. Below 3*K files,
+// precision@50 collapses toward the base rate for both rankings and the
+// comparison is uninformative. Also require a minimum bug-fix sample.
+const GUARD_MIN_UNIVERSE = 150; // 3 * K(50)
+const GUARD_MIN_SAMPLE = 5;
+console.log('');
+console.log('VALIDITY GUARD:');
+const guardFails = [];
+if (universe.length < GUARD_MIN_UNIVERSE)
+  guardFails.push(`universe ${universe.length} < ${GUARD_MIN_UNIVERSE} (top-50 = ${(5000 / universe.length).toFixed(0)}% of repo)`);
+if (buggyInUniverse.length < GUARD_MIN_SAMPLE || testBugCommits < GUARD_MIN_SAMPLE)
+  guardFails.push(`sample too small (buggy=${buggyInUniverse.length}, fixCommits=${testBugCommits})`);
+if (guardFails.length) {
+  console.log(`  INCONCLUSIVE — ${guardFails.join('; ')}`);
+  console.log('  (verdict above is NOT counted; sample/universe insufficient)');
+} else {
+  const robust = buggyInUniverse.length >= 20 && testBugCommits >= 20;
+  console.log(`  VALID verdict — tier: ${robust ? 'ROBUST (headline-eligible)' : 'FRAGILE (reported, not headlined)'}`);
+}

@@ -1,6 +1,7 @@
 import Table from 'cli-table3';
 import chalk from 'chalk';
 import { AnalysisResult } from '../types';
+import { isDisplayableSource } from '../analyzers/curseScorer';
 import {
   formatPath,
   formatDate,
@@ -60,19 +61,21 @@ function renderCursedFiles(r: AnalysisResult): void {
     wordWrap: true,
   });
 
-  r.cursedFiles.forEach((f, i) => {
-    const stats = r.fileStats.get(f.filepath);
-    const lastTouched = stats ? formatDate(stats.lastChanged) : 'unknown';
-    table.push([
-      chalk.grey(String(i + 1)),
-      formatPath(f.filepath, 40),
-      formatScore(f.curseScore),
-      chalk.white(String(f.totalChanges)),
-      chalk.white(String(f.uniqueAuthors)),
-      chalk.grey(lastTouched),
-      chalk.grey(f.reasons.join(', ')),
-    ]);
-  });
+  r.cursedFiles
+    .filter((f) => isDisplayableSource(f.filepath))
+    .forEach((f, i) => {
+      const stats = r.fileStats.get(f.filepath);
+      const lastTouched = stats ? formatDate(stats.lastChanged) : 'unknown';
+      table.push([
+        chalk.grey(String(i + 1)),
+        formatPath(f.filepath, 40),
+        formatScore(f.curseScore),
+        chalk.white(String(f.totalChanges)),
+        chalk.white(String(f.uniqueAuthors)),
+        chalk.grey(lastTouched),
+        chalk.grey(f.reasons.join(', ')),
+      ]);
+    });
 
   console.log(table.toString());
 }

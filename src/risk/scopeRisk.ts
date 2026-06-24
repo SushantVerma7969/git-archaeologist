@@ -11,8 +11,19 @@ interface ExplanationInput {
   contributors: number;
 }
 
-export function classifyScopeRisk(busFactor: number, concentration: number): RiskLevel {
-  if (busFactor === 1 && concentration >= 80) {
+// A scope must be backed by at least this many file-touches before a
+// single-owner concentration is allowed to be a HIGH (headline) risk. Below
+// this, the scope is too thinly-evidenced for "bus factor 1" to be a credible
+// top-level finding — e.g. a 3-file helper dir touched 4 times by one person is
+// not a maintenance emergency. Such scopes still surface as MEDIUM, not hidden.
+const MIN_TOUCHES_FOR_HIGH = 15;
+
+export function classifyScopeRisk(
+  busFactor: number,
+  concentration: number,
+  totalTouches = Infinity,
+): RiskLevel {
+  if (busFactor === 1 && concentration >= 80 && totalTouches >= MIN_TOUCHES_FOR_HIGH) {
     return 'HIGH';
   }
   if (busFactor === 1 || (busFactor === 2 && concentration >= 50)) {
@@ -94,7 +105,7 @@ export function buildScopeRisks(
 
     const contributors = authorTotals.size;
     const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
-    const level = classifyScopeRisk(bf.busFactor, concentration);
+    const level = classifyScopeRisk(bf.busFactor, concentration, total);
     const explanationInput = {
       level,
       busFactor: bf.busFactor,

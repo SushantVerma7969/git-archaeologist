@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import packageJson from '../package.json';
 import { analyze } from './core/orchestrator';
+import { isDisplayableSource } from './analyzers/curseScorer';
 import { renderReport } from './output/terminalRenderer';
 import { generateHtmlReport } from './output/htmlReport';
 import { registerBlameCommand } from './blame';
@@ -104,8 +105,13 @@ program
       const since = options.since ? parseSince(options.since) : undefined;
       try {
         const topN = parseInt(options.top, 10);
-        const result = await analyze(resolvedPath, since, false, topN);
-        result.cursedFiles = result.cursedFiles.slice(0, topN);
+        // Request a generous ranking, then drop non-source files (docs, tests,
+        // benchmarks, translated READMEs) from the DISPLAY before taking topN,
+        // so the shown ranking is real code. Scores are unchanged.
+        const result = await analyze(resolvedPath, since, false, topN * 5 + 50);
+        result.cursedFiles = result.cursedFiles
+          .filter((f) => isDisplayableSource(f.filepath))
+          .slice(0, topN);
         renderReport({ ...result, busFactor: [], ownership: [], coupling: [] });
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
