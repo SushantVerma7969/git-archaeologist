@@ -178,4 +178,5 @@ export interface AnalysisResult {
   fileStats: Map<string, FileStats>;
   lastActiveByAuthor: Map<string, number>;
   identityMerges: IdentityMerge[];
+  authorNameMap: Map<string, string>;
 }

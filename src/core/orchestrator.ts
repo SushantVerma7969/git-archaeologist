@@ -120,6 +120,7 @@ export async function analyze(
       fileStats,
       lastActiveByAuthor,
       identityMerges: identity.merges,
+      authorNameMap,
     };
   } catch (err) {
     if (spinner) {
