@@ -103,8 +103,8 @@ program
       const resolvedPath = path.resolve(repoPath ?? '.');
       const since = options.since ? parseSince(options.since) : undefined;
       try {
-        const result = await analyze(resolvedPath, since);
         const topN = parseInt(options.top, 10);
+        const result = await analyze(resolvedPath, since, false, topN);
         result.cursedFiles = result.cursedFiles.slice(0, topN);
         renderReport({ ...result, busFactor: [], ownership: [], coupling: [] });
       } catch (err: unknown) {

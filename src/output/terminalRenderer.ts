@@ -60,7 +60,7 @@ function renderCursedFiles(r: AnalysisResult): void {
     wordWrap: true,
   });
 
-  r.cursedFiles.slice(0, 15).forEach((f, i) => {
+  r.cursedFiles.forEach((f, i) => {
     const stats = r.fileStats.get(f.filepath);
     const lastTouched = stats ? formatDate(stats.lastChanged) : 'unknown';
     table.push([

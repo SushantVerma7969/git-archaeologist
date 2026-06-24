@@ -17,6 +17,7 @@ export async function analyze(
   repoPath: string,
   since?: string,
   silent = false,
+  cursedLimit = 20,
 ): Promise<AnalysisResult> {
   const spinner = silent
     ? null
@@ -67,7 +68,7 @@ export async function analyze(
     }
 
     // Step 5 — run all analyzers
-    const cursedFiles = scoreCursedFiles(fileStats);
+    const cursedFiles = scoreCursedFiles(fileStats, cursedLimit);
 
     if (spinner) {
       spinner.text = 'Analyzing ownership...';
