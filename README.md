@@ -97,6 +97,12 @@ See also: [Research data](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
 For this comparison, HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.
 
+## Hotspots
+
+`git-arch risk --hotspots` ranks scopes by how many independent maintenance-risk signals fired for them: bus factor of 1, high contributor churn, an inactive dominant contributor, recently rising concentration, and ownership transitions. It does not invent a new weighted score — each fired signal carries its own evidence line, and scopes are ranked by signal count (concentration breaks ties). A scope where four independent signals agree is a stronger investigation candidate than one where only a single number looks high.
+
+By default it shows scopes with two or more signals; `--all` lowers that to one, and `--json` emits machine-readable output. As with every other view, these are investigation signals, not claims about ownership or maintainership.
+
 ## Known Limitations
 
 - Commit authorship is not the same as knowledge ownership.
@@ -120,6 +126,7 @@ Maintenance risk:
 git-arch risk /path/to/repo                    # ownership, bus factor, and owner activity
 git-arch risk /path/to/repo --all              # include LOW risk scopes
 git-arch risk /path/to/repo --temporal         # compare lifetime vs last 12 months
+git-arch risk /path/to/repo --hotspots         # rank scopes by how many risk signals fired
 git-arch ownership /path/to/repo               # folder ownership and bus factor
 ```
 

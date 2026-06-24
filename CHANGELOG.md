@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.25.0] - 2026-06-24
+- Added `git-arch risk --hotspots` — ranks scopes by how many independent maintenance-risk signals fired (bus factor, contributor churn, owner inactivity, rising concentration, ownership transitions)
+- Hotspots are an explainable aggregation of existing signals: each fired signal carries its own evidence string, and ranking is by signal count (tie-broken by concentration), not an opaque weighted score
+- `--hotspots --all` lowers the threshold to show single-signal scopes; `--hotspots --json` emits machine-readable output
+- Output keeps the investigation-prompt framing and makes no ownership or maintainership claims
+
+## [1.24.1] - 2026-06-24
+- Synced package.json version with the release tag history (was stale at 1.11.0)
+
 ## [1.7.0] - 2026-06-09
 - GitHub Action now posts PR risk score as a comment on every pull request
 - PR risk score (0-100) based on cursed files touched and bus factor 1 modules affected

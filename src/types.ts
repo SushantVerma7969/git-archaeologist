@@ -144,6 +144,19 @@ export interface AbandonedScope {
   concentration: number;
   explanation: string;
 }
+export interface HotspotSignal {
+  name: string;
+  reason: string;
+}
+export interface HotspotScope {
+  scope: string;
+  signalsFired: number;
+  signals: HotspotSignal[];
+  concentration: number;
+  busFactor: number;
+  explanation: RiskExplanation;
+  recommendations?: Recommendation[];
+}
 export interface CouplingPair {
   fileA: string;
   fileB: string;

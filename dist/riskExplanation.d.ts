@@ -1,4 +1,4 @@
-import { ContributorChurn, AnalysisResult, RiskExplanation, AbandonedScope, RiskLevel, ScopeRisk, TemporalScopeRisk, YearlyConcentrationSeries, OwnershipTransition, EvolutionSummary } from './types';
+import { ContributorChurn, AnalysisResult, RiskExplanation, AbandonedScope, RiskLevel, ScopeRisk, TemporalScopeRisk, YearlyConcentrationSeries, OwnershipTransition, EvolutionSummary, HotspotScope } from './types';
 interface ExplanationInput {
     level: RiskLevel;
     busFactor: number;
@@ -17,5 +17,16 @@ export declare function buildOwnershipTransitions(result: AnalysisResult): Owner
 export declare function buildEvolutionSummary(temporalRisks: TemporalScopeRisk[], ownershipTransitions: OwnershipTransition[]): EvolutionSummary;
 export declare function buildContributorChurn(result: AnalysisResult): ContributorChurn[];
 export declare function buildAbandonedScopes(risks: ScopeRisk[], churn: ContributorChurn[]): AbandonedScope[];
+interface HotspotInputs {
+    scopeRisks: ScopeRisk[];
+    churn: ContributorChurn[];
+    abandoned: AbandonedScope[];
+    transitions: OwnershipTransition[];
+    temporal: TemporalScopeRisk[];
+}
+interface BuildHotspotsOptions {
+    minSignals?: number;
+}
+export declare function buildHotspots(inputs: HotspotInputs, options?: BuildHotspotsOptions): HotspotScope[];
 export {};
 //# sourceMappingURL=riskExplanation.d.ts.map

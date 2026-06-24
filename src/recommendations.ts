@@ -103,3 +103,52 @@ action:
       return [];
   }
 }
+
+export function buildHotspotRecommendations(
+  signalNames: string[]
+): Recommendation[] {
+  const recommendations: Recommendation[] = [];
+  const has = (s: string) => signalNames.includes(s);
+
+  if (has('bus-factor')) {
+    recommendations.push({
+      title: 'Continuity risk',
+      action:
+        'Would work in this area continue smoothly if the dominant contributor became unavailable?',
+    });
+  }
+
+  if (has('churn')) {
+    recommendations.push({
+      title: 'Departing knowledge',
+      action:
+        'As contributors to this area became inactive, did their understanding transfer to anyone still active?',
+    });
+  }
+
+  if (has('owner-inactive')) {
+    recommendations.push({
+      title: 'Current reality',
+      action:
+        'Does the historical concentration here still reflect how this area is maintained today?',
+    });
+  }
+
+  if (has('rising-concentration')) {
+    recommendations.push({
+      title: 'Concentration trend',
+      action:
+        'Is responsibility narrowing toward fewer people recently, or is this a temporary burst of activity?',
+    });
+  }
+
+  if (has('ownership-transition')) {
+    recommendations.push({
+      title: 'Handover quality',
+      action:
+        'When primary responsibility for this area shifted, was the transition deliberate and well understood?',
+    });
+  }
+
+  return recommendations;
+}

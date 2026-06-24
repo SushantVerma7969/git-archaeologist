@@ -65,6 +65,7 @@ function registerRiskCommand(program) {
         .option('-s, --since <date>', 'Only analyze commits after this date')
         .option('-a, --all', 'Show LOW risk scopes too (default: only MEDIUM/HIGH)')
         .option('--temporal', 'Compare lifetime risk with the last 12 months')
+        .option('--hotspots', 'Rank scopes by how many maintenance-risk signals fired')
         .option('--series', 'Show yearly concentration trajectory')
         .option('-j, --json', 'Output risk report as JSON')
         .option('--html <file>', 'Write report as HTML')
@@ -72,6 +73,53 @@ function registerRiskCommand(program) {
         const resolvedPath = path.resolve(repoPath ?? '.');
         const since = options.since ? parseSince(options.since) : undefined;
         try {
+            if (options.hotspots) {
+                if (options.since) {
+                    console.error(chalk_1.default.red('\n  ✖  Error: ') + '--since cannot be used with --hotspots. Hotspot analysis uses a fixed 12-month recent window for its temporal signal.');
+                    process.exit(1);
+                }
+                const recentSince = parseSince('12m');
+                const lifetimeResult = await (0, orchestrator_1.analyze)(resolvedPath, undefined, options.json === true);
+                const recentResult = await (0, orchestrator_1.analyze)(resolvedPath, recentSince, options.json === true);
+                const scopeRisks = (0, riskExplanation_1.buildScopeRisks)(lifetimeResult);
+                const churn = (0, riskExplanation_1.buildContributorChurn)(lifetimeResult);
+                const abandoned = (0, riskExplanation_1.buildAbandonedScopes)(scopeRisks, churn);
+                const transitions = (0, riskExplanation_1.buildOwnershipTransitions)(lifetimeResult);
+                const temporal = (0, riskExplanation_1.buildTemporalScopeRisks)(lifetimeResult, recentResult);
+                const minSignals = options.all ? 1 : 2;
+                const hotspots = (0, riskExplanation_1.buildHotspots)({ scopeRisks, churn, abandoned, transitions, temporal }, { minSignals });
+                if (options.json) {
+                    console.log(JSON.stringify(hotspots, null, 2));
+                    return;
+                }
+                console.log('\n' + chalk_1.default.hex('#A78BFA')('─'.repeat(70)));
+                console.log(` ${chalk_1.default.bold.white('⛏  git-arch risk --hotspots')} — ${chalk_1.default.grey(resolvedPath.split('/').pop())}`);
+                console.log(chalk_1.default.grey('  Scopes ranked by how many maintenance-risk signals fired'));
+                console.log(chalk_1.default.grey(`  Showing scopes with ${minSignals}+ signals${options.all ? '' : ' — use --all for 1+'}`));
+                console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
+                if (hotspots.length === 0) {
+                    console.log(chalk_1.default.green('  ✓ No scopes met the signal threshold.\n'));
+                }
+                for (const h of hotspots) {
+                    console.log(chalk_1.default.bold.red(`  ${h.signalsFired} signals`) + `  ${chalk_1.default.cyan(h.scope)}`);
+                    for (const s of h.signals) {
+                        console.log(chalk_1.default.grey(`    * ${s.reason}`));
+                    }
+                    if (h.recommendations && h.recommendations.length > 0) {
+                        console.log(chalk_1.default.grey('  Questions to investigate:'));
+                        for (const rec of h.recommendations) {
+                            console.log(chalk_1.default.cyan(`    • ${rec.title}`));
+                            console.log(chalk_1.default.grey(`      ${rec.action}`));
+                        }
+                    }
+                    console.log();
+                }
+                console.log(chalk_1.default.grey('  Each signal reuses analysis already shown by other risk views.'));
+                console.log(chalk_1.default.grey('  These signals do not prove ownership, expertise, or maintainership.'));
+                console.log();
+                console.log(chalk_1.default.hex('#A78BFA')('─'.repeat(70)) + '\n');
+                return;
+            }
             if (options.temporal) {
                 if (options.since) {
                     console.error(chalk_1.default.red('\n  ✖  Error: ') + '--since cannot be used with --temporal. Temporal risk uses a fixed 12-month recent window.');
