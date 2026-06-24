@@ -261,6 +261,12 @@ Short answer: it correlates, but don't oversell it. In a small manual check, the
 - [Curse Score Validation Notes](RESEARCH.md): method, results, and why this is correlation rather than prediction
 - [Repository Risk Benchmark 2026](BENCHMARKS.md): multi-repo analysis of bus-factor-1 modules
 
+## Additional notes
+
+- [DESIGN.md](DESIGN.md) — rationale behind scoring and analysis decisions
+- [FEEDBACK.md](FEEDBACK.md) — discoveries and lessons learned during development
+- [RESEARCH.md](RESEARCH.md) — validation study and methodology
+
 ## Requirements
 
 Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
