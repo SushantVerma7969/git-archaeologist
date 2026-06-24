@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.27.0] - 2026-06-24
+- The implicit coupling table now surfaces genuine hidden dependencies: it excludes test fixtures, snapshots, and non-source paths (which co-change by design), requires at least 5 co-changes as evidence, and breaks score ties by raw co-change count so high-evidence coupling outranks trivially-perfect low-evidence pairs
+
 ## [1.26.0] - 2026-06-24
 - `git-arch risk --temporal --html` now renders the full temporal picture: a repository evolution summary, an enriched temporal table with concentration delta and trend direction, and a Maintenance Hotspots section matching the terminal ranking
 - All user-derived strings in the temporal and hotspot HTML are escaped, closing the injection gap in the previous temporal table

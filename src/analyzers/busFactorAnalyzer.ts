@@ -57,7 +57,7 @@ export function analyzeBusFactor(
 
 export function analyzeCoupling(
   commits: Array<{ filesChanged: string[] }>,
-  minCoChanges: number = 3
+  minCoChanges: number = 5
 ): CouplingPair[] {
   const coChangeMap = new Map<string, number>();
   const fileChangeCount = new Map<string, number>();
@@ -78,6 +78,17 @@ export function analyzeCoupling(
   for (const [key, coChanges] of coChangeMap) {
     if (coChanges < minCoChanges) continue;
     const [fileA, fileB] = key.split('|||');
+    // Coupling between fixtures, config, generated, or snapshot/test files is
+    // not an actionable hidden dependency — these co-change by design. Skip a
+    // pair if either side is non-source or a test fixture.
+    if (
+      !isSourceScope(scopeOf(fileA)) ||
+      !isSourceScope(scopeOf(fileB)) ||
+      isTestFixture(fileA) ||
+      isTestFixture(fileB)
+    ) {
+      continue;
+    }
     const maxChanges = Math.max(
       fileChangeCount.get(fileA) ?? 1,
       fileChangeCount.get(fileB) ?? 1
@@ -85,7 +96,31 @@ export function analyzeCoupling(
     const couplingScore = Math.round((coChanges / maxChanges) * 1000) / 10;
     results.push({ fileA, fileB, coChanges, couplingScore });
   }
+  // Rank by score, but break ties by raw co-change count so a 30/30 pair
+  // outranks a trivially-perfect 5/5 one. A high score on tiny evidence is
+  // weaker than the same score backed by many co-changes.
   return results
-    .sort((a, b) => b.couplingScore - a.couplingScore)
+    .sort((a, b) => b.couplingScore - a.couplingScore || b.coChanges - a.coChanges)
     .slice(0, 30);
+}
+
+function scopeOf(filepath: string): string {
+  return filepath.includes('/') ? filepath.split('/')[0] : '(root)';
+}
+
+// Snapshot, fixture, and test files co-change by design (a snapshot updates
+// whenever its test does), so they swamp the coupling table with expected
+// pairs rather than the hidden, code-level dependencies the view exists to find.
+const TEST_FIXTURE_PATTERNS = [
+  /\.expect\.[a-z]+$/i,
+  /\.snap$/i,
+  /__snapshots__\//,
+  /\/__tests__\//,
+  /\/fixtures?\//,
+  /\.test\.[a-z]+$/i,
+  /\.spec\.[a-z]+$/i,
+];
+
+function isTestFixture(filepath: string): boolean {
+  return TEST_FIXTURE_PATTERNS.some((p) => p.test(filepath));
 }
