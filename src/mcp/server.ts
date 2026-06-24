@@ -261,7 +261,7 @@ export function createServer(): McpServer {
   // --- Tool 5: get_risk_hotspots — scopes where multiple signals agree ---
   server.tool(
     'get_risk_hotspots',
-    'Folders ranked by how many independent maintenance-risk signals fired for ' +
+    'Folders ranked by how many distinct maintenance-risk signals fired for ' +
       'them (bus factor 1, high contributor churn, an inactive dominant contributor, ' +
       'rising concentration, ownership transitions). A scope where several signals ' +
       'agree is a stronger investigation target than one where a single number looks high.',

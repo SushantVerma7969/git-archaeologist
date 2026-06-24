@@ -142,7 +142,7 @@ export function buildHotspots(
       busFactor: risk.busFactor,
       explanation: {
         reasons: signals.map((s) => s.reason),
-        summary: `${signals.length} independent maintenance-risk signals fired for this scope. These are starting points for investigation, not conclusions about ownership or maintainership.`,
+        summary: `${signals.length} distinct maintenance-risk signals fired for this scope. These are starting points for investigation, not conclusions about ownership or maintainership.`,
       },
       recommendations: buildHotspotRecommendations(signalNames),
     });

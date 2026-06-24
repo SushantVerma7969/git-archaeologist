@@ -103,7 +103,7 @@ For this comparison, HIGH and MEDIUM count as concentrated and LOW counts as dis
 
 ## Hotspots
 
-`git-arch risk --hotspots` ranks scopes by how many independent maintenance-risk signals fired for them: bus factor of 1, high contributor churn, an inactive dominant contributor, recently rising concentration, and ownership transitions. There's no new weighted score behind it. Each fired signal carries its own evidence line, and scopes are ranked by how many signals fired, with concentration breaking ties. A scope where four independent signals agree is a far stronger thing to investigate than one where a single number happens to look high.
+`git-arch risk --hotspots` ranks scopes by how many distinct maintenance-risk signals fired for them: bus factor of 1, high contributor churn, an inactive dominant contributor, recently rising concentration, and ownership transitions. There's no new weighted score behind it. Each fired signal carries its own evidence line, and scopes are ranked by how many signals fired, with concentration breaking ties. A scope where four distinct signals agree is a far stronger thing to investigate than one where a single number happens to look high.
 
 By default it shows scopes with two or more signals. `--all` lowers that to one, and `--json` emits machine-readable output. As everywhere else, these are signals to investigate, not verdicts about ownership or maintainership.
 
@@ -199,7 +199,7 @@ It exposes five tools, each returning structured JSON:
 - **`who_owns`**: who has historically owned a specific file, and how recently they were active
 - **`get_bus_factor`**: per-folder single-point-of-failure map
 - **`find_coupled_files`**: files that have historically changed together
-- **`get_risk_hotspots`**: scopes where several independent risk signals agree
+- **`get_risk_hotspots`**: scopes where several distinct risk signals agree
 
 All tools take an optional `repoPath`, defaulting to the working directory. Example client configuration:
 
