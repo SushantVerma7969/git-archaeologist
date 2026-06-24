@@ -201,10 +201,19 @@ const evolutionSummary =
     ownershipTransitions
   );
 if (options.html) {
+  const hotspotsForHtml = buildHotspots({
+    scopeRisks: buildScopeRisks(lifetimeResult),
+    churn: contributorChurn,
+    abandoned: abandonedScopes,
+    transitions: ownershipTransitions,
+    temporal: temporalRisks,
+  });
+
   generateHtmlReport(
     lifetimeResult,
     options.html,
-    temporalRisks
+    temporalRisks,
+    { evolutionSummary, hotspots: hotspotsForHtml }
   );
 
   console.log(

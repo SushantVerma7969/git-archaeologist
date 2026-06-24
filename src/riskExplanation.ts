@@ -16,6 +16,8 @@ import {
 } from './types';
 import { formatTimeAgo } from './utils/activity';
 import { calculateConcentration } from './utils/concentration';
+import { isSourceScope } from './utils/scopeFilter';
+export { isSourceScope };
 import {
   buildRiskRecommendations,
   buildTemporalRecommendations,
@@ -251,6 +253,7 @@ export function buildTemporalScopeRisks(
   };
 
   return lifetimeRisks
+    .filter((lifetime) => isSourceScope(lifetime.scope))
     .map((lifetime) => {
       const recent = recentByScope.get(lifetime.scope);
       const recentTouches = recentTouchesByScope.get(lifetime.scope) ?? 0;
@@ -498,7 +501,7 @@ transitions.push({
 }
 }
 
-  return transitions;
+  return transitions.filter((t) => isSourceScope(t.scope));
 }
 export function buildEvolutionSummary(
   temporalRisks: TemporalScopeRisk[],
@@ -616,9 +619,9 @@ export function buildContributorChurn(
     });
   }
 
-  return churn.sort(
-    (a, b) => b.churnPercent - a.churnPercent
-  );
+  return churn
+    .filter((c) => isSourceScope(c.scope))
+    .sort((a, b) => b.churnPercent - a.churnPercent);
 }
 export function buildAbandonedScopes(
   risks: ScopeRisk[],
@@ -631,6 +634,9 @@ export function buildAbandonedScopes(
   const results: AbandonedScope[] = [];
 
   for (const risk of risks) {
+    if (!isSourceScope(risk.scope)) {
+      continue;
+    }
     const scopeChurn = churnMap.get(risk.scope);
 
     if (
@@ -839,35 +845,4 @@ export function buildHotspots(
 
 function severityRank(severity: 'LOW' | 'MEDIUM' | 'HIGH'): number {
   return severity === 'HIGH' ? 0 : severity === 'MEDIUM' ? 1 : 2;
-}
-
-// Hotspots are about engineering continuity risk, so non-source scopes —
-// CI config, docs, fixtures, vendored or generated trees — are excluded.
-// One-person ownership of .github or flow-typed is not a maintenance gap
-// worth surfacing, and including it drowns the scopes that are.
-const NON_SOURCE_SCOPES = new Set([
-  '.github',
-  '.circleci',
-  '.husky',
-  '.vscode',
-  'docs',
-  'doc',
-  'fixtures',
-  'flow-typed',
-  'node_modules',
-  'vendor',
-  'third_party',
-  'examples',
-  'example',
-  '(root)',
-]);
-
-function isSourceScope(scope: string): boolean {
-  if (NON_SOURCE_SCOPES.has(scope)) {
-    return false;
-  }
-  if (scope.startsWith('.')) {
-    return false;
-  }
-  return true;
 }

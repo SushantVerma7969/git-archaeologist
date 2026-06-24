@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { buildHotspots } = require('../dist/riskExplanation');
+const { buildHotspots, isSourceScope } = require('../dist/riskExplanation');
 
 function scopeRisk(scope, overrides = {}) {
   return {
@@ -153,5 +153,16 @@ test('non-source scopes are excluded from hotspot ranking', () => {
       { minSignals: 1 }
     );
     assert.equal(hotspots.length, 0, `${scope} should be excluded`);
+  }
+});
+
+test('isSourceScope rejects tooling, config, and generated scopes', () => {
+  // These should never appear as risk scopes in any view.
+  for (const scope of ['.claude', '.github', '.circleci', 'docs', 'fixtures', 'flow-typed', 'vendor', '(root)', '.vscode']) {
+    assert.equal(isSourceScope(scope), false, `${scope} should be non-source`);
+  }
+  // Real source trees should pass.
+  for (const scope of ['compiler', 'src', 'packages', 'lib', 'scripts']) {
+    assert.equal(isSourceScope(scope), true, `${scope} should be source`);
   }
 });

@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateHtmlReport = generateHtmlReport;
 const fs = __importStar(require("fs"));
+const scopeFilter_1 = require("../utils/scopeFilter");
 function esc(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
@@ -64,9 +65,9 @@ function buildTree(result) {
             fm.set(folder, []);
         fm.get(folder).push({ name: parts[parts.length - 1], filepath: fp, value: Math.max(stats.totalChanges, 1), score, changes: stats.totalChanges, authors: stats.uniqueAuthors.size, lastTouched: last });
     }
-    return { name: result.repoName, children: Array.from(fm.entries()).map(([f, files]) => ({ name: f, children: files })) };
+    return { name: result.repoName, children: Array.from(fm.entries()).filter(([f]) => (0, scopeFilter_1.isSourceScope)(f)).map(([f, files]) => ({ name: f, children: files })) };
 }
-function generateHtmlReport(result, outputPath, temporalRisks) {
+function generateHtmlReport(result, outputPath, temporalRisks, extras) {
     const from = result.dateRange.from.toISOString().split('T')[0];
     const to = result.dateRange.to.toISOString().split('T')[0];
     const maxS = Math.max(1, ...result.cursedFiles.map(f => f.curseScore));
@@ -242,7 +243,21 @@ window.hl=function(fp){
 <\/script>
 ${temporalRisks && temporalRisks.length > 0 ? `
 <h2>Temporal Risk Analysis</h2>
-
+<p style="color:#64748b;font-size:12px;line-height:1.6;max-width:760px">
+  Trend describes how concentration has moved over the repository's lifetime. A
+  <em>declining</em> trend means a scope is less concentrated than it once was — it does
+  not mean the scope is low-risk today. A scope can be spreading out over its history and
+  still be a current hotspot below if its present bus factor, churn, or owner activity warrant it.
+</p>
+${extras && extras.evolutionSummary ? `
+<p style="color:#94a3b8;font-size:13px;line-height:1.7">
+  ${extras.evolutionSummary.ownershipTransitions} ownership transitions detected ·
+  ${extras.evolutionSummary.highSeverityTransitions} high-severity ·
+  ${extras.evolutionSummary.emergingConcentration} scopes more concentrated ·
+  ${extras.evolutionSummary.historicalConcentration} less concentrated ·
+  ${extras.evolutionSummary.distributedScopes} stayed distributed
+</p>
+` : ''}
 <table>
   <thead>
     <tr>
@@ -250,26 +265,44 @@ ${temporalRisks && temporalRisks.length > 0 ? `
       <th>Category</th>
       <th>Lifetime</th>
       <th>Recent</th>
+      <th>Delta</th>
+      <th>Trend</th>
     </tr>
   </thead>
   <tbody>
     ${temporalRisks.map(r => `
       <tr>
-        <td>${r.scope}</td>
-        <td>${r.category}</td>
-        <td>
-          ${r.lifetime.level}
-          (${r.lifetime.concentration}%)
-        </td>
-        <td>
-          ${r.recent
-        ? `${r.recent.level} (${r.recent.concentration}%)`
-        : `${r.recentTouches} touches`}
-        </td>
+        <td style="font-family:monospace;font-size:12px">${esc(String(r.scope))}</td>
+        <td>${esc(String(r.category))}</td>
+        <td>${esc(String(r.lifetime.level))} (${r.lifetime.concentration}%)</td>
+        <td>${r.recent
+        ? `${esc(String(r.recent.level))} (${r.recent.concentration}%)`
+        : `${r.recentTouches} touches`}</td>
+        <td style="color:#94a3b8">${r.delta === null || r.delta === undefined
+        ? '—'
+        : `${r.delta > 0 ? '+' : ''}${r.delta} pts`}</td>
+        <td style="color:#64748b">${esc(String(r.trend))}</td>
       </tr>
     `).join('')}
   </tbody>
 </table>
+<p style="color:#64748b;font-size:11px">These signals do not prove ownership, expertise, or maintainership.</p>
+` : ''}
+${extras && extras.hotspots && extras.hotspots.length > 0 ? `
+<h2>Maintenance Hotspots</h2>
+<p style="color:#94a3b8;font-size:13px">Scopes ranked by how many independent maintenance-risk signals fired.</p>
+${extras.hotspots.map((h) => `
+<div style="border:1px solid #1e293b;border-radius:8px;padding:14px 16px;margin:10px 0">
+  <div style="font-weight:700;color:#f1f5f9">
+    <span style="color:#ef4444">${h.signalsFired} signals</span>
+    <span style="font-family:monospace;margin-left:8px">${esc(String(h.scope))}</span>
+  </div>
+  <ul style="margin:8px 0 0;padding-left:18px;color:#94a3b8;font-size:12px;line-height:1.7">
+    ${h.signals.map((s) => `<li>${esc(String(s.reason))}</li>`).join('')}
+  </ul>
+</div>
+`).join('')}
+<p style="color:#64748b;font-size:11px">Each signal reuses analysis already shown by other risk views. These signals do not prove ownership, expertise, or maintainership.</p>
 ` : ''}
 </body>
 </html>`;

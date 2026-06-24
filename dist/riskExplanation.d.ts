@@ -1,4 +1,6 @@
 import { ContributorChurn, AnalysisResult, RiskExplanation, AbandonedScope, RiskLevel, ScopeRisk, TemporalScopeRisk, YearlyConcentrationSeries, OwnershipTransition, EvolutionSummary, HotspotScope } from './types';
+import { isSourceScope } from './utils/scopeFilter';
+export { isSourceScope };
 interface ExplanationInput {
     level: RiskLevel;
     busFactor: number;
@@ -28,5 +30,4 @@ interface BuildHotspotsOptions {
     minSignals?: number;
 }
 export declare function buildHotspots(inputs: HotspotInputs, options?: BuildHotspotsOptions): HotspotScope[];
-export {};
 //# sourceMappingURL=riskExplanation.d.ts.map

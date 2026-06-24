@@ -1,5 +1,6 @@
 import { FileStats, BusFactor, CouplingPair } from '../types';
 import { isBot } from '../utils/botFilter';
+import { isSourceScope } from '../utils/scopeFilter';
 
 export function analyzeBusFactor(
   fileStatsMap: Map<string, FileStats>,
@@ -22,6 +23,9 @@ export function analyzeBusFactor(
 
   const results: BusFactor[] = [];
   for (const [folder, authorTotals] of folderMap) {
+    if (!isSourceScope(folder)) {
+      continue;
+    }
     const totalChanges = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
     if (totalChanges === 0) continue;
     const sorted = Array.from(authorTotals.entries())

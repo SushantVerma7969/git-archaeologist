@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyzeBusFactor = analyzeBusFactor;
 exports.analyzeCoupling = analyzeCoupling;
 const botFilter_1 = require("../utils/botFilter");
+const scopeFilter_1 = require("../utils/scopeFilter");
 function analyzeBusFactor(fileStatsMap, authorNameMap) {
     const folderMap = new Map();
     for (const [, stats] of fileStatsMap) {
@@ -21,6 +22,9 @@ function analyzeBusFactor(fileStatsMap, authorNameMap) {
     }
     const results = [];
     for (const [folder, authorTotals] of folderMap) {
+        if (!(0, scopeFilter_1.isSourceScope)(folder)) {
+            continue;
+        }
         const totalChanges = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
         if (totalChanges === 0)
             continue;

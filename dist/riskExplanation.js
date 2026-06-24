@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isSourceScope = void 0;
 exports.classifyScopeRisk = classifyScopeRisk;
 exports.buildRiskExplanation = buildRiskExplanation;
 exports.buildScopeRisks = buildScopeRisks;
@@ -12,6 +13,8 @@ exports.buildAbandonedScopes = buildAbandonedScopes;
 exports.buildHotspots = buildHotspots;
 const activity_1 = require("./utils/activity");
 const concentration_1 = require("./utils/concentration");
+const scopeFilter_1 = require("./utils/scopeFilter");
+Object.defineProperty(exports, "isSourceScope", { enumerable: true, get: function () { return scopeFilter_1.isSourceScope; } });
 const recommendations_1 = require("./recommendations");
 function classifyScopeRisk(busFactor, concentration) {
     if (busFactor === 1 && concentration >= 80) {
@@ -194,6 +197,7 @@ function buildTemporalScopeRisks(lifetimeResult, recentResult) {
         'Insufficient recent evidence': 5,
     };
     return lifetimeRisks
+        .filter((lifetime) => (0, scopeFilter_1.isSourceScope)(lifetime.scope))
         .map((lifetime) => {
         const recent = recentByScope.get(lifetime.scope);
         const recentTouches = recentTouchesByScope.get(lifetime.scope) ?? 0;
@@ -357,7 +361,7 @@ function buildOwnershipTransitions(result) {
             });
         }
     }
-    return transitions;
+    return transitions.filter((t) => (0, scopeFilter_1.isSourceScope)(t.scope));
 }
 function buildEvolutionSummary(temporalRisks, ownershipTransitions) {
     return {
@@ -422,12 +426,17 @@ function buildContributorChurn(result) {
             level,
         });
     }
-    return churn.sort((a, b) => b.churnPercent - a.churnPercent);
+    return churn
+        .filter((c) => (0, scopeFilter_1.isSourceScope)(c.scope))
+        .sort((a, b) => b.churnPercent - a.churnPercent);
 }
 function buildAbandonedScopes(risks, churn) {
     const churnMap = new Map(churn.map((c) => [c.scope, c]));
     const results = [];
     for (const risk of risks) {
+        if (!(0, scopeFilter_1.isSourceScope)(risk.scope)) {
+            continue;
+        }
         const scopeChurn = churnMap.get(risk.scope);
         if (!scopeChurn ||
             risk.lastActiveDays === undefined) {
@@ -491,7 +500,7 @@ function buildHotspots(inputs, options = {}) {
     }
     const hotspots = [];
     for (const risk of inputs.scopeRisks) {
-        if (!isSourceScope(risk.scope)) {
+        if (!(0, scopeFilter_1.isSourceScope)(risk.scope)) {
             continue;
         }
         const signals = [];
@@ -582,34 +591,5 @@ function buildHotspots(inputs, options = {}) {
 }
 function severityRank(severity) {
     return severity === 'HIGH' ? 0 : severity === 'MEDIUM' ? 1 : 2;
-}
-// Hotspots are about engineering continuity risk, so non-source scopes —
-// CI config, docs, fixtures, vendored or generated trees — are excluded.
-// One-person ownership of .github or flow-typed is not a maintenance gap
-// worth surfacing, and including it drowns the scopes that are.
-const NON_SOURCE_SCOPES = new Set([
-    '.github',
-    '.circleci',
-    '.husky',
-    '.vscode',
-    'docs',
-    'doc',
-    'fixtures',
-    'flow-typed',
-    'node_modules',
-    'vendor',
-    'third_party',
-    'examples',
-    'example',
-    '(root)',
-]);
-function isSourceScope(scope) {
-    if (NON_SOURCE_SCOPES.has(scope)) {
-        return false;
-    }
-    if (scope.startsWith('.')) {
-        return false;
-    }
-    return true;
 }
 //# sourceMappingURL=riskExplanation.js.map

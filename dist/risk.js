@@ -162,7 +162,14 @@ function registerRiskCommand(program) {
                 const abandonedScopes = (0, riskExplanation_1.buildAbandonedScopes)((0, riskExplanation_1.buildScopeRisks)(lifetimeResult), contributorChurn);
                 const evolutionSummary = (0, riskExplanation_1.buildEvolutionSummary)(temporalRisks, ownershipTransitions);
                 if (options.html) {
-                    (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks);
+                    const hotspotsForHtml = (0, riskExplanation_1.buildHotspots)({
+                        scopeRisks: (0, riskExplanation_1.buildScopeRisks)(lifetimeResult),
+                        churn: contributorChurn,
+                        abandoned: abandonedScopes,
+                        transitions: ownershipTransitions,
+                        temporal: temporalRisks,
+                    });
+                    (0, htmlReport_1.generateHtmlReport)(lifetimeResult, options.html, temporalRisks, { evolutionSummary, hotspots: hotspotsForHtml });
                     console.log(chalk_1.default.green(`✔ HTML report written to ${options.html}`));
                     return;
                 }

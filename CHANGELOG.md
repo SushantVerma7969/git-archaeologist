@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.0] - 2026-06-24
+- `git-arch risk --temporal --html` now renders the full temporal picture: a repository evolution summary, an enriched temporal table with concentration delta and trend direction, and a Maintenance Hotspots section matching the terminal ranking
+- All user-derived strings in the temporal and hotspot HTML are escaped, closing the injection gap in the previous temporal table
+- Tooling, config, and generated scopes (.github, .claude, docs, fixtures, flow-typed, vendor, (root), etc.) are now excluded from every risk view — temporal risk, contributor churn, ownership transitions, abandoned scopes, the bus-factor table, and the codebase treemap — via one shared scope filter, so the whole report reports the same set of source scopes
+- Added a note clarifying that a declining lifetime trend does not mean a scope is low-risk today
+- The `analyze` ownership table now surfaces genuine concentration: files need real history (5+ changes) and more than one contributor, are ranked by the dominant contributor's volume rather than raw percent, and exclude non-source paths — so it shows meaningfully owned files with their co-contributors instead of trivial single-touch fixtures
+
 ## [1.25.0] - 2026-06-24
 - Added `git-arch risk --hotspots` — ranks scopes by how many independent maintenance-risk signals fired (bus factor, contributor churn, owner inactivity, rising concentration, ownership transitions)
 - Hotspots are an explainable aggregation of existing signals: each fired signal carries its own evidence string, and ranking is by signal count (tie-broken by concentration), not an opaque weighted score
