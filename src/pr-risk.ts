@@ -6,6 +6,7 @@ import { parseCommits, validateRepo, buildFileStats } from './core/gitParser';
 import { buildAuthorNameMap } from './analyzers/ownershipAnalyzer';
 import { scoreCursedFiles } from './analyzers/curseScorer';
 import { analyzeBusFactor } from './analyzers/busFactorAnalyzer';
+import { scorePrRisk } from './pr-risk-core';
 
 export function registerPrRiskCommand(program: Command): void {
   program
@@ -68,84 +69,10 @@ export function registerPrRiskCommand(program: Command): void {
           const cursedMap = new Map(cursedFiles.map((f) => [f.filepath, f]));
           const busFactor1 = busFactor.filter((b) => b.busFactor === 1);
 
-          // Score each changed file
-          let totalRisk = 0;
-          const riskFactors: string[] = [];
-          const fileRisks: Array<{ file: string; risk: number; reasons: string[] }> = [];
-
-          for (const file of changedFiles) {
-            let fileRisk = 0;
-            const reasons: string[] = [];
-
-            // Curse score contribution
-            const cursed = cursedMap.get(file);
-            if (cursed) {
-              const contribution = Math.min(40, Math.round(cursed.curseScore / 20));
-              fileRisk += contribution;
-              reasons.push(
-                `curse score ${cursed.curseScore.toFixed(0)} (${cursed.uniqueAuthors} authors, ${cursed.totalChanges} changes)`,
-              );
-            }
-
-            // Bus factor 1 contribution
-            for (const bf of busFactor1) {
-              const scope = bf.scope === '(root)' ? '' : bf.scope + '/';
-              if (file.startsWith(scope)) {
-                fileRisk += 25;
-                reasons.push(
-                  `in bus factor 1 module "${bf.scope}" — owned by ${bf.atRiskAuthors[0]}`,
-                );
-                break;
-              }
-            }
-
-            // Blast radius contribution — check coupling
-            const fileCommits = commits.filter((c) => c.filesChanged.includes(file));
-            const coChanges = new Map<string, number>();
-            for (const commit of fileCommits) {
-              for (const f of commit.filesChanged) {
-                if (f === file) continue;
-                coChanges.set(f, (coChanges.get(f) ?? 0) + 1);
-              }
-            }
-            const blastRadius = Array.from(coChanges.values()).filter(
-              (count) =>
-                Math.round((count / Math.max(fileCommits.length, 1)) * 100) >= 20,
-            ).length;
-
-            // Get top coupled files for display
-            const topCoupled = Array.from(coChanges.entries())
-              .map(([f, count]) => ({
-                f,
-                pct: Math.round((count / Math.max(fileCommits.length, 1)) * 100),
-              }))
-              .filter((x) => x.pct >= 20)
-              .sort((a, b) => b.pct - a.pct)
-              .slice(0, 3);
-
-            if (blastRadius > 10) {
-              fileRisk += 20;
-              const coupled = topCoupled.map((x) => `${x.f} (${x.pct}%)`).join(', ');
-              reasons.push(`blast radius ${blastRadius} files — also check: ${coupled}`);
-            } else if (blastRadius > 5) {
-              fileRisk += 10;
-              const coupled = topCoupled.map((x) => `${x.f} (${x.pct}%)`).join(', ');
-              reasons.push(`blast radius ${blastRadius} files — also check: ${coupled}`);
-            } else if (topCoupled.length > 0) {
-              const coupled = topCoupled.map((x) => `${x.f} (${x.pct}%)`).join(', ');
-              reasons.push(`historically changes with: ${coupled}`);
-            }
-
-            if (fileRisk > 0) {
-              totalRisk += fileRisk;
-              fileRisks.push({ file, risk: Math.min(100, fileRisk), reasons });
-            }
-          }
-
-          totalRisk = Math.min(
-            100,
-            Math.round(totalRisk / Math.max(changedFiles.length, 1)),
-          );
+          // Score via the pure core: headline = worst file, not the mean.
+          const report = scorePrRisk({ changedFiles, commits, cursedFiles, busFactor });
+          const totalRisk = report.score;
+          const fileRisks = report.highRiskFiles;
 
           const riskEmoji = totalRisk >= 75 ? '🔴' : totalRisk >= 40 ? '🟡' : '🟢';
           const riskLabel =
@@ -173,7 +100,7 @@ export function registerPrRiskCommand(program: Command): void {
 
           if (fileRisks.length === 0) {
             console.log(
-              chalk.green('  ✓ No high-risk files in this change. Safe to push.\n'),
+              chalk.green('  ✓ No high-risk files detected in this change.\n'),
             );
           } else {
             fileRisks.sort((a, b) => b.risk - a.risk);
@@ -193,9 +120,7 @@ export function registerPrRiskCommand(program: Command): void {
             }
 
             // Safe files
-            const safeFiles = changedFiles.filter(
-              (f) => !fileRisks.find((r) => r.file === f),
-            );
+            const safeFiles = report.safeFiles;
             if (safeFiles.length > 0) {
               console.log(
                 chalk.green(`  ✓ Safe files (${safeFiles.length}): `) +
