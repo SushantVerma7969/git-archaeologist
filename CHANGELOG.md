@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.32.3] - 2026-06-24
+
+### Fixed
+- **Benchmark and build-artifact files no longer leak into the cursed list.** Root-level `bench.ts`/`benchmark.js` (and similar) were caught only when they lived under a `bench/` directory, so a benchmark at the repo root could rank as a top "cursed" file. The display filter now excludes root-level benchmark files. Display-only; curse scores are untouched.
+- **Trivial stubs can no longer dominate the risk headline.** A scope with too little history in *both* dimensions (few touches *and* few files) is now classified LOW rather than MEDIUM, so a 3-file `bin/` launcher touched a handful of times can't headline the risk map over the substantive `src/` code. Same-level scopes are also tie-broken by concentration weighted by evidence volume, not raw concentration alone.
+- **Identity merging now catches name-variant + separator-different emails.** A contributor committing as `Daishi Kato <dai-shi@users.noreply.github.com>` and `daishi <daishi@axlight.com>` was split into two people, *understating* true concentration. A new rule ("2b") merges records whose email local-parts match once separators (`.-_`) are normalized *and* whose display names are compatible (one is the other's first token or a substring). Deliberately narrow: the local-part must match, so two different people sharing a first name are not merged. Every merge is disclosed in the "MERGED IDENTITIES" block and overridable via `.git-arch-identities`.
+- **Co-author identities are canonicalized.** `Co-authored-by:` trailer emails previously bypassed the identity merge, so a co-author could re-appear as a phantom separate contributor in ownership even after their primary identity was merged. Co-author emails are now run through the same canonicalization, and co-author identities are fed into the identity map.
+
+### Added
+- 3 regression tests for the identity rule: the Daishi-style variant merge, a substring-name variant merge, and a CONSERVATIVE guard proving two different people with colliding normalized local-parts but incompatible names do *not* merge.
+
+### Notes
+- These fixes came out of a hostile adversarial test against four real repositories chosen to stress different assumptions: **p-queue** (false-positive on a small single-maintainer lib), **unbuild** (trivial-stub risk + monorepo structure), **jotai** (split-identity under-counting), and **astro** (large-repo behavior). Each flaw above maps to one of those repos. The curse-score model is unchanged; display/classification and identity-resolution only.
+
 ## [1.32.2] - 2026-06-24
 
 ### Fixed
