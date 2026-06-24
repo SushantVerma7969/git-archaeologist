@@ -1,6 +1,6 @@
-const { execSync } = require('child_process');
-const core = require('@actions/core');
-const github = require('@actions/github');
+import { execSync } from 'child_process';
+import * as core from '@actions/core';
+import * as github from '@actions/github';
 
 async function run() {
   try {

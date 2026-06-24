@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.31.3] - 2026-06-24
+- Cleared all dependency vulnerabilities in the GitHub Action by upgrading `@actions/github` and pinning a patched `undici`. The action was rebundled and re-verified end-to-end.
+- Trimmed the published npm package: source maps (`.js.map`, `.d.ts.map`) are no longer shipped, cutting the unpacked size from ~376 KB to ~221 KB. Maps are still produced locally for development.
+- Added CI-status and monthly-downloads badges to the README.
+
+
 ## [1.31.1] - 2026-06-24
 - Fixed the GitHub Action, which could not run. Its manifest pointed at the unbundled `action/index.js`, whose `@actions/*` dependencies are not committed, so a real run failed to resolve them. The action is now bundled into a single self-contained `action/dist/index.js` (via `ncc`) and the manifest points there. Also removed a stray `post:` hook that re-ran the whole action and corrected the output declarations for a JavaScript (node20) action. Verified end-to-end against a real repository.
 
