@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.31.1] - 2026-06-24
+- Fixed the GitHub Action, which could not run. Its manifest pointed at the unbundled `action/index.js`, whose `@actions/*` dependencies are not committed, so a real run failed to resolve them. The action is now bundled into a single self-contained `action/dist/index.js` (via `ncc`) and the manifest points there. Also removed a stray `post:` hook that re-ran the whole action and corrected the output declarations for a JavaScript (node20) action. Verified end-to-end against a real repository.
+
+
 ## [1.31.0] - 2026-06-24
 - Added an MCP (Model Context Protocol) server so AI coding agents can query a repository's git history directly. Run `git-arch mcp` to start it over stdio. It exposes five structured-JSON tools — analyze_repo, who_owns, get_bus_factor, find_coupled_files, and get_risk_hotspots — each defaulting to the working directory. The MCP SDK is loaded lazily, so normal CLI usage is unaffected.
 

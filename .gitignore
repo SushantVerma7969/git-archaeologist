@@ -17,3 +17,8 @@ research/
 
 # OS
 .DS_Store
+
+# The GitHub Action bundle MUST be committed — Actions run the file at `main:`
+# directly with no build step. action/node_modules stays ignored; the bundled
+# action/dist/index.js (produced by `npm run build:action`) is committed.
+!action/dist/

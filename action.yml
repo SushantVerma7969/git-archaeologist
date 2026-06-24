@@ -1,34 +1,34 @@
 name: 'Git Archaeologist'
-description: 'Analyze your repo for cursed files, bus factor, and hidden coupling'
+description: 'Analyze git history for maintenance risk — curse-score hotspots and bus-factor-1 scopes — and comment on pull requests.'
 author: 'Sushant Verma'
+branding:
+  icon: 'git-branch'
+  color: 'orange'
 
 inputs:
   top:
-    description: 'Number of cursed files to show'
+    description: 'How many of the highest-risk ("cursed") files to report.'
     required: false
     default: '10'
   since:
-    description: 'Only analyze commits after this date (e.g. 90d, 1y, 2024-01-01)'
+    description: 'Only analyze commits after this point (e.g. "1y", "90d", "2024-01-01"). Empty means full history.'
     required: false
     default: ''
   fail-on-curse-score:
-    description: 'Fail the action if any file exceeds this curse score'
+    description: 'Fail the job if the top cursed file scores at or above this value. 0 disables the gate.'
     required: false
     default: '0'
   github-token:
-    description: 'GitHub token for posting PR comments (use secrets.GITHUB_TOKEN)'
+    description: 'Token used to post the analysis as a pull-request comment. Usually ${{ secrets.GITHUB_TOKEN }}.'
     required: false
-    default: ''
+    default: ${{ github.token }}
 
 outputs:
   top-cursed-file:
-    description: 'The most cursed file in the repo'
-    value: ${{ steps.analyze.outputs.top-cursed-file }}
+    description: 'Path of the highest-curse-score file found.'
   top-curse-score:
-    description: 'The highest curse score found'
-    value: ${{ steps.analyze.outputs.top-curse-score }}
+    description: 'Curse score of that file.'
 
 runs:
   using: 'node20'
-  main: 'action/index.js'
-  post: 'action/index.js'
+  main: 'action/dist/index.js'
