@@ -11,6 +11,7 @@ import { scoreCursedFiles } from '../analyzers/curseScorer';
 import { analyzeOwnership, buildAuthorNameMap } from '../analyzers/ownershipAnalyzer';
 import { analyzeBusFactor, analyzeCoupling } from '../analyzers/busFactorAnalyzer';
 import { buildLastActiveMap } from '../utils/activity';
+import { buildIdentityMap, loadIdentityOverrides } from '../utils/identity';
 
 export async function analyze(
   repoPath: string,
@@ -33,6 +34,24 @@ export async function analyze(
 
     // Step 2 — parse all commits
     const commits = parseCommits(repoPath, since);
+
+    // Step 2b — canonicalize contributor identities. One person who commits
+    // under several emails (joe@fb.com, joe@meta.com, the GitHub noreply form)
+    // would otherwise read as several contributors, inflating bus factor and
+    // deflating ownership. Rewriting each commit's authorEmail to a canonical
+    // email here means every downstream analyzer gets merged identities with
+    // no analyzer changes. Conservative by default; correctable via a
+    // .git-arch-identities file in the repo root.
+    const overrides = loadIdentityOverrides(repoPath);
+    const identity = buildIdentityMap(
+      commits.map((c) => ({ email: c.authorEmail, name: c.authorName })),
+      overrides
+    );
+    for (const c of commits) {
+      const canonical = identity.emailToCanonical.get(c.authorEmail.trim().toLowerCase());
+      if (canonical) c.authorEmail = canonical;
+    }
+
     if (spinner) {
   spinner.text = 'Building file statistics...';
 }
@@ -95,6 +114,7 @@ export async function analyze(
       coupling,
       fileStats,
       lastActiveByAuthor,
+      identityMerges: identity.merges,
     };
   } catch (err) {
     if (spinner) {

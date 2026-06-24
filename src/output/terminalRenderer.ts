@@ -17,6 +17,7 @@ export function renderReport(result: AnalysisResult): void {
   renderCursedFiles(result);
   renderBusFactor(result);
   renderOwnership(result);
+  renderIdentityMerges(result);
   renderCoupling(result);
   renderFooter();
 }
@@ -176,6 +177,43 @@ function renderCoupling(r: AnalysisResult): void {
   });
 
   console.log(table.toString());
+}
+
+function renderIdentityMerges(r: AnalysisResult): void {
+  const merges = r.identityMerges;
+  if (!merges || merges.length === 0) return;
+
+  const totalCollapsed = merges.reduce((sum, m) => sum + (m.members.length - 1), 0);
+
+  console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
+  console.log(
+    chalk.hex('#A78BFA').bold('  🧬  MERGED IDENTITIES  ') +
+      chalk.grey('— contributors who commit under multiple emails')
+  );
+  console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
+  console.log(
+    chalk.grey(
+      `  Collapsed ${totalCollapsed} duplicate ` +
+        `${totalCollapsed === 1 ? 'identity' : 'identities'} into ` +
+        `${merges.length} ${merges.length === 1 ? 'person' : 'people'}. ` +
+        `Ownership and bus-factor numbers reflect the merged identities.`
+    )
+  );
+  console.log(
+    chalk.grey('  Override with a ') +
+      chalk.white('.git-arch-identities') +
+      chalk.grey(' file if any merge is wrong.\n')
+  );
+
+  for (const m of merges.slice(0, 12)) {
+    console.log('  ' + chalk.white(m.name) + chalk.grey(`  (${m.members.length} emails)`));
+    for (const email of m.members) {
+      console.log(chalk.grey('       ' + email));
+    }
+  }
+  if (merges.length > 12) {
+    console.log(chalk.grey(`\n  …and ${merges.length - 12} more.`));
+  }
 }
 
 function renderFooter(): void {

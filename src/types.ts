@@ -1,4 +1,5 @@
  import type { Recommendation } from './recommendations';
+ import type { IdentityMerge } from './utils/identity';
  export interface CommitRecord {
   hash: string;
   authorEmail: string;
@@ -178,5 +179,6 @@ export interface AnalysisResult {
   coupling: CouplingPair[];
   fileStats: Map<string, FileStats>;
   lastActiveByAuthor: Map<string, number>;
+  identityMerges: IdentityMerge[];
 }
 

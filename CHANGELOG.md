@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.28.0] - 2026-06-24
+- Identity canonicalization: contributors who commit under multiple emails (e.g. joe@fb.com, joe@meta.com, and the GitHub noreply form) are now merged into a single person before any analysis runs, so ownership concentration and bus factor reflect real people rather than duplicate identities. The merge is conservative by default — it only links identities on strong signals (a shared GitHub noreply handle, or a matching display name *and* email local-part) and never on a common name alone. A new MERGED IDENTITIES section shows exactly what was collapsed, and a `.git-arch-identities` file in the repo root can force merges or splits the heuristic gets wrong.
+
 ## [1.27.0] - 2026-06-24
 - The implicit coupling table now surfaces genuine hidden dependencies: it excludes test fixtures, snapshots, and non-source paths (which co-change by design), requires at least 5 co-changes as evidence, and breaks score ties by raw co-change count so high-evidence coupling outranks trivially-perfect low-evidence pairs
 
