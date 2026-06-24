@@ -22,3 +22,10 @@ research/
 # directly with no build step. action/node_modules stays ignored; the bundled
 # action/dist/index.js (produced by `npm run build:action`) is committed.
 !action/dist/
+
+# research/ holds the archived data dump (ignored), but the validation
+# harness and its results are part of the repo
+!research/
+research/*
+!research/validate.mjs
+!research/results.txt
