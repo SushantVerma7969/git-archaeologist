@@ -584,7 +584,7 @@ footer a:hover { color: var(--ink2); }
 <!-- ── NAV ── -->
 <nav>
   <div class="nav-inner">
-    <a class="nav-brand" href="#">
+    <a class="nav-brand" href="#top">
       <span class="pick">⛏</span> git-archaeologist
     </a>
     <ul class="nav-links">
@@ -608,7 +608,7 @@ footer a:hover { color: var(--ink2); }
     <div class="pub-line">
       <span class="redbar"></span>
       <span>State of OSS Maintainability · 2026</span>
-      <span>git-archaeologist v1.9.2</span>
+      <span>git-archaeologist v1.32.2</span>
       <span>June 9, 2026</span>
     </div>
     <h1>More contributors<br>doesn't mean<br><em>safer code</em></h1>
@@ -720,7 +720,7 @@ footer a:hover { color: var(--ink2); }
       <div class="grid-cell">
         <span class="cell-tag red">Finding 02</span>
         <h3>Spring Boot showed the highest BF-1 count in this dataset</h3>
-        <p>25 bus factor 1 modules with only 140 authors. Spring Boot's architecture is highly modular — 22,528 files across dozens of sub-modules, many authored and maintained by a small number of contributors. This number held across three separate analysis runs. <a href="https://github.com/SushantVerma7969/git-archaeologist/blob/main/research/spring-boot.json" target="_blank">Raw data →</a></p>
+        <p>25 bus factor 1 modules with only 140 authors. Spring Boot's architecture is highly modular — 22,528 files across dozens of sub-modules, many authored and maintained by a small number of contributors. This number held across three separate analysis runs. <a href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank">Raw data →</a></p>
       </div>
       <div class="grid-cell">
         <span class="cell-tag green">Finding 03</span>
@@ -802,7 +802,7 @@ footer a:hover { color: var(--ink2); }
       <div class="sec-label red">Cursed Files</div>
       <h2>The files most at risk</h2>
     </div>
-    <p class="narrow">The curse score combines change frequency, recency, author count, age decay, and acceleration. Config, documentation, generated files, and vendored code are excluded — these are real source files. Full formula in the <a href="#methodology">Methodology</a> section.</p>
+    <p class="narrow">The curse score combines change frequency, recency, author count, age decay, and acceleration. Config, documentation, generated files, and vendored code are excluded — these are real source files. The two highest scores in the dataset are shown below with full author and change counts; per-repo top files for all 26 projects are in the <a href="#data">data table</a>. Full formula in the <a href="#methodology">Methodology</a> section.</p>
     <table class="cursed-tbl">
       <thead>
         <tr>
@@ -827,48 +827,6 @@ footer a:hover { color: var(--ink2); }
           <td class="cf-num">434</td>
           <td class="cf-num">1,817</td>
           <td class="cf-score" style="color:var(--red)">107,471</td>
-        </tr>
-        <tr>
-          <td><div class="cf-path">actionpack/lib/action_dispatch/routing/mapper.rb</div></td>
-          <td class="cf-proj">Rails</td>
-          <td class="cf-num">—</td>
-          <td class="cf-num">—</td>
-          <td class="cf-score" style="color:var(--amber)">43,909</td>
-        </tr>
-        <tr>
-          <td><div class="cf-path">src/server.h</div></td>
-          <td class="cf-proj">Redis</td>
-          <td class="cf-num">—</td>
-          <td class="cf-num">—</td>
-          <td class="cf-score" style="color:var(--amber)">10,886</td>
-        </tr>
-        <tr>
-          <td><div class="cf-path">packages/runtime-core/src/renderer.ts</div></td>
-          <td class="cf-proj">Vue Core</td>
-          <td class="cf-num">—</td>
-          <td class="cf-num">—</td>
-          <td class="cf-score" style="color:var(--ink3)">3,784</td>
-        </tr>
-        <tr>
-          <td><div class="cf-path">lib/nest-application.ts</div></td>
-          <td class="cf-proj">NestJS</td>
-          <td class="cf-num">—</td>
-          <td class="cf-num">—</td>
-          <td class="cf-score" style="color:var(--ink3)">3,784</td>
-        </tr>
-        <tr>
-          <td><div class="cf-path">ssa/opGen.go <span class="cf-note">(partially generated)</span></div></td>
-          <td class="cf-proj">Go</td>
-          <td class="cf-num">—</td>
-          <td class="cf-num">—</td>
-          <td class="cf-score" style="color:var(--ink3)">3,545</td>
-        </tr>
-        <tr>
-          <td><div class="cf-path">coordinator/group/GroupMetadataManager.java</div></td>
-          <td class="cf-proj">Kafka</td>
-          <td class="cf-num">—</td>
-          <td class="cf-num">—</td>
-          <td class="cf-score" style="color:var(--ink3)">2,123</td>
         </tr>
       </tbody>
     </table>
@@ -913,7 +871,7 @@ footer a:hover { color: var(--ink2); }
       <div class="sec-label">Methodology</div>
       <h2>How this was measured</h2>
     </div>
-    <p class="narrow">All analysis used <strong>git-archaeologist v1.9.2</strong> (<code>git-arch analyze &lt;repo&gt; --json</code>) against local clones. Commit SHAs at time of analysis are in <code>research/README.md</code>.</p>
+    <p class="narrow">All analysis used <strong>git-archaeologist v1.32.2</strong> (<code>git-arch analyze &lt;repo&gt; --json</code>) against local clones. Commit SHAs at time of analysis are published in the <a href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank" style="color:var(--red)">research/ folder</a>.</p>
 
     <h3>Bus factor definition</h3>
     <p class="narrow">A module is BF-1 when a single contributor accounts for more than 50% of all non-merge commits touching that file. This measures <strong>historical maintenance activity concentration</strong> — not who understands the code, who has reviewed it, or who could maintain it if needed. A stable, rarely-changed module will appear concentrated even if it is widely understood. The metric is objective and reproducible; what it cannot capture is tacit knowledge.</p>
@@ -997,7 +955,7 @@ footer a:hover { color: var(--ink2); }
       <div class="grid-cell">
         <span class="cell-tag">Snapshot in time</span>
         <h3 style="font-size:16px;margin-top:0">Results reflect June 9, 2026</h3>
-        <p>All 26 repos analyzed at specific commit SHAs (see <code>research/README.md</code>). Results will differ after significant contributor activity. Concentration can improve — Vite proves this.</p>
+        <p>All 26 repos analyzed at specific commit SHAs (published in the research/ folder). Results will differ after significant contributor activity. Concentration can improve — Vite proves this.</p>
       </div>
       <div class="grid-cell">
         <span class="cell-tag">Identity</span>
@@ -1034,12 +992,12 @@ footer a:hover { color: var(--ink2); }
     <div class="formula">npm install -g git-archaeologist
 git-arch analyze /path/to/repo --json</div>
 
-    <p class="narrow">Repository commit SHAs are in <code>research/README.md</code>. All 26 JSON files are available individually.</p>
+    <p class="narrow">Repository commit SHAs are published in the research/ folder. All 26 JSON files are available individually.</p>
 
     <div class="btn-row">
       <a class="btn btn-primary" href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank">Browse Raw Data (GitHub)</a>
-      <a class="btn" href="https://github.com/SushantVerma7969/git-archaeologist/blob/main/research/README.md" target="_blank">Commit SHAs</a>
-      <a class="btn" id="dlJson" href="#">Download JSON</a>
+      <a class="btn" href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank">Commit SHAs</a>
+      <a class="btn" id="dlJson" href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank">Per-repo JSON (GitHub)</a>
       <a class="btn" id="dlCsv" href="#">Download CSV</a>
     </div>
 
@@ -1054,7 +1012,7 @@ git-arch analyze /path/to/repo --json</div>
 
 <footer>
   <div class="foot-inner">
-    <p>State of OSS Maintainability 2026 · git-archaeologist v1.9.2 · Analysis date: June 9, 2026</p>
+    <p>State of OSS Maintainability 2026 · git-archaeologist v1.32.2 · Analysis date: June 9, 2026</p>
     <p><a href="https://github.com/SushantVerma7969/git-archaeologist" target="_blank">github.com/SushantVerma7969/git-archaeologist</a></p>
   </div>
 </footer>
@@ -1113,6 +1071,25 @@ const DATA = [
   { name:'elasticsearch',  commits:1232,   files:45636,  authors:166,  bf1:5,  bf2:4,  topFile:'EsqlCapabilities.java',                        score:3716   },
   { name:'docker-compose', commits:1000,   files:740,    authors:112,  bf1:5,  bf2:4,  topFile:'pkg/compose/create.go',                        score:1000   },
 ];
+
+// ── CSV DOWNLOAD (generated from DATA, no dead link) ──
+(function() {
+  const btn = document.getElementById('dlCsv');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const head = ['project','commits','files','authors','bf1','bf2','top_cursed_file','curse_score'];
+    const lines = [head.join(',')].concat(DATA.map(d =>
+      [d.name, d.commits, d.files, d.authors, d.bf1, d.bf2, '"' + d.topFile.replace(/"/g,'""') + '"', d.score].join(',')
+    ));
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'oss-maintainability-2026.csv';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  });
+})();
 
 // ── BAR CHART ──
 (function() {
