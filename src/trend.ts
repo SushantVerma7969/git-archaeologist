@@ -8,7 +8,9 @@ export function registerTrendCommand(program: Command): void {
   program
     .command('trend [repoPath]')
     .alias('t')
-    .description('Show which files are getting more active recently (commit-frequency shift)')
+    .description(
+      'Show which files are getting more active recently (commit-frequency shift)',
+    )
     .option('-n, --top <number>', 'Number of files to show', '10')
     .action(async (repoPath: string | undefined, options: { top: string }) => {
       const resolvedPath = path.resolve(repoPath ?? '.');

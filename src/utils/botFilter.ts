@@ -16,6 +16,7 @@ const BOT_EMAIL_PATTERNS = [
   'github-actions',
   'github-bot', // facebook-github-bot, *-github-bot CI accounts
   'semantic-release-bot',
+  'copilot@users.noreply.github.com', // GitHub Copilot co-author identity
 ];
 
 // Full or partial NAME matches for known automation accounts. These are

@@ -33,9 +33,7 @@ export function buildOwnershipReport(
   const folderAuthors = new Map<string, Map<string, number>>();
 
   for (const [, stats] of result.fileStats) {
-    const folder = stats.filepath.includes('/')
-      ? stats.filepath.split('/')[0]
-      : '(root)';
+    const folder = stats.filepath.includes('/') ? stats.filepath.split('/')[0] : '(root)';
     if (!isSourceScope(folder)) continue;
 
     if (!folderAuthors.has(folder)) {
@@ -50,9 +48,7 @@ export function buildOwnershipReport(
     }
   }
 
-  const busFactorByScope = new Map(
-    result.busFactor.map((b) => [b.scope, b.busFactor]),
-  );
+  const busFactorByScope = new Map(result.busFactor.map((b) => [b.scope, b.busFactor]));
 
   const folders: FolderOwnership[] = [];
   for (const [folder, authors] of folderAuthors) {

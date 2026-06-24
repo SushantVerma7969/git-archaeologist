@@ -1,0 +1,13 @@
+# .git-arch-identities — correct contributor identity merges/splits the
+# heuristic can't safely infer on its own. Copy this to `.git-arch-identities`
+# in your repo root and edit. Lines starting with # are comments.
+#
+# merge: group several emails belonging to ONE person into a single identity.
+#   Use this when one contributor commits under multiple emails the tool can't
+#   link (e.g. a personal address and a work address with different local-parts).
+# merge: alice@personal.com, alice@work.com, 12345+alice@users.noreply.github.com
+#
+# split: force an email to stay SEPARATE from any heuristic merge.
+#   Use this for a shared account (e.g. a release/CI mailbox) that the tool
+#   might otherwise fold into a person.
+# split: ci-shared@example.com

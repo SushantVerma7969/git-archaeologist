@@ -7,7 +7,9 @@ import { analyzeCoupling } from './analyzers/busFactorAnalyzer';
 export function registerBlastCommand(program: Command): void {
   program
     .command('blast <filepath> [repoPath]')
-    .description('Show what historically changed together with this file (co-change, not a guaranteed dependency)')
+    .description(
+      'Show what historically changed together with this file (co-change, not a guaranteed dependency)',
+    )
     .option('-s, --since <date>', 'Limit to commits after this date')
     .action(
       async (

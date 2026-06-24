@@ -99,9 +99,7 @@ export function registerPrRiskCommand(program: Command): void {
           console.log();
 
           if (fileRisks.length === 0) {
-            console.log(
-              chalk.green('  ✓ No high-risk files detected in this change.\n'),
-            );
+            console.log(chalk.green('  ✓ No high-risk files detected in this change.\n'));
           } else {
             fileRisks.sort((a, b) => b.risk - a.risk);
 

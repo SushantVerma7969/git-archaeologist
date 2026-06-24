@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.32.1] - 2026-06-24
+
+### Fixed
+- GitHub Copilot's co-author identity (`copilot@users.noreply.github.com`) is now filtered like a bot, so it is no longer reported as a contributor or owner.
+
+### Added
+- 14 regression tests covering the v1.32.0 fixes: pr-risk worst-file scoring and the new-file blast floor, `cursed --top N` honoring N above 20, ownership bot exclusion and identity merging, display-name resolution, and bus-factor non-substitution.
+- `.git-arch-identities.example` documenting the merge/split override format.
+
 ## [1.32.0] - 2026-06-24
 
 ### Fixed
