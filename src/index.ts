@@ -13,7 +13,6 @@ import { registerOwnershipCommand } from './ownership';
 import { registerPrRiskCommand } from './pr-risk';
 import { registerRiskCommand } from './risk';
 
-
 function parseSince(input: string): string {
   // Accept: 90d, 30days, 6months, 1year, or ISO date like 2024-01-01
   const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
@@ -36,7 +35,7 @@ program
   .name('git-arch')
   .description(
     chalk.hex('#A78BFA')('⛏  Git Archaeologist') +
-    ' — uncover history, ownership & tech debt in any git repo'
+      ' — uncover history, ownership & tech debt in any git repo',
   )
   .version(packageJson.version);
 
@@ -46,44 +45,52 @@ program
   .description('Analyze a git repository and print the full report')
   .option('-j, --json', 'Output raw JSON instead of the terminal report')
   .option('-H, --html [outputFile]', 'Generate an HTML report file')
-  .option('-s, --since <date>', 'Only analyze commits after this date (e.g. 90d, 2024-01-01, 6months)')
-  .action(async (repoPath: string | undefined, options: { json?: boolean; html?: boolean | string; since?: string }) => {
-    const resolvedPath = path.resolve(repoPath ?? '.');
-    const since = options.since ? parseSince(options.since) : undefined;
-    try {
-      const result = await analyze(resolvedPath, since);
+  .option(
+    '-s, --since <date>',
+    'Only analyze commits after this date (e.g. 90d, 2024-01-01, 6months)',
+  )
+  .action(
+    async (
+      repoPath: string | undefined,
+      options: { json?: boolean; html?: boolean | string; since?: string },
+    ) => {
+      const resolvedPath = path.resolve(repoPath ?? '.');
+      const since = options.since ? parseSince(options.since) : undefined;
+      try {
+        const result = await analyze(resolvedPath, since);
 
-      if (options.json) {
-        const serializable = {
-          ...result,
-          fileStats: Object.fromEntries(
-            Array.from(result.fileStats.entries()).map(([k, v]) => [
-              k,
-              {
-                ...v,
-                uniqueAuthors: Array.from(v.uniqueAuthors),
-                authorChanges: Object.fromEntries(v.authorChanges),
-              },
-            ])
-          ),
-        };
-        console.log(JSON.stringify(serializable, null, 2));
-      } else if (options.html !== undefined) {
-        const defaultName = `git-arch-report-${result.repoName}.html`;
-        const outFile = typeof options.html === 'string' ? options.html : defaultName;
-        const outPath = path.resolve(outFile);
-        generateHtmlReport(result, outPath);
-        renderReport(result);
-        console.log(chalk.hex('#A78BFA')(`\n  📄 HTML report saved → ${outPath}\n`));
-      } else {
-        renderReport(result);
+        if (options.json) {
+          const serializable = {
+            ...result,
+            fileStats: Object.fromEntries(
+              Array.from(result.fileStats.entries()).map(([k, v]) => [
+                k,
+                {
+                  ...v,
+                  uniqueAuthors: Array.from(v.uniqueAuthors),
+                  authorChanges: Object.fromEntries(v.authorChanges),
+                },
+              ]),
+            ),
+          };
+          console.log(JSON.stringify(serializable, null, 2));
+        } else if (options.html !== undefined) {
+          const defaultName = `git-arch-report-${result.repoName}.html`;
+          const outFile = typeof options.html === 'string' ? options.html : defaultName;
+          const outPath = path.resolve(outFile);
+          generateHtmlReport(result, outPath);
+          renderReport(result);
+          console.log(chalk.hex('#A78BFA')(`\n  📄 HTML report saved → ${outPath}\n`));
+        } else {
+          renderReport(result);
+        }
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(chalk.red('\n  ✖  Error: ') + message);
+        process.exit(1);
       }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error(chalk.red('\n  ✖  Error: ') + message);
-      process.exit(1);
-    }
-  });
+    },
+  );
 
 program
   .command('cursed [repoPath]')
@@ -91,33 +98,34 @@ program
   .description('Show only the cursed files ranking')
   .option('-n, --top <number>', 'How many files to show', '10')
   .option('-s, --since <date>', 'Only analyze commits after this date')
-  .action(async (repoPath: string | undefined, options: { top: string; since?: string }) => {
-    const resolvedPath = path.resolve(repoPath ?? '.');
-    const since = options.since ? parseSince(options.since) : undefined;
-    try {
-      const result = await analyze(resolvedPath, since);
-      const topN = parseInt(options.top, 10);
-      result.cursedFiles = result.cursedFiles.slice(0, topN);
-      renderReport({ ...result, busFactor: [], ownership: [], coupling: [] });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error(chalk.red('\n  ✖  Error: ') + message);
-      process.exit(1);
-    }
-  });
+  .action(
+    async (repoPath: string | undefined, options: { top: string; since?: string }) => {
+      const resolvedPath = path.resolve(repoPath ?? '.');
+      const since = options.since ? parseSince(options.since) : undefined;
+      try {
+        const result = await analyze(resolvedPath, since);
+        const topN = parseInt(options.top, 10);
+        result.cursedFiles = result.cursedFiles.slice(0, topN);
+        renderReport({ ...result, busFactor: [], ownership: [], coupling: [] });
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(chalk.red('\n  ✖  Error: ') + message);
+        process.exit(1);
+      }
+    },
+  );
 
-program
-  .action(async () => {
-    const resolvedPath = path.resolve('.');
-    try {
-      const result = await analyze(resolvedPath, undefined);
-      renderReport(result);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error(chalk.red('\n  ✖  Error: ') + message);
-      process.exit(1);
-    }
-  });
+program.action(async () => {
+  const resolvedPath = path.resolve('.');
+  try {
+    const result = await analyze(resolvedPath, undefined);
+    renderReport(result);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(chalk.red('\n  ✖  Error: ') + message);
+    process.exit(1);
+  }
+});
 
 registerBlameCommand(program);
 registerTrendCommand(program);

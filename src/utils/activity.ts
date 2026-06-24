@@ -18,7 +18,10 @@ export function buildLastActiveMap(commits: CommitRecord[]): Map<string, number>
 /**
  * Format a unix timestamp as a human-readable "X ago" string.
  */
-export function formatTimeAgo(timestamp: number, now: number = Date.now() / 1000): string {
+export function formatTimeAgo(
+  timestamp: number,
+  now: number = Date.now() / 1000,
+): string {
   const diffSeconds = now - timestamp;
   const days = Math.floor(diffSeconds / 86400);
 

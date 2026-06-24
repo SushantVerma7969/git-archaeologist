@@ -34,11 +34,20 @@ function buildRepo(commitsByAuthor) {
       const file = path.join(dir, 'src', 'main.js');
       fs.writeFileSync(file, `// edit ${n} by ${name}\n`);
       git(dir, ['add', '-A']);
-      execFileSync('git', [
-        '-c', `user.name=${name}`,
-        '-c', `user.email=${email}`,
-        'commit', '-q', '-m', `change ${n}`,
-      ], { cwd: dir, stdio: 'pipe' });
+      execFileSync(
+        'git',
+        [
+          '-c',
+          `user.name=${name}`,
+          '-c',
+          `user.email=${email}`,
+          'commit',
+          '-q',
+          '-m',
+          `change ${n}`,
+        ],
+        { cwd: dir, stdio: 'pipe' },
+      );
       n++;
     }
   }
@@ -65,7 +74,11 @@ test('a genuine bot is excluded from ownership', async () => {
   const repo = buildRepo([
     { name: 'Real Dev', email: 'dev@example.com', commits: 6 },
     { name: 'Second Dev', email: 'second@example.com', commits: 4 },
-    { name: 'dependabot[bot]', email: 'dependabot[bot]@users.noreply.github.com', commits: 9 },
+    {
+      name: 'dependabot[bot]',
+      email: 'dependabot[bot]@users.noreply.github.com',
+      commits: 9,
+    },
   ]);
   try {
     const result = await analyze(repo, undefined, true);
@@ -75,7 +88,7 @@ test('a genuine bot is excluded from ownership', async () => {
     assert.ok(contributorNames.includes('Real Dev'), 'real contributor missing');
     assert.ok(
       !contributorNames.includes('dependabot[bot]'),
-      'bot leaked into ownership contributors'
+      'bot leaked into ownership contributors',
     );
   } finally {
     fs.rmSync(repo, { recursive: true, force: true });
@@ -87,7 +100,11 @@ test('noreply contributor counts toward bus factor, bot does not', async () => {
   // inflate the contributor set; bus factor should reflect the human only.
   const repo = buildRepo([
     { name: 'Solo Human', email: 'solo@users.noreply.github.com', commits: 10 },
-    { name: 'renovate[bot]', email: 'renovate[bot]@users.noreply.github.com', commits: 10 },
+    {
+      name: 'renovate[bot]',
+      email: 'renovate[bot]@users.noreply.github.com',
+      commits: 10,
+    },
   ]);
   try {
     const result = await analyze(repo, undefined, true);

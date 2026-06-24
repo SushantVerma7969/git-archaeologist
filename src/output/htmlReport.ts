@@ -3,7 +3,12 @@ import { AnalysisResult } from '../types';
 import { isSourceScope } from '../utils/scopeFilter';
 
 function esc(s: string): string {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function col(score: number, max: number): string {
@@ -15,7 +20,16 @@ function col(score: number, max: number): string {
   return '#3b82f6';
 }
 
-interface TreeNode { name: string; filepath?: string; value?: number; score?: number; changes?: number; authors?: number; lastTouched?: string; children?: TreeNode[]; }
+interface TreeNode {
+  name: string;
+  filepath?: string;
+  value?: number;
+  score?: number;
+  changes?: number;
+  authors?: number;
+  lastTouched?: string;
+  children?: TreeNode[];
+}
 
 function buildTree(result: AnalysisResult): TreeNode {
   const sm = new Map<string, number>();
@@ -27,56 +41,85 @@ function buildTree(result: AnalysisResult): TreeNode {
     const score = sm.get(fp) ?? 0;
     const last = new Date(stats.lastChanged * 1000).toISOString().split('T')[0];
     if (!fm.has(folder)) fm.set(folder, []);
-    fm.get(folder)!.push({ name: parts[parts.length-1], filepath: fp, value: Math.max(stats.totalChanges, 1), score, changes: stats.totalChanges, authors: stats.uniqueAuthors.size, lastTouched: last });
+    fm.get(folder)!.push({
+      name: parts[parts.length - 1],
+      filepath: fp,
+      value: Math.max(stats.totalChanges, 1),
+      score,
+      changes: stats.totalChanges,
+      authors: stats.uniqueAuthors.size,
+      lastTouched: last,
+    });
   }
-  return { name: result.repoName, children: Array.from(fm.entries()).filter(([f]) => isSourceScope(f)).map(([f, files]) => ({ name: f, children: files })) };
+  return {
+    name: result.repoName,
+    children: Array.from(fm.entries())
+      .filter(([f]) => isSourceScope(f))
+      .map(([f, files]) => ({ name: f, children: files })),
+  };
 }
 
 export function generateHtmlReport(
   result: AnalysisResult,
   outputPath: string,
   temporalRisks?: any[],
-  extras?: { evolutionSummary?: any; hotspots?: any[] }
+  extras?: { evolutionSummary?: any; hotspots?: any[] },
 ): void {
   const from = result.dateRange.from.toISOString().split('T')[0];
-  const to   = result.dateRange.to.toISOString().split('T')[0];
-  const maxS = Math.max(1, ...result.cursedFiles.map(f => f.curseScore));
+  const to = result.dateRange.to.toISOString().split('T')[0];
+  const maxS = Math.max(1, ...result.cursedFiles.map((f) => f.curseScore));
   const treeJSON = JSON.stringify(buildTree(result));
 
-  const cursedRows = result.cursedFiles.slice(0, 20).map((f, i) => {
-    const c = col(f.curseScore, maxS);
-    const stats = result.fileStats.get(f.filepath);
-    const last = stats ? new Date(stats.lastChanged * 1000).toISOString().split('T')[0] : '—';
-    return `<tr onclick="hl('${esc(f.filepath)}')" style="cursor:pointer">
-      <td style="color:#64748b;width:32px">${i+1}</td>
+  const cursedRows = result.cursedFiles
+    .slice(0, 20)
+    .map((f, i) => {
+      const c = col(f.curseScore, maxS);
+      const stats = result.fileStats.get(f.filepath);
+      const last = stats
+        ? new Date(stats.lastChanged * 1000).toISOString().split('T')[0]
+        : '—';
+      return `<tr onclick="hl('${esc(f.filepath)}')" style="cursor:pointer">
+      <td style="color:#64748b;width:32px">${i + 1}</td>
       <td style="font-family:monospace;font-size:12px">${esc(f.filepath)}</td>
       <td><span style="background:${c};color:#000;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700">${f.curseScore.toFixed(0)}</span></td>
       <td style="color:#94a3b8">${f.totalChanges}</td>
       <td style="color:#94a3b8">${f.uniqueAuthors}</td>
       <td style="color:#64748b;font-size:12px">${last}</td>
     </tr>`;
-  }).join('');
+    })
+    .join('');
 
-  const busRows = result.busFactor.map(b => {
-    const bc = b.busFactor===1?'#ef4444':b.busFactor===2?'#f97316':'#22c55e';
-    const icon = b.busFactor===1?'⚠':b.busFactor===2?'⚡':'✓';
-    return `<tr>
+  const busRows = result.busFactor
+    .map((b) => {
+      const bc =
+        b.busFactor === 1 ? '#ef4444' : b.busFactor === 2 ? '#f97316' : '#22c55e';
+      const icon = b.busFactor === 1 ? '⚠' : b.busFactor === 2 ? '⚡' : '✓';
+      return `<tr>
       <td style="font-family:monospace;font-size:12px">${esc(b.scope)}</td>
       <td><span style="background:${bc};color:#000;padding:2px 10px;border-radius:20px;font-weight:700">${icon} ${b.busFactor}</span></td>
       <td style="color:#94a3b8">${b.filesAtRisk}</td>
-      <td style="color:#94a3b8;font-size:12px">${esc(b.atRiskAuthors.slice(0,2).join(', '))}</td>
+      <td style="color:#94a3b8;font-size:12px">${esc(b.atRiskAuthors.slice(0, 2).join(', '))}</td>
     </tr>`;
-  }).join('');
+    })
+    .join('');
 
-  const couplingRows = result.coupling.slice(0, 15).map(c2 => {
-    const cc = c2.couplingScore>=80?'#ef4444':c2.couplingScore>=50?'#f97316':'#eab308';
-    return `<tr>
+  const couplingRows = result.coupling
+    .slice(0, 15)
+    .map((c2) => {
+      const cc =
+        c2.couplingScore >= 80
+          ? '#ef4444'
+          : c2.couplingScore >= 50
+            ? '#f97316'
+            : '#eab308';
+      return `<tr>
       <td style="font-family:monospace;font-size:11px">${esc(c2.fileA)}</td>
       <td style="color:#475569;text-align:center;padding:0 8px">↔</td>
       <td style="font-family:monospace;font-size:11px">${esc(c2.fileB)}</td>
       <td><span style="background:${cc};color:#000;padding:2px 10px;border-radius:20px;font-weight:600">${c2.couplingScore}%</span></td>
     </tr>`;
-  }).join('');
+    })
+    .join('');
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -215,7 +258,9 @@ window.hl=function(fp){
 
 };
 <\/script>
-${temporalRisks && temporalRisks.length > 0 ? `
+${
+  temporalRisks && temporalRisks.length > 0
+    ? `
 <h2>Temporal Risk Analysis</h2>
 <p style="color:#64748b;font-size:12px;line-height:1.6;max-width:760px">
   Trend describes how concentration has moved over the repository's lifetime. A
@@ -223,7 +268,9 @@ ${temporalRisks && temporalRisks.length > 0 ? `
   not mean the scope is low-risk today. A scope can be spreading out over its history and
   still be a current hotspot below if its present bus factor, churn, or owner activity warrant it.
 </p>
-${extras && extras.evolutionSummary ? `
+${
+  extras && extras.evolutionSummary
+    ? `
 <p style="color:#94a3b8;font-size:13px;line-height:1.7">
   ${extras.evolutionSummary.ownershipTransitions} ownership transitions detected ·
   ${extras.evolutionSummary.highSeverityTransitions} high-severity ·
@@ -231,7 +278,9 @@ ${extras && extras.evolutionSummary ? `
   ${extras.evolutionSummary.historicalConcentration} less concentrated ·
   ${extras.evolutionSummary.distributedScopes} stayed distributed
 </p>
-` : ''}
+`
+    : ''
+}
 <table>
   <thead>
     <tr>
@@ -244,7 +293,9 @@ ${extras && extras.evolutionSummary ? `
     </tr>
   </thead>
   <tbody>
-    ${temporalRisks.map(r => `
+    ${temporalRisks
+      .map(
+        (r) => `
       <tr>
         <td style="font-family:monospace;font-size:12px">${esc(String(r.scope))}</td>
         <td>${esc(String(r.category))}</td>
@@ -261,15 +312,23 @@ ${extras && extras.evolutionSummary ? `
         }</td>
         <td style="color:#64748b">${esc(String(r.trend))}</td>
       </tr>
-    `).join('')}
+    `,
+      )
+      .join('')}
   </tbody>
 </table>
 <p style="color:#64748b;font-size:11px">These signals do not prove ownership, expertise, or maintainership.</p>
-` : ''}
-${extras && extras.hotspots && extras.hotspots.length > 0 ? `
+`
+    : ''
+}
+${
+  extras && extras.hotspots && extras.hotspots.length > 0
+    ? `
 <h2>Maintenance Hotspots</h2>
 <p style="color:#94a3b8;font-size:13px">Scopes ranked by how many independent maintenance-risk signals fired.</p>
-${extras.hotspots.map((h: any) => `
+${extras.hotspots
+  .map(
+    (h: any) => `
 <div style="border:1px solid #1e293b;border-radius:8px;padding:14px 16px;margin:10px 0">
   <div style="font-weight:700;color:#f1f5f9">
     <span style="color:#ef4444">${h.signalsFired} signals</span>
@@ -279,9 +338,13 @@ ${extras.hotspots.map((h: any) => `
     ${h.signals.map((s: any) => `<li>${esc(String(s.reason))}</li>`).join('')}
   </ul>
 </div>
-`).join('')}
+`,
+  )
+  .join('')}
 <p style="color:#64748b;font-size:11px">Each signal reuses analysis already shown by other risk views. These signals do not prove ownership, expertise, or maintainership.</p>
-` : ''}
+`
+    : ''
+}
 </body>
 </html>`;
 

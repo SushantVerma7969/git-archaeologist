@@ -1,12 +1,19 @@
+# Dependencies
 node_modules/
+action/node_modules/
+
+# Build output — built fresh on publish (prepublishOnly) and in CI, never committed
+dist/
+
+# Source maps
 *.js.map
 *.d.ts.map
-.DS_Store
+
+# Generated reports
 git-arch-report-*.html
 
-research/kubernetes.json
-research/vscode.json
-research/elasticsearch.json
-research/recency-study/runs/
+# Research data — archived outside the repo, not tracked
 research/
-action/node_modules/
+
+# OS
+.DS_Store

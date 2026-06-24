@@ -22,7 +22,10 @@ test('genuinely coupled source files surface', () => {
 
 test('test fixtures and snapshots are excluded even under source folders', () => {
   const cases = [
-    ['compiler/__tests__/fixtures/x.expect.md', 'compiler/__tests__/fixtures/y.expect.md'],
+    [
+      'compiler/__tests__/fixtures/x.expect.md',
+      'compiler/__tests__/fixtures/y.expect.md',
+    ],
     ['src/__snapshots__/a.snap', 'src/__snapshots__/b.snap'],
     ['src/a.test.ts', 'src/b.test.ts'],
     ['packages/fixtures/a.js', 'packages/fixtures/b.js'],
@@ -40,7 +43,7 @@ test('non-source scopes are excluded from coupling', () => {
 test('higher co-change count breaks ties at equal score', () => {
   const commits = [
     ...coupledCommits(['src/a.ts', 'src/b.ts'], 30), // 30/30 = 100%
-    ...coupledCommits(['src/c.ts', 'src/d.ts'], 6),  // 6/6 = 100%
+    ...coupledCommits(['src/c.ts', 'src/d.ts'], 6), // 6/6 = 100%
   ];
   const result = analyzeCoupling(commits);
   // Both 100%, but the 30-co-change pair ranks first.

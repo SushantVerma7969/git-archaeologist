@@ -24,12 +24,11 @@ export function registerTrendCommand(program: Command): void {
         }
 
         // Period A: 180 to 90 days ago (older)
-        const olderCommits = parseCommits(resolvedPath, dateStr(180))
-          .filter(c => {
-            const cutoff = new Date();
-            cutoff.setDate(cutoff.getDate() - 90);
-            return c.timestamp < cutoff.getTime() / 1000;
-          });
+        const olderCommits = parseCommits(resolvedPath, dateStr(180)).filter((c) => {
+          const cutoff = new Date();
+          cutoff.setDate(cutoff.getDate() - 90);
+          return c.timestamp < cutoff.getTime() / 1000;
+        });
 
         // Period B: last 90 days (recent)
         const recentCommits = parseCommits(resolvedPath, dateStr(90));
@@ -56,7 +55,12 @@ export function registerTrendCommand(program: Command): void {
 
         // Find files with increasing activity
         const allFiles = new Set([...olderCount.keys(), ...recentCount.keys()]);
-        const trends: Array<{ file: string; older: number; recent: number; delta: number }> = [];
+        const trends: Array<{
+          file: string;
+          older: number;
+          recent: number;
+          delta: number;
+        }> = [];
 
         for (const file of allFiles) {
           const older = olderCount.get(file) ?? 0;
@@ -69,35 +73,65 @@ export function registerTrendCommand(program: Command): void {
         const better = trends.sort((a, b) => a.delta - b.delta).slice(0, 5);
 
         console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
-        console.log(' ' + chalk.bold.white('⛏  git-arch trend') + chalk.grey(' — activity shift: 90d ago vs last 90d'));
+        console.log(
+          ' ' +
+            chalk.bold.white('⛏  git-arch trend') +
+            chalk.grey(' — activity shift: 90d ago vs last 90d'),
+        );
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
-        console.log(chalk.grey('  Older period commits: ' + olderCommits.length + '  |  Recent commits: ' + recentCommits.length));
+        console.log(
+          chalk.grey(
+            '  Older period commits: ' +
+              olderCommits.length +
+              '  |  Recent commits: ' +
+              recentCommits.length,
+          ),
+        );
 
-        if (worse.filter(t => t.delta > 0).length === 0) {
-          console.log(chalk.green('\n  ✓ No files significantly more active recently.\n'));
+        if (worse.filter((t) => t.delta > 0).length === 0) {
+          console.log(
+            chalk.green('\n  ✓ No files significantly more active recently.\n'),
+          );
         } else {
-          console.log('\n' + chalk.red.bold('  ⬆ More active recently (potential risk increase):'));
-          for (const t of worse.filter(t => t.delta > 0)) {
+          console.log(
+            '\n' + chalk.red.bold('  ⬆ More active recently (potential risk increase):'),
+          );
+          for (const t of worse.filter((t) => t.delta > 0)) {
             const file = t.file.length > 50 ? '...' + t.file.slice(-47) : t.file;
             const delta = chalk.red.bold('+' + t.delta);
             const detail = chalk.grey(`(${t.older} → ${t.recent} changes)`);
-            console.log('  ' + chalk.red('↑') + ' ' + chalk.white(file.padEnd(52)) + delta + ' ' + detail);
+            console.log(
+              '  ' +
+                chalk.red('↑') +
+                ' ' +
+                chalk.white(file.padEnd(52)) +
+                delta +
+                ' ' +
+                detail,
+            );
           }
         }
 
-        const gettingBetter = better.filter(t => t.delta < 0).slice(0, 5);
+        const gettingBetter = better.filter((t) => t.delta < 0).slice(0, 5);
         if (gettingBetter.length > 0) {
           console.log('\n' + chalk.green.bold('  ⬇ Less active recently (stabilizing):'));
           for (const t of gettingBetter) {
             const file = t.file.length > 50 ? '...' + t.file.slice(-47) : t.file;
             const delta = chalk.green.bold(String(t.delta));
             const detail = chalk.grey(`(${t.older} → ${t.recent} changes)`);
-            console.log('  ' + chalk.green('↓') + ' ' + chalk.white(file.padEnd(52)) + delta + ' ' + detail);
+            console.log(
+              '  ' +
+                chalk.green('↓') +
+                ' ' +
+                chalk.white(file.padEnd(52)) +
+                delta +
+                ' ' +
+                detail,
+            );
           }
         }
 
         console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
-
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(chalk.red('\n  ✖  Error: ') + message);

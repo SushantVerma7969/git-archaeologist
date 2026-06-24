@@ -50,18 +50,25 @@ export function registerOwnershipCommand(program: Command): void {
 
         // Overall ownership
         const overall = Array.from(authorTotalCommits.entries())
-          .map(([name, count]) => ({ name, count, pct: Math.round((count / totalCommits) * 100) }))
+          .map(([name, count]) => ({
+            name,
+            count,
+            pct: Math.round((count / totalCommits) * 100),
+          }))
           .sort((a, b) => b.pct - a.pct);
 
         // Count files each author primarily owns (most commits on that file)
         const fileOwners = new Map<string, string>();
-        const allFiles = new Set(commits.flatMap(c => c.filesChanged));
+        const allFiles = new Set(commits.flatMap((c) => c.filesChanged));
         for (const file of allFiles) {
           let maxCount = 0;
           let owner = 'nobody';
           for (const [author, fileMap] of authorFileCount) {
             const count = fileMap.get(file) ?? 0;
-            if (count > maxCount) { maxCount = count; owner = author; }
+            if (count > maxCount) {
+              maxCount = count;
+              owner = author;
+            }
           }
           fileOwners.set(file, owner);
         }
@@ -74,21 +81,32 @@ export function registerOwnershipCommand(program: Command): void {
         // Nobody owns = files where top author has <= 30% of commits on that file
         let nobodyCount = 0;
         for (const file of allFiles) {
-          const fileCounts = Array.from(authorFileCount.values())
-            .map(fm => fm.get(file) ?? 0);
+          const fileCounts = Array.from(authorFileCount.values()).map(
+            (fm) => fm.get(file) ?? 0,
+          );
           const total = fileCounts.reduce((a, b) => a + b, 0);
           const max = Math.max(...fileCounts);
           if (total > 0 && max / total <= 0.3) nobodyCount++;
         }
 
         console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
-        console.log(` ${chalk.bold.white('⛏  git-arch ownership')} — ${chalk.grey(resolvedPath.split('/').pop())}`);
+        console.log(
+          ` ${chalk.bold.white('⛏  git-arch ownership')} — ${chalk.grey(resolvedPath.split('/').pop())}`,
+        );
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
         console.log();
-        console.log(`  ${chalk.hex('#A78BFA')('Total commits')}   ${chalk.yellow.bold(String(totalCommits))}`);
-        console.log(`  ${chalk.hex('#A78BFA')('Contributors')}    ${chalk.yellow.bold(String(overall.length))}`);
-        console.log(`  ${chalk.hex('#A78BFA')('Total files')}     ${chalk.yellow.bold(String(allFiles.size))}`);
-        console.log(`  ${chalk.hex('#A78BFA')('Unowned files')}   ${chalk.red.bold(String(nobodyCount))} ${chalk.grey('(no single author > 30% of commits)')}`);
+        console.log(
+          `  ${chalk.hex('#A78BFA')('Total commits')}   ${chalk.yellow.bold(String(totalCommits))}`,
+        );
+        console.log(
+          `  ${chalk.hex('#A78BFA')('Contributors')}    ${chalk.yellow.bold(String(overall.length))}`,
+        );
+        console.log(
+          `  ${chalk.hex('#A78BFA')('Total files')}     ${chalk.yellow.bold(String(allFiles.size))}`,
+        );
+        console.log(
+          `  ${chalk.hex('#A78BFA')('Unowned files')}   ${chalk.red.bold(String(nobodyCount))} ${chalk.grey('(no single author > 30% of commits)')}`,
+        );
         console.log();
 
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
@@ -98,9 +116,18 @@ export function registerOwnershipCommand(program: Command): void {
 
         for (const { name, count, pct } of overall.slice(0, 15)) {
           const bar = '█'.repeat(Math.round(pct / 2)).padEnd(35);
-          const pctColor = pct >= 40 ? chalk.red : pct >= 20 ? chalk.yellow : pct >= 10 ? chalk.white : chalk.grey;
+          const pctColor =
+            pct >= 40
+              ? chalk.red
+              : pct >= 20
+                ? chalk.yellow
+                : pct >= 10
+                  ? chalk.white
+                  : chalk.grey;
           const owned = ownedFiles.get(name) ?? 0;
-          console.log(`  ${pctColor(bar)} ${pctColor.bold((pct + '%').padStart(4))}  ${chalk.white(name.padEnd(28))} ${chalk.grey(count + ' commits · ' + owned + ' files primarily owned')}`);
+          console.log(
+            `  ${pctColor(bar)} ${pctColor.bold((pct + '%').padStart(4))}  ${chalk.white(name.padEnd(28))} ${chalk.grey(count + ' commits · ' + owned + ' files primarily owned')}`,
+          );
         }
 
         if (overall.length > 15) {
@@ -125,20 +152,28 @@ export function registerOwnershipCommand(program: Command): void {
 
         for (const [folder, fm] of folders) {
           const total = Array.from(fm.values()).reduce((a, b) => a + b, 0);
-          const top = Array.from(fm.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
+          const top = Array.from(fm.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3);
           const topOwner = top[0];
           const ownerPct = Math.round((topOwner[1] / total) * 100);
-          const bf = top.length === 1 || (top[0][1] / total) > 0.7 ? chalk.red(' ⚠ bus factor 1') : '';
-          console.log(`  ${chalk.cyan(folder.padEnd(25))} ${chalk.white(topOwner[0].padEnd(25))} ${chalk.yellow(ownerPct + '%')}${bf}`);
+          const bf =
+            top.length === 1 || top[0][1] / total > 0.7
+              ? chalk.red(' ⚠ bus factor 1')
+              : '';
+          console.log(
+            `  ${chalk.cyan(folder.padEnd(25))} ${chalk.white(topOwner[0].padEnd(25))} ${chalk.yellow(ownerPct + '%')}${bf}`,
+          );
           for (const [name, count] of top.slice(1)) {
             const pct2 = Math.round((count / total) * 100);
-            console.log(`  ${' '.repeat(25)} ${chalk.grey(name.padEnd(25))} ${chalk.grey(pct2 + '%')}`);
+            console.log(
+              `  ${' '.repeat(25)} ${chalk.grey(name.padEnd(25))} ${chalk.grey(pct2 + '%')}`,
+            );
           }
           console.log();
         }
 
         console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
-
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
         console.error(chalk.red('\n  ✖  Error: ') + message);

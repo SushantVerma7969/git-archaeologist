@@ -10,14 +10,12 @@ const MIN_CHANGES_FOR_OWNERSHIP = 5;
 
 export function analyzeOwnership(
   fileStatsMap: Map<string, FileStats>,
-  authorNameMap: Map<string, string>
+  authorNameMap: Map<string, string>,
 ): FileOwnership[] {
   const results: FileOwnership[] = [];
   for (const [, stats] of fileStatsMap) {
     if (stats.totalChanges < MIN_CHANGES_FOR_OWNERSHIP) continue;
-    const scope = stats.filepath.includes('/')
-      ? stats.filepath.split('/')[0]
-      : '(root)';
+    const scope = stats.filepath.includes('/') ? stats.filepath.split('/')[0] : '(root)';
     if (!isSourceScope(scope)) continue;
     const contributors = Array.from(stats.authorChanges.entries())
       .map(([email, changes]) => ({
@@ -43,14 +41,11 @@ export function analyzeOwnership(
   // Rank by the dominant contributor's raw volume of changes, so a heavily
   // edited file with one clear owner outranks a lightly edited one that is
   // technically more concentrated.
-  return results.sort(
-    (a, b) =>
-      b.contributors[0].changes - a.contributors[0].changes
-  );
+  return results.sort((a, b) => b.contributors[0].changes - a.contributors[0].changes);
 }
 
 export function buildAuthorNameMap(
-  commits: Array<{ authorEmail: string; authorName: string }>
+  commits: Array<{ authorEmail: string; authorName: string }>,
 ): Map<string, string> {
   const map = new Map<string, string>();
   for (const c of commits) {

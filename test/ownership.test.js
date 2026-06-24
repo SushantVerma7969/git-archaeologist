@@ -4,19 +4,24 @@ const test = require('node:test');
 const { analyzeOwnership } = require('../dist/analyzers/ownershipAnalyzer');
 
 function fileStats(filepath, authors) {
-  return [filepath, {
+  return [
     filepath,
-    totalChanges: Object.values(authors).reduce((a, b) => a + b, 0),
-    uniqueAuthors: new Set(Object.keys(authors)),
-    authorChanges: new Map(Object.entries(authors)),
-    authorChangesByYear: new Map(),
-    firstChanged: 1,
-    lastChanged: 2,
-    changeTimeline: [],
-  }];
+    {
+      filepath,
+      totalChanges: Object.values(authors).reduce((a, b) => a + b, 0),
+      uniqueAuthors: new Set(Object.keys(authors)),
+      authorChanges: new Map(Object.entries(authors)),
+      authorChangesByYear: new Map(),
+      firstChanged: 1,
+      lastChanged: 2,
+      changeTimeline: [],
+    },
+  ];
 }
 const names = new Map([
-  ['a@x.com', 'A'], ['b@x.com', 'B'], ['c@x.com', 'C'],
+  ['a@x.com', 'A'],
+  ['b@x.com', 'B'],
+  ['c@x.com', 'C'],
 ]);
 
 test('single-author files are excluded (no concentration signal)', () => {
@@ -39,8 +44,8 @@ test('non-source files are excluded from ownership', () => {
 
 test('contested, substantive source files surface, ranked by dominant volume', () => {
   const map = new Map([
-    fileStats('src/big.ts', { 'a@x.com': 80, 'b@x.com': 20 }),   // owner volume 80
-    fileStats('src/small.ts', { 'b@x.com': 9, 'a@x.com': 1 }),   // owner volume 9, 90%
+    fileStats('src/big.ts', { 'a@x.com': 80, 'b@x.com': 20 }), // owner volume 80
+    fileStats('src/small.ts', { 'b@x.com': 9, 'a@x.com': 1 }), // owner volume 9, 90%
   ]);
   const result = analyzeOwnership(map, names);
   assert.equal(result.length, 2);

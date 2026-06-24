@@ -1,6 +1,6 @@
- import type { Recommendation } from './recommendations';
- import type { IdentityMerge } from './utils/identity';
- export interface CommitRecord {
+import type { Recommendation } from './recommendations';
+import type { IdentityMerge } from './utils/identity';
+export interface CommitRecord {
   hash: string;
   authorEmail: string;
   authorName: string;
@@ -87,13 +87,9 @@ export interface TemporalScopeRisk {
   lifetime: ScopeRisk;
   recent?: ScopeRisk;
   recentTouches: number;
-delta: number | null;
-summary: string;
-  trend:
-  | 'rising'
-  | 'declining'
-  | 'stable'
-  | 'insufficient_data';
+  delta: number | null;
+  summary: string;
+  trend: 'rising' | 'declining' | 'stable' | 'insufficient_data';
 
   recommendations?: Recommendation[];
 }
@@ -107,11 +103,7 @@ export interface YearlyConcentrationPoint {
 export interface YearlyConcentrationSeries {
   scope: string;
   points: YearlyConcentrationPoint[];
-  direction:
-    | 'rising'
-    | 'declining'
-    | 'stable'
-    | 'insufficient_data';
+  direction: 'rising' | 'declining' | 'stable' | 'insufficient_data';
 }
 export interface OwnershipTransition {
   scope: string;
@@ -181,4 +173,3 @@ export interface AnalysisResult {
   lastActiveByAuthor: Map<string, number>;
   identityMerges: IdentityMerge[];
 }
-

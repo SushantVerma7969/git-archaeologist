@@ -7,7 +7,7 @@ export function formatPath(filepath: string, maxLen: number = 55): string {
   // Keep filename and one parent always visible
   const filename = parts[parts.length - 1];
   const parent = parts[parts.length - 2];
-  const prefix = '.../' ;
+  const prefix = '.../';
   const short = `${prefix}${parent}/${filename}`;
   return short.length <= maxLen ? short : '...' + filename.slice(-(maxLen - 3));
 }
@@ -48,12 +48,18 @@ export function sectionHeader(title: string): string {
 
 export function summaryBox(lines: string[]): string {
   const width = 70;
-  const top    = chalk.hex('#A78BFA')('╭' + '─'.repeat(width - 2) + '╮');
+  const top = chalk.hex('#A78BFA')('╭' + '─'.repeat(width - 2) + '╮');
   const bottom = chalk.hex('#A78BFA')('╰' + '─'.repeat(width - 2) + '╯');
   const mid = lines.map((l) => {
     const visible = l.replace(/\x1B\[[0-9;]*m/g, '');
     const pad = width - 2 - visible.length;
-    return chalk.hex('#A78BFA')('│') + ' ' + l + ' '.repeat(Math.max(0, pad - 1)) + chalk.hex('#A78BFA')('│');
+    return (
+      chalk.hex('#A78BFA')('│') +
+      ' ' +
+      l +
+      ' '.repeat(Math.max(0, pad - 1)) +
+      chalk.hex('#A78BFA')('│')
+    );
   });
   return [top, ...mid, bottom].join('\n');
 }

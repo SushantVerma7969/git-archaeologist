@@ -14,13 +14,14 @@ function makeStats(scope, totals) {
   const files = ['a.ts', 'b.ts', 'c.ts'];
   return files.map((file, index) => {
     const authorChanges = new Map(
-      entries.map(([email, count]) => [email, index === 0 ? count : 0])
+      entries.map(([email, count]) => [email, index === 0 ? count : 0]),
     );
     return [
       `${scope}/${file}`,
       {
         filepath: `${scope}/${file}`,
-        totalChanges: index === 0 ? entries.reduce((sum, [, count]) => sum + count, 0) : 0,
+        totalChanges:
+          index === 0 ? entries.reduce((sum, [, count]) => sum + count, 0) : 0,
         uniqueAuthors: new Set(entries.map(([email]) => email)),
         authorChanges,
         authorChangesByYear: new Map(),
@@ -45,13 +46,15 @@ function makeResult(scopes) {
 
     return contributors.length === 0
       ? []
-      : [{
-        filepath: `${scope.scope}/a.ts`,
-        owner: contributors[0].name,
-        ownerEmail: contributors[0].email,
-        ownershipPercent: 0,
-        contributors,
-      }];
+      : [
+          {
+            filepath: `${scope.scope}/a.ts`,
+            owner: contributors[0].name,
+            ownerEmail: contributors[0].email,
+            ownershipPercent: 0,
+            contributors,
+          },
+        ];
   });
 
   return {
@@ -107,7 +110,10 @@ test('buildRiskExplanation emits structured reasons and HIGH summary', () => {
     'Bus factor is 1',
     'Top contributor owns 84% of touches',
   ]);
-  assert.equal(explanation.summary, 'Knowledge remains concentrated in a single contributor.');
+  assert.equal(
+    explanation.summary,
+    'Knowledge remains concentrated in a single contributor.',
+  );
 });
 
 test('buildRiskExplanation emits MEDIUM and LOW summaries', () => {
@@ -118,7 +124,7 @@ test('buildRiskExplanation emits MEDIUM and LOW summaries', () => {
       concentration: 50,
       contributors: 4,
     }).summary,
-    'Knowledge is shared, but still concentrated across a small contributor set.'
+    'Knowledge is shared, but still concentrated across a small contributor set.',
   );
   assert.equal(
     buildRiskExplanation({
@@ -127,7 +133,7 @@ test('buildRiskExplanation emits MEDIUM and LOW summaries', () => {
       concentration: 40,
       contributors: 6,
     }).summary,
-    'Knowledge appears distributed across 6 contributor identities.'
+    'Knowledge appears distributed across 6 contributor identities.',
   );
 });
 
@@ -164,42 +170,51 @@ test('buildScopeRisks reuses existing values and explanation', () => {
     ],
     coupling: [],
     fileStats: new Map([
-      ['compiler/a.ts', {
-        filepath: 'compiler/a.ts',
-        totalChanges: 50,
-        uniqueAuthors: new Set(['ada@example.com', 'grace@example.com']),
-        authorChanges: new Map([
-          ['ada@example.com', 42],
-          ['grace@example.com', 8],
-        ]),
-        firstChanged: 1,
-        lastChanged: 2,
-        changeTimeline: [],
-      }],
-      ['compiler/b.ts', {
-        filepath: 'compiler/b.ts',
-        totalChanges: 30,
-        uniqueAuthors: new Set(['ada@example.com', 'grace@example.com']),
-        authorChanges: new Map([
-          ['ada@example.com', 25],
-          ['grace@example.com', 5],
-        ]),
-        firstChanged: 1,
-        lastChanged: 2,
-        changeTimeline: [],
-      }],
-      ['compiler/c.ts', {
-        filepath: 'compiler/c.ts',
-        totalChanges: 20,
-        uniqueAuthors: new Set(['ada@example.com', 'grace@example.com']),
-        authorChanges: new Map([
-          ['ada@example.com', 17],
-          ['grace@example.com', 3],
-        ]),
-        firstChanged: 1,
-        lastChanged: 2,
-        changeTimeline: [],
-      }],
+      [
+        'compiler/a.ts',
+        {
+          filepath: 'compiler/a.ts',
+          totalChanges: 50,
+          uniqueAuthors: new Set(['ada@example.com', 'grace@example.com']),
+          authorChanges: new Map([
+            ['ada@example.com', 42],
+            ['grace@example.com', 8],
+          ]),
+          firstChanged: 1,
+          lastChanged: 2,
+          changeTimeline: [],
+        },
+      ],
+      [
+        'compiler/b.ts',
+        {
+          filepath: 'compiler/b.ts',
+          totalChanges: 30,
+          uniqueAuthors: new Set(['ada@example.com', 'grace@example.com']),
+          authorChanges: new Map([
+            ['ada@example.com', 25],
+            ['grace@example.com', 5],
+          ]),
+          firstChanged: 1,
+          lastChanged: 2,
+          changeTimeline: [],
+        },
+      ],
+      [
+        'compiler/c.ts',
+        {
+          filepath: 'compiler/c.ts',
+          totalChanges: 20,
+          uniqueAuthors: new Set(['ada@example.com', 'grace@example.com']),
+          authorChanges: new Map([
+            ['ada@example.com', 17],
+            ['grace@example.com', 3],
+          ]),
+          firstChanged: 1,
+          lastChanged: 2,
+          changeTimeline: [],
+        },
+      ],
     ]),
     lastActiveByAuthor: new Map(),
   };
@@ -243,23 +258,62 @@ test('buildScopeRisks excludes name-only bots through ownership-filtered identit
 
 test('buildTemporalScopeRisks applies protocol categories from concentration status', () => {
   const lifetimeResult = makeResult([
-    { scope: 'persistent', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
-    { scope: 'historical', busFactor: 1, totals: { 'a@example.com': 60, 'b@example.com': 40 } },
-    { scope: 'emerging', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
-    { scope: 'distributed', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
-    { scope: 'inactive', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
+    {
+      scope: 'persistent',
+      busFactor: 1,
+      totals: { 'a@example.com': 80, 'b@example.com': 20 },
+    },
+    {
+      scope: 'historical',
+      busFactor: 1,
+      totals: { 'a@example.com': 60, 'b@example.com': 40 },
+    },
+    {
+      scope: 'emerging',
+      busFactor: 3,
+      totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 },
+    },
+    {
+      scope: 'distributed',
+      busFactor: 3,
+      totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 },
+    },
+    {
+      scope: 'inactive',
+      busFactor: 1,
+      totals: { 'a@example.com': 80, 'b@example.com': 20 },
+    },
     { scope: 'thin', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
   ]);
   const recentResult = makeResult([
-    { scope: 'persistent', busFactor: 1, totals: { 'a@example.com': 80, 'b@example.com': 20 } },
-    { scope: 'historical', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
-    { scope: 'emerging', busFactor: 1, totals: { 'a@example.com': 60, 'b@example.com': 40 } },
-    { scope: 'distributed', busFactor: 3, totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 } },
+    {
+      scope: 'persistent',
+      busFactor: 1,
+      totals: { 'a@example.com': 80, 'b@example.com': 20 },
+    },
+    {
+      scope: 'historical',
+      busFactor: 3,
+      totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 },
+    },
+    {
+      scope: 'emerging',
+      busFactor: 1,
+      totals: { 'a@example.com': 60, 'b@example.com': 40 },
+    },
+    {
+      scope: 'distributed',
+      busFactor: 3,
+      totals: { 'a@example.com': 34, 'b@example.com': 33, 'c@example.com': 33 },
+    },
     { scope: 'thin', busFactor: 1, filesAtRisk: 1, totals: { 'a@example.com': 9 } },
   ]);
 
   const categories = new Map(
-    buildTemporalScopeRisks(lifetimeResult, recentResult).map((risk) => [risk.scope, risk.category])
+    buildTemporalScopeRisks(lifetimeResult, recentResult).map((risk) => [
+      risk.scope,
+      risk.category,
+    ]),
   );
 
   assert.equal(categories.get('persistent'), 'Persistent concentration');
@@ -304,48 +358,56 @@ test('buildOwnershipTransitions detects ownership handoff', () => {
     coupling: [],
     lastActiveByAuthor: new Map(),
     fileStats: new Map([
-      ['compiler/a.ts', {
-        filepath: 'compiler/a.ts',
-        totalChanges: 100,
-        uniqueAuthors: new Set([
-          'alice@example.com',
-          'bob@example.com',
-        ]),
-        authorChanges: new Map(),
-        authorChangesByYear: new Map([
-          [2024, new Map([
-            ['alice@example.com', 10],
-            ['bob@example.com', 2],
-          ])],
-          [2025, new Map([
-            ['alice@example.com', 8],
-            ['bob@example.com', 4],
-          ])],
-          [2026, new Map([
-            ['alice@example.com', 3],
-            ['bob@example.com', 12],
-          ])],
-        ]),
-        firstChanged: 1,
-        lastChanged: 2,
-        changeTimeline: [],
-      }],
+      [
+        'compiler/a.ts',
+        {
+          filepath: 'compiler/a.ts',
+          totalChanges: 100,
+          uniqueAuthors: new Set(['alice@example.com', 'bob@example.com']),
+          authorChanges: new Map(),
+          authorChangesByYear: new Map([
+            [
+              2024,
+              new Map([
+                ['alice@example.com', 10],
+                ['bob@example.com', 2],
+              ]),
+            ],
+            [
+              2025,
+              new Map([
+                ['alice@example.com', 8],
+                ['bob@example.com', 4],
+              ]),
+            ],
+            [
+              2026,
+              new Map([
+                ['alice@example.com', 3],
+                ['bob@example.com', 12],
+              ]),
+            ],
+          ]),
+          firstChanged: 1,
+          lastChanged: 2,
+          changeTimeline: [],
+        },
+      ],
     ]),
   };
 
-  const transitions =
-    buildOwnershipTransitions(result);
+  const transitions = buildOwnershipTransitions(result);
 
   assert.equal(transitions.length, 1);
 
   assert.deepEqual(transitions[0], {
-  scope: 'compiler',
-  fromOwner: 'alice@example.com',
-  toOwner: 'bob@example.com',
-  fromYear: 2025,
-  toYear: 2026,
-  severity: 'HIGH',
-  explanation:
-    'Ownership shifted and remains highly concentrated in a single contributor.',
-});
+    scope: 'compiler',
+    fromOwner: 'alice@example.com',
+    toOwner: 'bob@example.com',
+    fromYear: 2025,
+    toYear: 2026,
+    severity: 'HIGH',
+    explanation:
+      'Ownership shifted and remains highly concentrated in a single contributor.',
+  });
 });

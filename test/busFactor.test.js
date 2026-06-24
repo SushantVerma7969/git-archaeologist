@@ -4,16 +4,19 @@ const test = require('node:test');
 const { analyzeBusFactor } = require('../dist/analyzers/busFactorAnalyzer');
 
 function fileStats(filepath, authors) {
-  return [filepath, {
+  return [
     filepath,
-    totalChanges: Object.values(authors).reduce((a, b) => a + b, 0),
-    uniqueAuthors: new Set(Object.keys(authors)),
-    authorChanges: new Map(Object.entries(authors)),
-    authorChangesByYear: new Map(),
-    firstChanged: 1,
-    lastChanged: 2,
-    changeTimeline: [],
-  }];
+    {
+      filepath,
+      totalChanges: Object.values(authors).reduce((a, b) => a + b, 0),
+      uniqueAuthors: new Set(Object.keys(authors)),
+      authorChanges: new Map(Object.entries(authors)),
+      authorChangesByYear: new Map(),
+      firstChanged: 1,
+      lastChanged: 2,
+      changeTimeline: [],
+    },
+  ];
 }
 
 test('bus factor excludes non-source folders', () => {
@@ -24,7 +27,10 @@ test('bus factor excludes non-source folders', () => {
     fileStats('src/index.ts', { 'a@x.com': 6, 'b@x.com': 4 }),
     fileStats('compiler/core.ts', { 'a@x.com': 9 }),
   ]);
-  const names = new Map([['a@x.com', 'A'], ['b@x.com', 'B']]);
+  const names = new Map([
+    ['a@x.com', 'A'],
+    ['b@x.com', 'B'],
+  ]);
   const scopes = analyzeBusFactor(map, names).map((r) => r.scope);
   assert.ok(scopes.includes('src'));
   assert.ok(scopes.includes('compiler'));

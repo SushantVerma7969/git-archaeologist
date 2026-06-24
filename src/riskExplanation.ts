@@ -2,7 +2,7 @@ import {
   ContributorChurn,
   AnalysisResult,
   RiskExplanation,
-  AbandonedScope,	
+  AbandonedScope,
   RiskLevel,
   ScopeRisk,
   TemporalRiskCategory,
@@ -59,9 +59,10 @@ export function buildRiskExplanation(input: ExplanationInput): RiskExplanation {
   }
 
   if (input.level === 'MEDIUM') {
-    const summary = input.busFactor === 1
-      ? 'One contributor still accounts for enough history to create continuity risk.'
-      : 'Knowledge is shared, but still concentrated across a small contributor set.';
+    const summary =
+      input.busFactor === 1
+        ? 'One contributor still accounts for enough history to create continuity risk.'
+        : 'Knowledge is shared, but still concentrated across a small contributor set.';
     return { reasons, summary };
   }
 
@@ -85,13 +86,14 @@ function buildNonBotEmailSet(result: AnalysisResult): Set<string> {
   return emails;
 }
 
-
-export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOptions = {}): ScopeRisk[] {
+export function buildScopeRisks(
+  result: AnalysisResult,
+  options: ScopeRiskOptions = {},
+): ScopeRisk[] {
   const minFilesAtRisk = options.minFilesAtRisk ?? 3;
   const nonBotEmails = buildNonBotEmailSet(result);
   const folderAuthorChanges = new Map<string, Map<string, number>>();
   for (const [, stats] of result.fileStats) {
-  
     const parts = stats.filepath.split('/');
     const folder = parts.length > 1 ? parts[0] : '(root)';
     if (!folderAuthorChanges.has(folder)) folderAuthorChanges.set(folder, new Map());
@@ -118,12 +120,12 @@ export function buildScopeRisks(result: AnalysisResult, options: ScopeRiskOption
     if (bf.filesAtRisk < minFilesAtRisk) continue;
 
     const total = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
-if (total === 0) continue;
+    if (total === 0) continue;
 
-const concentration = calculateConcentration(authorTotals);
-if (concentration === null) continue;
+    const concentration = calculateConcentration(authorTotals);
+    if (concentration === null) continue;
 
-const contributors = authorTotals.size;
+    const contributors = authorTotals.size;
     const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
     const level = classifyScopeRisk(bf.busFactor, concentration);
     const explanationInput = {
@@ -134,48 +136,49 @@ const contributors = authorTotals.size;
     };
 
     const ownerEmail = nameToEmail.get(topOwner);
-    const lastActiveTs = ownerEmail ? result.lastActiveByAuthor.get(ownerEmail) : undefined;
+    const lastActiveTs = ownerEmail
+      ? result.lastActiveByAuthor.get(ownerEmail)
+      : undefined;
     let lastActive: string | undefined;
-let lastActiveDays: number | undefined;
+    let lastActiveDays: number | undefined;
 
-if (lastActiveTs !== undefined) {
-  lastActive = formatTimeAgo(lastActiveTs);
+    if (lastActiveTs !== undefined) {
+      lastActive = formatTimeAgo(lastActiveTs);
 
-  lastActiveDays = Math.floor(
-    (Date.now() / 1000 - lastActiveTs) / 86400
-  );
-}
-const recommendations = buildRiskRecommendations(
-  level,
-  bf.busFactor,
-  lastActive
-);
+      lastActiveDays = Math.floor((Date.now() / 1000 - lastActiveTs) / 86400);
+    }
+    const recommendations = buildRiskRecommendations(level, bf.busFactor, lastActive);
 
     risks.push({
-  scope: folder,
-  level,
-  busFactor: bf.busFactor,
-  concentration,
-  contributors,
-  totalFileTouches: total,
-  topOwner,
-  filesAtRisk: bf.filesAtRisk,
-  explanation: buildRiskExplanation(explanationInput),
-  recommendations,
-lastActive,
-lastActiveDays,
-});
+      scope: folder,
+      level,
+      busFactor: bf.busFactor,
+      concentration,
+      contributors,
+      totalFileTouches: total,
+      topOwner,
+      filesAtRisk: bf.filesAtRisk,
+      explanation: buildRiskExplanation(explanationInput),
+      recommendations,
+      lastActive,
+      lastActiveDays,
+    });
   }
 
   const order: Record<'HIGH' | 'MEDIUM' | 'LOW', number> = {
-  HIGH: 0,
-  MEDIUM: 1,
-  LOW: 2,
-};
-  return risks.sort((a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration);
+    HIGH: 0,
+    MEDIUM: 1,
+    LOW: 2,
+  };
+  return risks.sort(
+    (a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration,
+  );
 }
 
-function countNonBotTouchesByScope(result: AnalysisResult, nonBotEmails: Set<string>): Map<string, number> {
+function countNonBotTouchesByScope(
+  result: AnalysisResult,
+  nonBotEmails: Set<string>,
+): Map<string, number> {
   const touches = new Map<string, number>();
 
   for (const [, stats] of result.fileStats) {
@@ -194,7 +197,11 @@ function countNonBotTouchesByScope(result: AnalysisResult, nonBotEmails: Set<str
   return touches;
 }
 
-function classifyTemporalRisk(lifetime: ScopeRisk, recent?: ScopeRisk, recentTouches = 0): TemporalRiskCategory {
+function classifyTemporalRisk(
+  lifetime: ScopeRisk,
+  recent?: ScopeRisk,
+  recentTouches = 0,
+): TemporalRiskCategory {
   if (recentTouches === 0) {
     return 'No recent activity';
   }
@@ -218,7 +225,11 @@ function classifyTemporalRisk(lifetime: ScopeRisk, recent?: ScopeRisk, recentTou
   return 'Persistently distributed';
 }
 
-function buildTemporalSummary(lifetime: ScopeRisk, recent: ScopeRisk | undefined, category: TemporalRiskCategory): string {
+function buildTemporalSummary(
+  lifetime: ScopeRisk,
+  recent: ScopeRisk | undefined,
+  category: TemporalRiskCategory,
+): string {
   if (category === 'No recent activity') {
     return 'This scope has lifetime history but no non-bot touches in the recent window.';
   }
@@ -236,12 +247,15 @@ function buildTemporalSummary(lifetime: ScopeRisk, recent: ScopeRisk | undefined
 
 export function buildTemporalScopeRisks(
   lifetimeResult: AnalysisResult,
-  recentResult: AnalysisResult
+  recentResult: AnalysisResult,
 ): TemporalScopeRisk[] {
   const lifetimeRisks = buildScopeRisks(lifetimeResult);
   const recentRisks = buildScopeRisks(recentResult, { minFilesAtRisk: 0 });
   const recentByScope = new Map(recentRisks.map((risk) => [risk.scope, risk]));
-  const recentTouchesByScope = countNonBotTouchesByScope(recentResult, buildNonBotEmailSet(recentResult));
+  const recentTouchesByScope = countNonBotTouchesByScope(
+    recentResult,
+    buildNonBotEmailSet(recentResult),
+  );
 
   const categoryOrder: Record<TemporalRiskCategory, number> = {
     'Persistent concentration': 0,
@@ -259,35 +273,33 @@ export function buildTemporalScopeRisks(
       const recentTouches = recentTouchesByScope.get(lifetime.scope) ?? 0;
       const category = classifyTemporalRisk(lifetime, recent, recentTouches);
 
-      const series = buildYearlyConcentrationSeries(lifetimeResult)
-  .find((s) => s.scope === lifetime.scope);
+      const series = buildYearlyConcentrationSeries(lifetimeResult).find(
+        (s) => s.scope === lifetime.scope,
+      );
 
-return {
-  scope: lifetime.scope,
-  category,
-  lifetime,
-  recent,
-  recentTouches,
-  delta: recent
-    ? Number(
-        (
-          recent.concentration -
-          lifetime.concentration
-        ).toFixed(1)
-      )
-    : null,
-  trend: series?.direction ?? 'insufficient_data',
-  summary: buildTemporalSummary(lifetime, recent, category),
-  recommendations: buildTemporalRecommendations(category),
-};
+      return {
+        scope: lifetime.scope,
+        category,
+        lifetime,
+        recent,
+        recentTouches,
+        delta: recent
+          ? Number((recent.concentration - lifetime.concentration).toFixed(1))
+          : null,
+        trend: series?.direction ?? 'insufficient_data',
+        summary: buildTemporalSummary(lifetime, recent, category),
+        recommendations: buildTemporalRecommendations(category),
+      };
     })
     .sort((a, b) => {
-      return categoryOrder[a.category] - categoryOrder[b.category]
-        || b.lifetime.concentration - a.lifetime.concentration;
+      return (
+        categoryOrder[a.category] - categoryOrder[b.category] ||
+        b.lifetime.concentration - a.lifetime.concentration
+      );
     });
 }
 function classifySeriesDirection(
-  points: YearlyConcentrationPoint[]
+  points: YearlyConcentrationPoint[],
 ): 'rising' | 'declining' | 'stable' | 'insufficient_data' {
   const valid = points.filter((p) => p.concentration !== null);
 
@@ -308,18 +320,13 @@ function classifySeriesDirection(
 }
 
 export function buildYearlyConcentrationSeries(
-  result: AnalysisResult
+  result: AnalysisResult,
 ): YearlyConcentrationSeries[] {
   const series: YearlyConcentrationSeries[] = [];
-  const scopeData = new Map<
-    string,
-    Map<number, Map<string, number>>
-  >();
+  const scopeData = new Map<string, Map<number, Map<string, number>>>();
 
   for (const [, stats] of result.fileStats) {
-    const scope = stats.filepath.includes('/')
-      ? stats.filepath.split('/')[0]
-      : '(root)';
+    const scope = stats.filepath.includes('/') ? stats.filepath.split('/')[0] : '(root)';
 
     if (!scopeData.has(scope)) {
       scopeData.set(scope, new Map());
@@ -335,18 +342,13 @@ export function buildYearlyConcentrationSeries(
       const scopeAuthors = yearlyScopeData.get(year)!;
 
       for (const [author, count] of authors) {
-        scopeAuthors.set(
-          author,
-          (scopeAuthors.get(author) ?? 0) + count
-        );
+        scopeAuthors.set(author, (scopeAuthors.get(author) ?? 0) + count);
       }
     }
   }
 
   for (const [scope, yearlyData] of scopeData) {
-    const years = Array.from(yearlyData.keys()).sort(
-      (a, b) => a - b
-    );
+    const years = Array.from(yearlyData.keys()).sort((a, b) => a - b);
 
     const points: YearlyConcentrationPoint[] = [];
 
@@ -355,10 +357,7 @@ export function buildYearlyConcentrationSeries(
 
       points.push({
         year,
-        commitCount: Array.from(authors.values()).reduce(
-          (a, b) => a + b,
-          0
-        ),
+        commitCount: Array.from(authors.values()).reduce((a, b) => a + b, 0),
         concentration: calculateConcentration(authors),
       });
     }
@@ -370,181 +369,145 @@ export function buildYearlyConcentrationSeries(
     });
   }
 
-  
-  
-
   return series;
 }
-export function buildOwnershipTransitions(
-  result: AnalysisResult
-): OwnershipTransition[] {
-    const transitions: OwnershipTransition[] = [];
+export function buildOwnershipTransitions(result: AnalysisResult): OwnershipTransition[] {
+  const transitions: OwnershipTransition[] = [];
 
-  const scopeData = new Map<
-    string,
-    Map<number, Map<string, number>>
-  >();
-for (const [, stats] of result.fileStats) {
-  const scope = stats.filepath.includes('/')
-    ? stats.filepath.split('/')[0]
-    : '(root)';
+  const scopeData = new Map<string, Map<number, Map<string, number>>>();
+  for (const [, stats] of result.fileStats) {
+    const scope = stats.filepath.includes('/') ? stats.filepath.split('/')[0] : '(root)';
 
-  if (!scopeData.has(scope)) {
-    scopeData.set(scope, new Map());
-  }
-
-  const yearlyScopeData = scopeData.get(scope)!;
-
-  for (const [year, authors] of stats.authorChangesByYear) {
-    if (!yearlyScopeData.has(year)) {
-      yearlyScopeData.set(year, new Map());
+    if (!scopeData.has(scope)) {
+      scopeData.set(scope, new Map());
     }
 
-    const scopeAuthors = yearlyScopeData.get(year)!;
+    const yearlyScopeData = scopeData.get(scope)!;
 
-    for (const [author, count] of authors) {
-      scopeAuthors.set(
-        author,
-        (scopeAuthors.get(author) ?? 0) + count
-      );
+    for (const [year, authors] of stats.authorChangesByYear) {
+      if (!yearlyScopeData.has(year)) {
+        yearlyScopeData.set(year, new Map());
+      }
+
+      const scopeAuthors = yearlyScopeData.get(year)!;
+
+      for (const [author, count] of authors) {
+        scopeAuthors.set(author, (scopeAuthors.get(author) ?? 0) + count);
+      }
     }
   }
-}
-for (const [scope, yearlyData] of scopeData) {
-  const years = Array.from(yearlyData.keys()).sort(
-    (a, b) => a - b
-  );
+  for (const [scope, yearlyData] of scopeData) {
+    const years = Array.from(yearlyData.keys()).sort((a, b) => a - b);
 
-  const dominantOwners: {
-  year: number;
-  owner: string;
-  share: number;
-}[] = [];
+    const dominantOwners: {
+      year: number;
+      owner: string;
+      share: number;
+    }[] = [];
 
-  for (const year of years) {
-    const authors = yearlyData.get(year)!;
+    for (const year of years) {
+      const authors = yearlyData.get(year)!;
 
-    const sorted = Array.from(authors.entries()).sort(
-      (a, b) => b[1] - a[1]
-    );
+      const sorted = Array.from(authors.entries()).sort((a, b) => b[1] - a[1]);
 
-    if (sorted.length === 0) {
-      continue;
+      if (sorted.length === 0) {
+        continue;
+      }
+
+      const total = Array.from(authors.values()).reduce((a, b) => a + b, 0);
+
+      const share = total === 0 ? 0 : (sorted[0][1] / total) * 100;
+
+      dominantOwners.push({
+        year,
+        owner: sorted[0][0],
+        share,
+      });
     }
+    for (let i = 1; i < dominantOwners.length; i++) {
+      const previous = dominantOwners[i - 1];
+      const current = dominantOwners[i];
 
-    const total = Array.from(authors.values()).reduce(
-  (a, b) => a + b,
-  0
-);
+      let severity: 'LOW' | 'MEDIUM' | 'HIGH';
 
-const share =
-  total === 0
-    ? 0
-    : (sorted[0][1] / total) * 100;
+      if (current.share >= 80) {
+        severity = 'HIGH';
+      } else if (current.share >= 50) {
+        severity = 'MEDIUM';
+      } else {
+        severity = 'LOW';
+      }
 
-dominantOwners.push({
-  year,
-  owner: sorted[0][0],
-  share,
-});
+      if (previous.owner === current.owner) {
+        continue;
+      }
+
+      const explanation =
+        severity === 'HIGH'
+          ? 'Ownership shifted and remains highly concentrated in a single contributor.'
+          : severity === 'MEDIUM'
+            ? 'Ownership shifted and responsibility is concentrated across a small contributor group.'
+            : 'Ownership shifted while work remained relatively distributed.';
+
+      transitions.push({
+        scope,
+        fromOwner: previous.owner,
+        toOwner: current.owner,
+        fromYear: previous.year,
+        toYear: current.year,
+        severity,
+        explanation,
+      });
+    }
   }
-for (let i = 1; i < dominantOwners.length; i++) {
-  const previous = dominantOwners[i - 1];
-  const current = dominantOwners[i];
-
-  let severity: 'LOW' | 'MEDIUM' | 'HIGH';
-
-if (current.share >= 80) {
-  severity = 'HIGH';
-} else if (current.share >= 50) {
-  severity = 'MEDIUM';
-} else {
-  severity = 'LOW';
-}
-
-  if (previous.owner === current.owner) {
-    continue;
-  }
-
-  const explanation =
-  severity === 'HIGH'
-    ? 'Ownership shifted and remains highly concentrated in a single contributor.'
-    : severity === 'MEDIUM'
-      ? 'Ownership shifted and responsibility is concentrated across a small contributor group.'
-      : 'Ownership shifted while work remained relatively distributed.';
-
-transitions.push({
-  scope,
-  fromOwner: previous.owner,
-  toOwner: current.owner,
-  fromYear: previous.year,
-  toYear: current.year,
-  severity,
-  explanation,
-});
-}
-}
 
   return transitions.filter((t) => isSourceScope(t.scope));
 }
 export function buildEvolutionSummary(
   temporalRisks: TemporalScopeRisk[],
-  ownershipTransitions: OwnershipTransition[]
+  ownershipTransitions: OwnershipTransition[],
 ): EvolutionSummary {
   return {
     ownershipTransitions: ownershipTransitions.length,
 
-    highSeverityTransitions:
-      ownershipTransitions.filter(
-        (t) => t.severity === 'HIGH'
-      ).length,
+    highSeverityTransitions: ownershipTransitions.filter((t) => t.severity === 'HIGH')
+      .length,
 
-    emergingConcentration:
-      temporalRisks.filter(
-        (r) => r.category === 'Emerging concentration'
-      ).length,
+    emergingConcentration: temporalRisks.filter(
+      (r) => r.category === 'Emerging concentration',
+    ).length,
 
-    historicalConcentration:
-      temporalRisks.filter(
-        (r) => r.category === 'Historical concentration'
-      ).length,
+    historicalConcentration: temporalRisks.filter(
+      (r) => r.category === 'Historical concentration',
+    ).length,
 
-    persistentConcentration:
-      temporalRisks.filter(
-        (r) => r.category === 'Persistent concentration'
-      ).length,
+    persistentConcentration: temporalRisks.filter(
+      (r) => r.category === 'Persistent concentration',
+    ).length,
 
-    distributedScopes:
-      temporalRisks.filter(
-        (r) => r.category === 'Persistently distributed'
-      ).length,
+    distributedScopes: temporalRisks.filter(
+      (r) => r.category === 'Persistently distributed',
+    ).length,
   };
 }
 
-export function buildContributorChurn(
-  result: AnalysisResult
-): ContributorChurn[] {
+export function buildContributorChurn(result: AnalysisResult): ContributorChurn[] {
   const now = Date.now() / 1000;
   const twelveMonths = 365 * 24 * 60 * 60;
 
   const nonBotEmails = buildNonBotEmailSet(result);
 
-  const scopeContributors = new Map<
-    string,
-    Set<string>
-  >();
+  const scopeContributors = new Map<string, Set<string>>();
 
   for (const [, stats] of result.fileStats) {
     const parts = stats.filepath.split('/');
-    const scope =
-      parts.length > 1 ? parts[0] : '(root)';
+    const scope = parts.length > 1 ? parts[0] : '(root)';
 
     if (!scopeContributors.has(scope)) {
       scopeContributors.set(scope, new Set());
     }
 
-    const contributors =
-      scopeContributors.get(scope)!;
+    const contributors = scopeContributors.get(scope)!;
 
     for (const email of stats.uniqueAuthors) {
       if (!nonBotEmails.has(email)) {
@@ -565,30 +528,22 @@ export function buildContributorChurn(
     let inactiveContributors = 0;
 
     for (const email of contributors) {
-      const lastActive =
-        result.lastActiveByAuthor.get(email);
+      const lastActive = result.lastActiveByAuthor.get(email);
 
-      if (
-        lastActive !== undefined &&
-        now - lastActive > twelveMonths
-      ) {
+      if (lastActive !== undefined && now - lastActive > twelveMonths) {
         inactiveContributors++;
       }
     }
 
     const churnPercent = Number(
-      (
-        inactiveContributors /
-        contributors.size *
-        100
-      ).toFixed(1)
+      ((inactiveContributors / contributors.size) * 100).toFixed(1),
     );
 
     let level: 'LOW' | 'MEDIUM' | 'HIGH';
 
     if (churnPercent >= 50) {
-  level = 'HIGH';
-} else if (churnPercent >= 25) {
+      level = 'HIGH';
+    } else if (churnPercent >= 25) {
       level = 'MEDIUM';
     } else {
       level = 'LOW';
@@ -609,11 +564,9 @@ export function buildContributorChurn(
 }
 export function buildAbandonedScopes(
   risks: ScopeRisk[],
-  churn: ContributorChurn[]
+  churn: ContributorChurn[],
 ): AbandonedScope[] {
-  const churnMap = new Map(
-    churn.map((c) => [c.scope, c])
-  );
+  const churnMap = new Map(churn.map((c) => [c.scope, c]));
 
   const results: AbandonedScope[] = [];
 
@@ -623,30 +576,27 @@ export function buildAbandonedScopes(
     }
     const scopeChurn = churnMap.get(risk.scope);
 
-    if (
-      !scopeChurn ||
-      risk.lastActiveDays === undefined
-    ) {
+    if (!scopeChurn || risk.lastActiveDays === undefined) {
       continue;
     }
 
     let severity: 'LOW' | 'MEDIUM' | 'HIGH';
 
     if (
-  risk.concentration >= 50 &&
-  risk.lastActiveDays > 365 &&
-  scopeChurn.churnPercent >= 50
-) {
-  severity = 'HIGH';
-} else if (
-  risk.concentration >= 40 &&
-  risk.lastActiveDays > 180 &&
-  scopeChurn.churnPercent >= 25
-) {
-  severity = 'MEDIUM';
-} else {
-  severity = 'LOW';
-}
+      risk.concentration >= 50 &&
+      risk.lastActiveDays > 365 &&
+      scopeChurn.churnPercent >= 50
+    ) {
+      severity = 'HIGH';
+    } else if (
+      risk.concentration >= 40 &&
+      risk.lastActiveDays > 180 &&
+      scopeChurn.churnPercent >= 25
+    ) {
+      severity = 'MEDIUM';
+    } else {
+      severity = 'LOW';
+    }
 
     if (severity === 'LOW') {
       continue;
@@ -696,17 +646,13 @@ interface BuildHotspotsOptions {
 // always see WHY a scope surfaced, not just that it did.
 export function buildHotspots(
   inputs: HotspotInputs,
-  options: BuildHotspotsOptions = {}
+  options: BuildHotspotsOptions = {},
 ): HotspotScope[] {
   const minSignals = options.minSignals ?? 2;
 
   const churnByScope = new Map(inputs.churn.map((c) => [c.scope, c]));
-  const abandonedByScope = new Map(
-    inputs.abandoned.map((a) => [a.scope, a])
-  );
-  const temporalByScope = new Map(
-    inputs.temporal.map((t) => [t.scope, t])
-  );
+  const abandonedByScope = new Map(inputs.abandoned.map((a) => [a.scope, a]));
+  const temporalByScope = new Map(inputs.temporal.map((t) => [t.scope, t]));
   const transitionsByScope = new Map<string, OwnershipTransition>();
   for (const t of inputs.transitions) {
     // Keep the highest-severity transition per scope as the representative
@@ -762,10 +708,7 @@ export function buildHotspots(
         reason: `Dominant contributor inactive ${abandoned.ownerInactiveDays} days [${abandoned.severity}]`,
       });
       signalNames.push('owner-inactive');
-    } else if (
-      risk.lastActiveDays !== undefined &&
-      risk.lastActiveDays > 365
-    ) {
+    } else if (risk.lastActiveDays !== undefined && risk.lastActiveDays > 365) {
       signals.push({
         name: 'owner-inactive',
         reason: `Latest analyzed activity from the dominant contributor was ${risk.lastActiveDays} days ago`,
@@ -821,9 +764,7 @@ export function buildHotspots(
   }
 
   return hotspots.sort(
-    (a, b) =>
-      b.signalsFired - a.signalsFired ||
-      b.concentration - a.concentration
+    (a, b) => b.signalsFired - a.signalsFired || b.concentration - a.concentration,
   );
 }
 

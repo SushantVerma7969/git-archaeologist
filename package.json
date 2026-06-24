@@ -1,6 +1,6 @@
 {
   "name": "git-archaeologist",
-  "version": "1.29.1",
+  "version": "1.30.0",
   "description": "Find the most dangerous files in any git repo — curse scores, bus factor, hidden coupling",
   "main": "dist/index.js",
   "bin": {
@@ -10,7 +10,12 @@
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.js\"",
+    "lint": "eslint \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
   "keywords": [
     "git",
@@ -28,9 +33,13 @@
   "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/node": "^22.0.0",
+    "eslint": "^9.39.4",
+    "prettier": "^3.8.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.62.0"
   },
   "dependencies": {
     "chalk": "^4.1.2",

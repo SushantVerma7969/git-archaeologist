@@ -17,7 +17,11 @@ test('GitHub noreply addresses are NOT bots (private-email real users)', () => {
     ['Daishi Kato', 'dai-shi@users.noreply.github.com'],
   ];
   for (const [name, email] of realPeople) {
-    assert.equal(isBot(name, email), false, `${name} <${email}> wrongly flagged as a bot`);
+    assert.equal(
+      isBot(name, email),
+      false,
+      `${name} <${email}> wrongly flagged as a bot`,
+    );
   }
 });
 

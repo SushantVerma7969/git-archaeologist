@@ -16,11 +16,11 @@ import { buildIdentityMap, loadIdentityOverrides } from '../utils/identity';
 export async function analyze(
   repoPath: string,
   since?: string,
-  silent = false
+  silent = false,
 ): Promise<AnalysisResult> {
   const spinner = silent
-  ? null
-  : ora({ text: 'Validating repository...', color: 'magenta' }).start();
+    ? null
+    : ora({ text: 'Validating repository...', color: 'magenta' }).start();
 
   try {
     // Step 1 — validate
@@ -29,8 +29,8 @@ export async function analyze(
     const totalCommits = getTotalCommitCount(repoPath, since);
     const sinceLabel = since ? ` (since ${since})` : '';
     if (spinner) {
-  spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
-}
+      spinner.text = `Parsing ${totalCommits.toLocaleString()} commits in ${repoName}${sinceLabel}...`;
+    }
 
     // Step 2 — parse all commits
     const commits = parseCommits(repoPath, since);
@@ -45,7 +45,7 @@ export async function analyze(
     const overrides = loadIdentityOverrides(repoPath);
     const identity = buildIdentityMap(
       commits.map((c) => ({ email: c.authorEmail, name: c.authorName })),
-      overrides
+      overrides,
     );
     for (const c of commits) {
       const canonical = identity.emailToCanonical.get(c.authorEmail.trim().toLowerCase());
@@ -53,8 +53,8 @@ export async function analyze(
     }
 
     if (spinner) {
-  spinner.text = 'Building file statistics...';
-}
+      spinner.text = 'Building file statistics...';
+    }
 
     // Step 3 — build per-file stats
     const fileStats = buildFileStats(commits);
@@ -63,39 +63,43 @@ export async function analyze(
     const authorNameMap = buildAuthorNameMap(commits);
 
     if (spinner) {
-  spinner.text = 'Scoring cursed files...';
-}
+      spinner.text = 'Scoring cursed files...';
+    }
 
     // Step 5 — run all analyzers
     const cursedFiles = scoreCursedFiles(fileStats);
 
     if (spinner) {
-  spinner.text = 'Analyzing ownership...';
-}
+      spinner.text = 'Analyzing ownership...';
+    }
     const ownership = analyzeOwnership(fileStats, authorNameMap);
 
     if (spinner) {
-  spinner.text = 'Calculating bus factor...';
-}
+      spinner.text = 'Calculating bus factor...';
+    }
     const busFactor = analyzeBusFactor(fileStats, authorNameMap);
 
     if (spinner) {
-  spinner.text = 'Detecting implicit coupling...';
-}
+      spinner.text = 'Detecting implicit coupling...';
+    }
     const coupling = analyzeCoupling(commits);
 
     // Step 6 — collect date range
     const allTimestamps = commits.map((c) => c.timestamp);
-    const minTs = allTimestamps.length > 0 ? allTimestamps.reduce((a, b) => a < b ? a : b) : 0;
-    const maxTs = allTimestamps.length > 0 ? allTimestamps.reduce((a, b) => a > b ? a : b) : 0;
+    const minTs =
+      allTimestamps.length > 0 ? allTimestamps.reduce((a, b) => (a < b ? a : b)) : 0;
+    const maxTs =
+      allTimestamps.length > 0 ? allTimestamps.reduce((a, b) => (a > b ? a : b)) : 0;
 
     // Step 7 — count unique authors
     const allAuthors = new Set(commits.map((c) => c.authorEmail));
     const lastActiveByAuthor = buildLastActiveMap(commits);
 
     if (spinner) {
-  spinner.succeed(`Analysis complete — ${fileStats.size.toLocaleString()} files scanned`);
-}
+      spinner.succeed(
+        `Analysis complete — ${fileStats.size.toLocaleString()} files scanned`,
+      );
+    }
 
     return {
       repoPath,
@@ -118,8 +122,8 @@ export async function analyze(
     };
   } catch (err) {
     if (spinner) {
-  spinner.fail('Analysis failed');
-}
+      spinner.fail('Analysis failed');
+    }
     throw err;
   }
 }

@@ -40,7 +40,7 @@ test('minSignals: 1 surfaces a single-signal scope', () => {
       transitions: [],
       temporal: [],
     },
-    { minSignals: 1 }
+    { minSignals: 1 },
   );
   assert.equal(hotspots.length, 1);
   assert.equal(hotspots[0].signalsFired, 1);
@@ -48,9 +48,28 @@ test('minSignals: 1 surfaces a single-signal scope', () => {
 
 test('multiple signals accumulate and every signal carries a reason', () => {
   const hotspots = buildHotspots({
-    scopeRisks: [scopeRisk('lib', { busFactor: 1, concentration: 90, lastActiveDays: 400 })],
-    churn: [{ scope: 'lib', contributors: 4, inactiveContributors: 3, churnPercent: 75, level: 'HIGH' }],
-    abandoned: [{ scope: 'lib', severity: 'HIGH', ownerInactiveDays: 400, churnPercent: 75, concentration: 90, explanation: '' }],
+    scopeRisks: [
+      scopeRisk('lib', { busFactor: 1, concentration: 90, lastActiveDays: 400 }),
+    ],
+    churn: [
+      {
+        scope: 'lib',
+        contributors: 4,
+        inactiveContributors: 3,
+        churnPercent: 75,
+        level: 'HIGH',
+      },
+    ],
+    abandoned: [
+      {
+        scope: 'lib',
+        severity: 'HIGH',
+        ownerInactiveDays: 400,
+        churnPercent: 75,
+        concentration: 90,
+        explanation: '',
+      },
+    ],
     transitions: [],
     temporal: [],
   });
@@ -72,7 +91,13 @@ test('ranking: more signals first, concentration breaks ties', () => {
       scopeRisk('tie-low', { busFactor: 1, concentration: 70, lastActiveDays: 400 }),
     ],
     churn: [
-      { scope: 'three-signal', contributors: 4, inactiveContributors: 3, churnPercent: 75, level: 'HIGH' },
+      {
+        scope: 'three-signal',
+        contributors: 4,
+        inactiveContributors: 3,
+        churnPercent: 75,
+        level: 'HIGH',
+      },
     ],
     abandoned: [],
     transitions: [],
@@ -95,15 +120,41 @@ test('rising-concentration signal only fires on rising emerging/persistent trend
     transitions: [],
   };
   const rising = buildHotspots(
-    { ...base, temporal: [{ scope: 'lib', category: 'Emerging concentration', trend: 'rising', delta: 18, lifetime: {}, recentTouches: 50, summary: '' }] },
-    { minSignals: 2 }
+    {
+      ...base,
+      temporal: [
+        {
+          scope: 'lib',
+          category: 'Emerging concentration',
+          trend: 'rising',
+          delta: 18,
+          lifetime: {},
+          recentTouches: 50,
+          summary: '',
+        },
+      ],
+    },
+    { minSignals: 2 },
   );
   assert.equal(rising.length, 1);
   assert.ok(rising[0].signals.some((s) => s.name === 'rising-concentration'));
 
   const stable = buildHotspots(
-    { ...base, temporal: [{ scope: 'lib', category: 'Emerging concentration', trend: 'stable', delta: 2, lifetime: {}, recentTouches: 50, summary: '' }] },
-    { minSignals: 2 }
+    {
+      ...base,
+      temporal: [
+        {
+          scope: 'lib',
+          category: 'Emerging concentration',
+          trend: 'stable',
+          delta: 2,
+          lifetime: {},
+          recentTouches: 50,
+          summary: '',
+        },
+      ],
+    },
+    { minSignals: 2 },
   );
   assert.equal(stable.length, 0);
 });
@@ -113,12 +164,20 @@ test('churn does not fire on a distributed scope (high bus factor)', () => {
   const hotspots = buildHotspots(
     {
       scopeRisks: [scopeRisk('lib', { busFactor: 5, lastActiveDays: 30 })],
-      churn: [{ scope: 'lib', contributors: 100, inactiveContributors: 90, churnPercent: 90, level: 'HIGH' }],
+      churn: [
+        {
+          scope: 'lib',
+          contributors: 100,
+          inactiveContributors: 90,
+          churnPercent: 90,
+          level: 'HIGH',
+        },
+      ],
       abandoned: [],
       transitions: [],
       temporal: [],
     },
-    { minSignals: 1 }
+    { minSignals: 1 },
   );
   // bus factor 5 => no bus-factor signal; churn gated out => 0 signals
   assert.equal(hotspots.length, 0);
@@ -128,12 +187,20 @@ test('churn fires when paired with a low bus factor', () => {
   const hotspots = buildHotspots(
     {
       scopeRisks: [scopeRisk('lib', { busFactor: 2, lastActiveDays: 30 })],
-      churn: [{ scope: 'lib', contributors: 10, inactiveContributors: 6, churnPercent: 60, level: 'HIGH' }],
+      churn: [
+        {
+          scope: 'lib',
+          contributors: 10,
+          inactiveContributors: 6,
+          churnPercent: 60,
+          level: 'HIGH',
+        },
+      ],
       abandoned: [],
       transitions: [],
       temporal: [],
     },
-    { minSignals: 1 }
+    { minSignals: 1 },
   );
   assert.equal(hotspots.length, 1);
   assert.ok(hotspots[0].signals.some((s) => s.name === 'churn'));
@@ -145,12 +212,20 @@ test('non-source scopes are excluded from hotspot ranking', () => {
     const hotspots = buildHotspots(
       {
         scopeRisks: [scopeRisk(scope, { busFactor: 1, lastActiveDays: 400 })],
-        churn: [{ scope, contributors: 4, inactiveContributors: 3, churnPercent: 75, level: 'HIGH' }],
+        churn: [
+          {
+            scope,
+            contributors: 4,
+            inactiveContributors: 3,
+            churnPercent: 75,
+            level: 'HIGH',
+          },
+        ],
         abandoned: [],
         transitions: [],
         temporal: [],
       },
-      { minSignals: 1 }
+      { minSignals: 1 },
     );
     assert.equal(hotspots.length, 0, `${scope} should be excluded`);
   }
@@ -158,7 +233,17 @@ test('non-source scopes are excluded from hotspot ranking', () => {
 
 test('isSourceScope rejects tooling, config, and generated scopes', () => {
   // These should never appear as risk scopes in any view.
-  for (const scope of ['.claude', '.github', '.circleci', 'docs', 'fixtures', 'flow-typed', 'vendor', '(root)', '.vscode']) {
+  for (const scope of [
+    '.claude',
+    '.github',
+    '.circleci',
+    'docs',
+    'fixtures',
+    'flow-typed',
+    'vendor',
+    '(root)',
+    '.vscode',
+  ]) {
     assert.equal(isSourceScope(scope), false, `${scope} should be non-source`);
   }
   // Real source trees should pass.

@@ -25,7 +25,7 @@ export function renderReport(result: AnalysisResult): void {
 function renderSummary(r: AnalysisResult): void {
   console.log('\n');
   const from = formatDate(Math.floor(r.dateRange.from.getTime() / 1000));
-  const to   = formatDate(Math.floor(r.dateRange.to.getTime()   / 1000));
+  const to = formatDate(Math.floor(r.dateRange.to.getTime() / 1000));
   console.log(
     summaryBox([
       chalk.bold.white('⛏  Git Archaeologist — Repository Analysis'),
@@ -38,7 +38,7 @@ function renderSummary(r: AnalysisResult): void {
       `  ${chalk.hex('#A78BFA')('Total files')}   ${chalk.yellow.bold(String(r.totalFiles))}`,
       `  ${chalk.hex('#A78BFA')('Total authors')} ${chalk.yellow.bold(String(r.totalAuthors))}`,
       `  ${chalk.hex('#A78BFA')('Date range')}    ${chalk.white(from)} → ${chalk.white(to)}`,
-    ])
+    ]),
   );
 }
 
@@ -110,12 +110,12 @@ function renderOwnership(r: AnalysisResult): void {
   console.log(sectionHeader('👑  OWNERSHIP  —  who truly owns each file'));
 
   // Show only files with a dominant owner (>= 60%) — most interesting
-  const dominated = r.ownership
-    .filter((o) => o.ownershipPercent >= 60)
-    .slice(0, 15);
+  const dominated = r.ownership.filter((o) => o.ownershipPercent >= 60).slice(0, 15);
 
   if (dominated.length === 0) {
-    console.log(chalk.grey('  No files with dominant ownership found (all well-shared).'));
+    console.log(
+      chalk.grey('  No files with dominant ownership found (all well-shared).'),
+    );
     return;
   }
 
@@ -148,7 +148,9 @@ function renderOwnership(r: AnalysisResult): void {
 }
 
 function renderCoupling(r: AnalysisResult): void {
-  console.log(sectionHeader('🔗  IMPLICIT COUPLING  —  files that always change together'));
+  console.log(
+    sectionHeader('🔗  IMPLICIT COUPLING  —  files that always change together'),
+  );
 
   if (r.coupling.length === 0) {
     console.log(chalk.grey('  No significant file coupling detected.'));
@@ -188,7 +190,7 @@ function renderIdentityMerges(r: AnalysisResult): void {
   console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
   console.log(
     chalk.hex('#A78BFA').bold('  🧬  MERGED IDENTITIES  ') +
-      chalk.grey('— contributors who commit under multiple emails')
+      chalk.grey('— contributors who commit under multiple emails'),
   );
   console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
   console.log(
@@ -196,17 +198,19 @@ function renderIdentityMerges(r: AnalysisResult): void {
       `  Collapsed ${totalCollapsed} duplicate ` +
         `${totalCollapsed === 1 ? 'identity' : 'identities'} into ` +
         `${merges.length} ${merges.length === 1 ? 'person' : 'people'}. ` +
-        `Ownership and bus-factor numbers reflect the merged identities.`
-    )
+        `Ownership and bus-factor numbers reflect the merged identities.`,
+    ),
   );
   console.log(
     chalk.grey('  Override with a ') +
       chalk.white('.git-arch-identities') +
-      chalk.grey(' file if any merge is wrong.\n')
+      chalk.grey(' file if any merge is wrong.\n'),
   );
 
   for (const m of merges.slice(0, 12)) {
-    console.log('  ' + chalk.white(m.name) + chalk.grey(`  (${m.members.length} emails)`));
+    console.log(
+      '  ' + chalk.white(m.name) + chalk.grey(`  (${m.members.length} emails)`),
+    );
     for (const email of m.members) {
       console.log(chalk.grey('       ' + email));
     }
@@ -219,7 +223,9 @@ function renderIdentityMerges(r: AnalysisResult): void {
 function renderFooter(): void {
   console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
   console.log(
-    chalk.grey('  ⛏  Git Archaeologist  |  github.com/SushantVerma7969/git-archaeologist')
+    chalk.grey(
+      '  ⛏  Git Archaeologist  |  github.com/SushantVerma7969/git-archaeologist',
+    ),
   );
   console.log(chalk.hex('#A78BFA')('─'.repeat(70)) + '\n');
 }

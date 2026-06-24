@@ -95,7 +95,7 @@ export interface BuildIdentityOptions {
 
 export function buildIdentityMap(
   identities: IdentityInput[],
-  options: BuildIdentityOptions = {}
+  options: BuildIdentityOptions = {},
 ): IdentityResult {
   // Collapse raw identities to unique (email) records, keeping the most
   // common display name and a commit count.
@@ -124,7 +124,9 @@ export function buildIdentityMap(
   const uf = new UnionFind();
   for (const email of byEmail.keys()) uf.add(email);
 
-  const splitSet = new Set((options.splitEmails ?? []).map((e) => e.trim().toLowerCase()));
+  const splitSet = new Set(
+    (options.splitEmails ?? []).map((e) => e.trim().toLowerCase()),
+  );
 
   // --- Rule 1: GitHub noreply handle links to a real email with the same
   // local-part or the same name. This is the strongest real-world case
@@ -162,8 +164,21 @@ export function buildIdentityMap(
   // merging unrelated people: BOTH the name and the local-part must match,
   // and the name must not be generic. We never merge on name alone.
   const GENERIC_NAMES = new Set([
-    'github', 'github action', 'github actions', 'unknown', 'dev', 'developer',
-    'admin', 'root', 'user', 'ci', 'build', 'release', 'bot', 'none', 'n/a',
+    'github',
+    'github action',
+    'github actions',
+    'unknown',
+    'dev',
+    'developer',
+    'admin',
+    'root',
+    'user',
+    'ci',
+    'build',
+    'release',
+    'bot',
+    'none',
+    'n/a',
   ]);
   const records = Array.from(byEmail.values());
   for (let i = 0; i < records.length; i++) {
@@ -175,7 +190,10 @@ export function buildIdentityMap(
       if (GENERIC_NAMES.has(a.nameKey)) continue;
       if (isBot(a.name, a.email) || isBot(b.name, b.email)) continue;
       // Same person only when the display name AND the email local-part agree.
-      if (a.nameKey === b.nameKey && emailLocalPart(a.email) === emailLocalPart(b.email)) {
+      if (
+        a.nameKey === b.nameKey &&
+        emailLocalPart(a.email) === emailLocalPart(b.email)
+      ) {
         uf.union(a.email, b.email);
       }
     }
@@ -221,7 +239,9 @@ export function buildIdentityMap(
     }
   }
 
-  merges.sort((a, b) => b.members.length - a.members.length || a.name.localeCompare(b.name));
+  merges.sort(
+    (a, b) => b.members.length - a.members.length || a.name.localeCompare(b.name),
+  );
 
   return { emailToCanonical, merges };
 }
@@ -247,7 +267,10 @@ export function loadIdentityOverrides(repoPath: string): BuildIdentityOptions {
     if (colon === -1) continue;
     const kind = trimmed.slice(0, colon).trim().toLowerCase();
     const rest = trimmed.slice(colon + 1);
-    const emails = rest.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+    const emails = rest
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
     if (kind === 'merge' && emails.length >= 2) {
       options.mergeGroups!.push(emails);
     } else if (kind === 'split') {

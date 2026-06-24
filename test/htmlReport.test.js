@@ -25,7 +25,10 @@ function emptyResult() {
 }
 
 function writeReport(temporalRisks, extras) {
-  const out = path.join(os.tmpdir(), `ga-html-${Date.now()}-${Math.random().toString(36).slice(2)}.html`);
+  const out = path.join(
+    os.tmpdir(),
+    `ga-html-${Date.now()}-${Math.random().toString(36).slice(2)}.html`,
+  );
   generateHtmlReport(emptyResult(), out, temporalRisks, extras);
   const html = fs.readFileSync(out, 'utf8');
   fs.unlinkSync(out);
@@ -34,8 +37,28 @@ function writeReport(temporalRisks, extras) {
 
 test('generates a report without throwing on a temporal result', () => {
   const html = writeReport(
-    [{ scope: 'lib', category: 'Persistent concentration', lifetime: { level: 'HIGH', concentration: 90 }, recent: { level: 'HIGH', concentration: 92 }, recentTouches: 50, delta: 2, trend: 'rising' }],
-    { evolutionSummary: { ownershipTransitions: 1, highSeverityTransitions: 0, emergingConcentration: 0, historicalConcentration: 0, persistentConcentration: 1, distributedScopes: 0 }, hotspots: [] }
+    [
+      {
+        scope: 'lib',
+        category: 'Persistent concentration',
+        lifetime: { level: 'HIGH', concentration: 90 },
+        recent: { level: 'HIGH', concentration: 92 },
+        recentTouches: 50,
+        delta: 2,
+        trend: 'rising',
+      },
+    ],
+    {
+      evolutionSummary: {
+        ownershipTransitions: 1,
+        highSeverityTransitions: 0,
+        emergingConcentration: 0,
+        historicalConcentration: 0,
+        persistentConcentration: 1,
+        distributedScopes: 0,
+      },
+      hotspots: [],
+    },
   );
   assert.ok(html.includes('Temporal Risk Analysis'));
   assert.ok(html.includes('lib'));
@@ -43,8 +66,18 @@ test('generates a report without throwing on a temporal result', () => {
 
 test('escapes scope and category names to prevent HTML injection', () => {
   const html = writeReport(
-    [{ scope: '<img src=x onerror=alert(1)>', category: '<script>bad()</script>', lifetime: { level: 'HIGH', concentration: 90 }, recent: null, recentTouches: 0, delta: null, trend: 'stable' }],
-    undefined
+    [
+      {
+        scope: '<img src=x onerror=alert(1)>',
+        category: '<script>bad()</script>',
+        lifetime: { level: 'HIGH', concentration: 90 },
+        recent: null,
+        recentTouches: 0,
+        delta: null,
+        trend: 'stable',
+      },
+    ],
+    undefined,
   );
   // Raw injection must not survive into the document.
   assert.ok(!html.includes('<img src=x onerror=alert(1)>'));
@@ -55,7 +88,13 @@ test('escapes scope and category names to prevent HTML injection', () => {
 
 test('escapes hotspot scope and signal reasons', () => {
   const html = writeReport(undefined, {
-    hotspots: [{ signalsFired: 2, scope: '<b>x</b>', signals: [{ name: 'churn', reason: '<i>reason</i>' }] }],
+    hotspots: [
+      {
+        signalsFired: 2,
+        scope: '<b>x</b>',
+        signals: [{ name: 'churn', reason: '<i>reason</i>' }],
+      },
+    ],
   });
   assert.ok(html.includes('Maintenance Hotspots'));
   assert.ok(!html.includes('<b>x</b>'));

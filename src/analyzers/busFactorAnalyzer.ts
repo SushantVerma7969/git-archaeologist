@@ -4,7 +4,7 @@ import { isSourceScope } from '../utils/scopeFilter';
 
 export function analyzeBusFactor(
   fileStatsMap: Map<string, FileStats>,
-  authorNameMap: Map<string, string>
+  authorNameMap: Map<string, string>,
 ): BusFactor[] {
   const folderMap = new Map<string, Map<string, number>>();
   for (const [, stats] of fileStatsMap) {
@@ -28,8 +28,7 @@ export function analyzeBusFactor(
     }
     const totalChanges = Array.from(authorTotals.values()).reduce((a, b) => a + b, 0);
     if (totalChanges === 0) continue;
-    const sorted = Array.from(authorTotals.entries())
-      .sort((a, b) => b[1] - a[1]);
+    const sorted = Array.from(authorTotals.entries()).sort((a, b) => b[1] - a[1]);
     let cumulative = 0;
     let busFactor = 0;
     const atRiskAuthors: string[] = [];
@@ -39,9 +38,13 @@ export function analyzeBusFactor(
       atRiskAuthors.push(authorNameMap.get(email) ?? email);
       if (cumulative / totalChanges >= 0.5) break;
     }
-    const filesAtRisk = folder === '(root)'
-      ? Array.from(fileStatsMap.values()).filter((s) => !s.filepath.includes('/')).length
-      : Array.from(fileStatsMap.values()).filter((s) => s.filepath.startsWith(folder + '/')).length;
+    const filesAtRisk =
+      folder === '(root)'
+        ? Array.from(fileStatsMap.values()).filter((s) => !s.filepath.includes('/'))
+            .length
+        : Array.from(fileStatsMap.values()).filter((s) =>
+            s.filepath.startsWith(folder + '/'),
+          ).length;
     let warning = '';
     if (busFactor === 1) {
       warning = `⚠️  Single point of failure — only ${atRiskAuthors[0]} owns this module`;
@@ -57,7 +60,7 @@ export function analyzeBusFactor(
 
 export function analyzeCoupling(
   commits: Array<{ filesChanged: string[] }>,
-  minCoChanges: number = 5
+  minCoChanges: number = 5,
 ): CouplingPair[] {
   const coChangeMap = new Map<string, number>();
   const fileChangeCount = new Map<string, number>();
@@ -91,7 +94,7 @@ export function analyzeCoupling(
     }
     const maxChanges = Math.max(
       fileChangeCount.get(fileA) ?? 1,
-      fileChangeCount.get(fileB) ?? 1
+      fileChangeCount.get(fileB) ?? 1,
     );
     const couplingScore = Math.round((coChanges / maxChanges) * 1000) / 10;
     results.push({ fileA, fileB, coChanges, couplingScore });

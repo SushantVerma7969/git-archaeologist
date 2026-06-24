@@ -91,14 +91,15 @@ export function parseCommits(repoPath: string, since?: string): CommitRecord[] {
       .split('\0')
       .map((f) => f.trim())
       .filter((f) => f.length > 0)
-      .filter((f) =>
-        !f.startsWith('node_modules/') &&
-        !f.startsWith('.git/') &&
-        !f.startsWith('dist/') &&
-        !f.startsWith('build/') &&
-        !f.startsWith('coverage/') &&
-        !f.endsWith('.map') &&
-        !f.endsWith('.d.ts')
+      .filter(
+        (f) =>
+          !f.startsWith('node_modules/') &&
+          !f.startsWith('.git/') &&
+          !f.startsWith('dist/') &&
+          !f.startsWith('build/') &&
+          !f.startsWith('coverage/') &&
+          !f.endsWith('.map') &&
+          !f.endsWith('.d.ts'),
       );
 
     commits.push({ hash, authorEmail, authorName, timestamp, filesChanged });
@@ -130,20 +131,20 @@ export function buildFileStats(commits: CommitRecord[]): Map<string, FileStats> 
       stats.uniqueAuthors.add(commit.authorEmail);
       stats.authorChanges.set(
         commit.authorEmail,
-        (stats.authorChanges.get(commit.authorEmail) ?? 0) + 1
+        (stats.authorChanges.get(commit.authorEmail) ?? 0) + 1,
       );
       const year = new Date(commit.timestamp * 1000).getUTCFullYear();
 
-if (!stats.authorChangesByYear.has(year)) {
-  stats.authorChangesByYear.set(year, new Map());
-}
+      if (!stats.authorChangesByYear.has(year)) {
+        stats.authorChangesByYear.set(year, new Map());
+      }
 
-const yearlyAuthors = stats.authorChangesByYear.get(year)!;
+      const yearlyAuthors = stats.authorChangesByYear.get(year)!;
 
-yearlyAuthors.set(
-  commit.authorEmail,
-  (yearlyAuthors.get(commit.authorEmail) ?? 0) + 1
-);
+      yearlyAuthors.set(
+        commit.authorEmail,
+        (yearlyAuthors.get(commit.authorEmail) ?? 0) + 1,
+      );
       if (commit.timestamp < stats.firstChanged) stats.firstChanged = commit.timestamp;
       if (commit.timestamp > stats.lastChanged) stats.lastChanged = commit.timestamp;
       stats.changeTimeline.push(commit.timestamp);
