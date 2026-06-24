@@ -1,0 +1,110 @@
+Generated 2026-06-24T04:33Z — git-archaeologist curse-score validation
+
+======================================================================
+REPO: study-express   cutoff: 2022-01-01
+======================================================================
+train commits (pre-cutoff):  5713
+test commits (post-cutoff):  440
+  of which bug-fixes:        49
+files in scorer universe:    892
+files that got a bug-fix:    70
+base rate (random pick):     7.8%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |   100%     12.74x  |    60%    7.65x |   CURSE ✓
+   20 |    80%     10.19x  |    50%    6.37x |   CURSE ✓
+   50 |    60%     7.65x  |    30%    3.82x |   CURSE ✓
+  100 |    45%     5.73x  |    26%    3.31x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 18%
+  top-20 Jaccard(curse, raw): 25%
+  top-50 Jaccard(curse, raw): 23%
+
+VERDICT INPUTS:
+  curse lift@50: 7.65x   raw lift@50: 3.82x
+  curse advantage over baseline: 100%
+
+======================================================================
+REPO: study-express   cutoff: 2020-06-01
+======================================================================
+train commits (pre-cutoff):  5647
+test commits (post-cutoff):  506
+  of which bug-fixes:        57
+files in scorer universe:    889
+files that got a bug-fix:    71
+base rate (random pick):     8.0%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    90%     11.27x  |    60%    7.51x |   CURSE ✓
+   20 |    90%     11.27x  |    50%    6.26x |   CURSE ✓
+   50 |    58%     7.26x  |    32%    4.01x |   CURSE ✓
+  100 |    45%     5.63x  |    28%    3.51x |   CURSE ✓
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 25%
+  top-20 Jaccard(curse, raw): 25%
+  top-50 Jaccard(curse, raw): 27%
+
+VERDICT INPUTS:
+  curse lift@50: 7.26x   raw lift@50: 4.01x
+  curse advantage over baseline: 81%
+
+======================================================================
+REPO: study-axios   cutoff: 2021-06-01
+======================================================================
+train commits (pre-cutoff):  1008
+test commits (post-cutoff):  1097
+  of which bug-fixes:        300
+files in scorer universe:    184
+files that got a bug-fix:    45
+base rate (random pick):     24.5%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    90%     3.68x  |   100%    4.09x |   raw
+   20 |    85%     3.48x  |    80%    3.27x |   CURSE ✓
+   50 |    50%     2.04x  |    54%    2.21x |   raw
+  100 |    32%     1.31x  |    33%    1.35x |   raw
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 54%
+  top-20 Jaccard(curse, raw): 60%
+  top-50 Jaccard(curse, raw): 61%
+
+VERDICT INPUTS:
+  curse lift@50: 2.04x   raw lift@50: 2.21x
+  curse advantage over baseline: -7%
+
+======================================================================
+REPO: study-lodash   cutoff: 2016-01-01
+======================================================================
+train commits (pre-cutoff):  6037
+test commits (post-cutoff):  1664
+  of which bug-fixes:        139
+files in scorer universe:    278
+files that got a bug-fix:    12
+base rate (random pick):     4.3%
+
+PRECISION@K / LIFT vs random  (lift = how many x better than chance)
+  K |  curse P@K  curse lift |  raw P@K  raw lift |  curse beats raw?
+  ----------------------------------------------------------------
+   10 |    30%     6.95x  |    40%    9.27x |   raw
+   20 |    30%     6.95x  |    30%    6.95x |   tie
+   50 |    14%     3.24x  |    16%    3.71x |   raw
+  100 |     8%     1.85x  |     9%    2.08x |   raw
+
+RANKING OVERLAP (audit claim: curse ≈ raw-change-count sort)
+  top-10 Jaccard(curse, raw): 43%
+  top-20 Jaccard(curse, raw): 60%
+  top-50 Jaccard(curse, raw): 79%
+
+VERDICT INPUTS:
+  curse lift@50: 3.24x   raw lift@50: 3.71x
+  curse advantage over baseline: -12%
+
