@@ -44,13 +44,22 @@ export async function analyze(
     // no analyzer changes. Conservative by default; correctable via a
     // .git-arch-identities file in the repo root.
     const overrides = loadIdentityOverrides(repoPath);
-    const identity = buildIdentityMap(
-      commits.map((c) => ({ email: c.authorEmail, name: c.authorName })),
-      overrides,
-    );
+    const identityInputs = commits.flatMap((c) => [
+      { email: c.authorEmail, name: c.authorName },
+      ...(c.coAuthors ?? []).map((co) => ({ email: co.email, name: co.name })),
+    ]);
+    const identity = buildIdentityMap(identityInputs, overrides);
     for (const c of commits) {
       const canonical = identity.emailToCanonical.get(c.authorEmail.trim().toLowerCase());
       if (canonical) c.authorEmail = canonical;
+      // Co-author trailers carry their own raw emails; canonicalize them too, or
+      // a contributor credited via Co-authored-by survives the identity merge and
+      // re-appears as a phantom separate person in ownership (e.g. daishi@axlight
+      // alongside the merged "Daishi Kato").
+      for (const co of c.coAuthors ?? []) {
+        const coCanon = identity.emailToCanonical.get(co.email.trim().toLowerCase());
+        if (coCanon) co.email = coCanon;
+      }
     }
 
     if (spinner) {

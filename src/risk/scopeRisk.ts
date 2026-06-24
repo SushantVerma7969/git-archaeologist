@@ -17,14 +17,26 @@ interface ExplanationInput {
 // top-level finding — e.g. a 3-file helper dir touched 4 times by one person is
 // not a maintenance emergency. Such scopes still surface as MEDIUM, not hidden.
 const MIN_TOUCHES_FOR_HIGH = 15;
+// A scope needs a floor of real history before single-ownership is treated as a
+// headline maintenance risk. A 3-file CLI stub touched 6 times is single-owner
+// because it's trivial, not because it's a continuity risk — demote it to LOW so
+// it can't top the risk map over substantive scopes. Tuned to clear genuine
+// micro-stubs (bin/, a 2-file shim) without hiding real small modules.
+const MIN_TOUCHES_FOR_MEDIUM = 10;
+const MIN_FILES_FOR_MEDIUM = 4;
 
 export function classifyScopeRisk(
   busFactor: number,
   concentration: number,
   totalTouches = Infinity,
+  fileCount = Infinity,
 ): RiskLevel {
   if (busFactor === 1 && concentration >= 80 && totalTouches >= MIN_TOUCHES_FOR_HIGH) {
     return 'HIGH';
+  }
+  // Trivial scopes: too little evidence to be a headline risk in either dimension.
+  if (totalTouches < MIN_TOUCHES_FOR_MEDIUM && fileCount < MIN_FILES_FOR_MEDIUM) {
+    return 'LOW';
   }
   if (busFactor === 1 || (busFactor === 2 && concentration >= 50)) {
     return 'MEDIUM';
@@ -105,7 +117,7 @@ export function buildScopeRisks(
 
     const contributors = authorTotals.size;
     const topOwner = bf.atRiskAuthors[0] ?? 'unknown';
-    const level = classifyScopeRisk(bf.busFactor, concentration, total);
+    const level = classifyScopeRisk(bf.busFactor, concentration, total, bf.filesAtRisk);
     const explanationInput = {
       level,
       busFactor: bf.busFactor,
@@ -148,7 +160,13 @@ export function buildScopeRisks(
     MEDIUM: 1,
     LOW: 2,
   };
+  // Within a risk level, rank by concentration weighted by evidence volume, so a
+  // tiny high-concentration stub (e.g. a 3-file `bin/` at 100%) can't outrank a
+  // substantive scope with real history. log-dampened touches keeps the weighting
+  // from being dominated by sheer size while still demoting trivial directories.
+  const weight = (r: { concentration: number; totalFileTouches: number }) =>
+    r.concentration * Math.log2(r.totalFileTouches + 2);
   return risks.sort(
-    (a, b) => order[a.level] - order[b.level] || b.concentration - a.concentration,
+    (a, b) => order[a.level] - order[b.level] || weight(b) - weight(a),
   );
 }

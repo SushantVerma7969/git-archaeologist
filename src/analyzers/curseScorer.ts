@@ -130,6 +130,7 @@ const DISPLAY_NONSOURCE = [
   /(^|\/)__snapshots__\//i,
   /\.snap$/i,
   /(^|\/)(bench|benchmark|benchmarks|perf|perf-testing|performance)\//i,
+  /(^|\/)(bench|benchmark|benchmarks)\.[a-z]+$/i, // root-level bench.ts / benchmark.js etc.
   // dotfiles and build/tooling config — not maintained product source
   /(^|\/)\.[^/]+$/, // any dot-prefixed file: .gitignore, .npmignore, .editorconfig
   /(^|\/)\.[^/]+\//, // anything under a dot-prefixed dir: .github/, .circleci/

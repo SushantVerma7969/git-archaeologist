@@ -199,6 +199,39 @@ export function buildIdentityMap(
     }
   }
 
+  // --- Rule 2b: same email local-part + compatible name variant.
+  // Catches "Daishi Kato" <a@x> ↔ "daishi" <a@y> — same local-part, and one
+  // display name is the first token (or a case-insensitive substring) of the
+  // other. Narrower than name-alone merging: the local-part MUST match, so we
+  // never merge two different people who happen to share a first name.
+  const firstToken = (n: string) => n.trim().toLowerCase().split(/\s+/)[0] ?? '';
+  // Normalize a local-part for comparison: strip separators git users vary on
+  // (dai-shi ↔ daishi, john.doe ↔ johndoe). Used ONLY in combination with a
+  // compatible-name check, so this can't merge unrelated people.
+  const normLocal = (e: string) => emailLocalPart(e).replace(/[.\-_]/g, '');
+  for (let i = 0; i < records.length; i++) {
+    for (let j = i + 1; j < records.length; j++) {
+      const a = records[i];
+      const b = records[j];
+      if (splitSet.has(a.email) || splitSet.has(b.email)) continue;
+      if (!a.nameKey || !b.nameKey) continue;
+      if (a.nameKey.length < 3 || b.nameKey.length < 3) continue;
+      if (GENERIC_NAMES.has(a.nameKey) || GENERIC_NAMES.has(b.nameKey)) continue;
+      if (isBot(a.name, a.email) || isBot(b.name, b.email)) continue;
+      if (normLocal(a.email) !== normLocal(b.email)) continue;
+      // names already equal were handled by Rule 2; here catch variant forms
+      if (a.nameKey === b.nameKey) continue;
+      const compatible =
+        firstToken(a.name) === b.nameKey ||
+        firstToken(b.name) === a.nameKey ||
+        a.nameKey.includes(b.nameKey) ||
+        b.nameKey.includes(a.nameKey);
+      if (compatible) {
+        uf.union(a.email, b.email);
+      }
+    }
+  }
+
   // --- explicit override merges (always win, even over splits) ---
   for (const group of options.mergeGroups ?? []) {
     const emails = group.map((e) => e.trim().toLowerCase()).filter(Boolean);

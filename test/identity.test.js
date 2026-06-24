@@ -99,3 +99,37 @@ test('unrelated identities are left untouched', () => {
   assert.equal(r.merges.length, 0);
   assert.equal(r.emailToCanonical.get('a@x.com'), 'a@x.com');
 });
+
+// --- Rule 2b regression: variant-name + normalized-local-part merge ---
+// Locks the jotai "Daishi Kato"/"daishi" fix and guards the over-merge edge.
+
+test('Rule 2b: variant name + separator-different local-part merges (Daishi case)', () => {
+  // "Daishi Kato" <dai-shi@noreply> and "daishi" <daishi@axlight> are one person:
+  // local-parts match once separators are normalized (dai-shi -> daishi) AND the
+  // short name is the first token of the full name.
+  const r = buildIdentityMap(
+    ids(
+      ['dai-shi@users.noreply.github.com', 'Daishi Kato'],
+      ['daishi@axlight.com', 'daishi'],
+    ),
+  );
+  assert.equal(r.merges.length, 1);
+  assert.equal(r.merges[0].members.length, 2);
+});
+
+test('CONSERVATIVE: normalized-local-part match but INCOMPATIBLE names does NOT merge', () => {
+  // Two different people whose local-parts collide after separator-stripping
+  // (a-smith -> asmith) but whose full names disagree must stay split.
+  const r = buildIdentityMap(
+    ids(['a-smith@a.com', 'Alex Smith'], ['asmith@b.com', 'Andrea Jones']),
+  );
+  assert.equal(r.merges.length, 0);
+});
+
+test('Rule 2b: substring name variant merges on normalized local-part', () => {
+  // "Jon" is a substring of "Jonathan"; same normalized local-part -> one person.
+  const r = buildIdentityMap(
+    ids(['jon.doe@a.com', 'Jonathan Doe'], ['jondoe@b.com', 'Jon']),
+  );
+  assert.equal(r.merges.length, 1);
+});
