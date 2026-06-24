@@ -42,7 +42,7 @@ const child_process_1 = require("child_process");
 const path = __importStar(require("path"));
 function validateRepo(repoPath) {
     try {
-        (0, child_process_1.execSync)('git rev-parse --is-inside-work-tree', {
+        (0, child_process_1.execFileSync)('git', ['rev-parse', '--is-inside-work-tree'], {
             cwd: repoPath,
             stdio: 'pipe',
         });
@@ -53,7 +53,7 @@ function validateRepo(repoPath) {
 }
 function getRepoName(repoPath) {
     try {
-        const remote = (0, child_process_1.execSync)('git remote get-url origin', {
+        const remote = (0, child_process_1.execFileSync)('git', ['remote', 'get-url', 'origin'], {
             cwd: repoPath,
             stdio: 'pipe',
         })
@@ -69,8 +69,11 @@ function getRepoName(repoPath) {
     return path.basename(path.resolve(repoPath));
 }
 function getTotalCommitCount(repoPath, since) {
-    const sinceFlag = since ? ` --since="${since}"` : '';
-    const out = (0, child_process_1.execSync)(`git rev-list --count HEAD${sinceFlag}`, {
+    // Args passed as an array so `since` is never interpolated into a shell.
+    const args = ['rev-list', '--count', 'HEAD'];
+    if (since)
+        args.push(`--since=${since}`);
+    const out = (0, child_process_1.execFileSync)('git', args, {
         cwd: repoPath,
         stdio: 'pipe',
     })
@@ -78,29 +81,39 @@ function getTotalCommitCount(repoPath, since) {
         .trim();
     return parseInt(out, 10);
 }
-function sanitizeFilePath(raw) {
-    // git sometimes wraps paths containing special chars in double quotes
-    // e.g. "test/some file.js" — strip the surrounding quotes
-    let p = raw.trim();
-    if (p.startsWith('"') && p.endsWith('"')) {
-        p = p.slice(1, -1);
-    }
-    return p;
-}
 function parseCommits(repoPath, since) {
     const DELIMITER = '||GITARCH||';
     const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
-    const sinceFlag = since ? ` --since="${since}"` : '';
-    const raw = (0, child_process_1.execSync)(`git log --pretty=format:"${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at" --name-only${sinceFlag}`, { cwd: repoPath, stdio: 'pipe', maxBuffer: 512 * 1024 * 1024 }).toString();
+    // NUL-terminated output (`-z`) makes parsing unambiguous: git separates
+    // each pathname with a NUL and each commit's path list ends with an extra
+    // NUL. Because pathnames are delimited by NUL rather than newline, a file
+    // whose name contains spaces, newlines, or looks like a timestamp can never
+    // be confused with anything else — which is why no downstream "is this a
+    // real path?" guard is needed. The args are passed as an array (not a shell
+    // string) so `since` cannot be interpolated into a shell command.
+    const args = [
+        'log',
+        `--pretty=format:${BEGIN_MARKER}%H${DELIMITER}%ae${DELIMITER}%an${DELIMITER}%at`,
+        '--name-only',
+        '-z',
+    ];
+    if (since)
+        args.push(`--since=${since}`);
+    const raw = (0, child_process_1.execFileSync)('git', args, {
+        cwd: repoPath,
+        stdio: 'pipe',
+        maxBuffer: 512 * 1024 * 1024,
+    }).toString();
     const commits = [];
-    const blocks = raw
-        .split(BEGIN_MARKER)
-        .map((b) => b.trim())
-        .filter(Boolean);
+    // With -z, the stream is: <header>\n<path>\0<path>\0...\0\0<header>\n...
+    // Split on the BEGIN_MARKER to get per-commit blocks, then within each
+    // block the header is the first line and the remaining NUL-separated
+    // tokens are pathnames.
+    const blocks = raw.split(BEGIN_MARKER).filter((b) => b.length > 0);
     for (const block of blocks) {
         const newlineIdx = block.indexOf('\n');
-        const header = newlineIdx === -1 ? block.trim() : block.substring(0, newlineIdx).trim();
-        const filesRaw = newlineIdx === -1 ? '' : block.substring(newlineIdx + 1).trim();
+        const header = (newlineIdx === -1 ? block : block.slice(0, newlineIdx)).trim();
+        const filesRaw = newlineIdx === -1 ? '' : block.slice(newlineIdx + 1);
         const parts = header.split(DELIMITER);
         if (parts.length !== 4)
             continue;
@@ -109,8 +122,8 @@ function parseCommits(repoPath, since) {
         if (isNaN(timestamp))
             continue;
         const filesChanged = filesRaw
-            .split('\n')
-            .map((f) => sanitizeFilePath(f))
+            .split('\0')
+            .map((f) => f.trim())
             .filter((f) => f.length > 0)
             .filter((f) => !f.startsWith('node_modules/') &&
             !f.startsWith('.git/') &&

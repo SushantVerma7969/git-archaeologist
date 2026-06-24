@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.0] - 2026-06-24
+- Fixed a correctness bug where `@users.noreply.github.com` addresses were treated as bots. That address is GitHub's default for any user who keeps their email private, so the rule silently excluded real contributors from ownership, bus-factor, and churn analysis — on React it erased 212 of 1,010 real contributors (21%), including active core maintainers. Genuine automation accounts are still detected via the `[bot]` convention and a known-bot list.
+- Hardened git history parsing to use NUL-terminated output (`git log -z`), so a filename containing spaces, newlines, or resembling a timestamp can no longer be misparsed. This removed two duplicated downstream guards that had been filtering corrupt-looking paths by magic value.
+- All git invocations now pass arguments as arrays (`execFileSync`) rather than interpolating into a shell string, removing a shell-injection surface on the `--since` value.
+- Added the project's first end-to-end integration tests: they build throwaway git repositories and assert on the full analyze() pipeline (test count 47 -> 54).
+
+
 ## [1.28.0] - 2026-06-24
 - Identity canonicalization: contributors who commit under multiple emails (e.g. joe@fb.com, joe@meta.com, and the GitHub noreply form) are now merged into a single person before any analysis runs, so ownership concentration and bus factor reflect real people rather than duplicate identities. The merge is conservative by default — it only links identities on strong signals (a shared GitHub noreply handle, or a matching display name *and* email local-part) and never on a common name alone. A new MERGED IDENTITIES section shows exactly what was collapsed, and a `.git-arch-identities` file in the repo root can force merges or splits the heuristic gets wrong.
 

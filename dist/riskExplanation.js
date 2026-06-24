@@ -241,12 +241,6 @@ function buildYearlyConcentrationSeries(result) {
     const series = [];
     const scopeData = new Map();
     for (const [, stats] of result.fileStats) {
-        if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
-            continue;
-        }
-        if (stats.filepath === 'ls') {
-            continue;
-        }
         const scope = stats.filepath.includes('/')
             ? stats.filepath.split('/')[0]
             : '(root)';
@@ -287,12 +281,6 @@ function buildOwnershipTransitions(result) {
     const transitions = [];
     const scopeData = new Map();
     for (const [, stats] of result.fileStats) {
-        if (/^\d{1,2}:\d{2}:\d{2}$/.test(stats.filepath)) {
-            continue;
-        }
-        if (stats.filepath === 'ls') {
-            continue;
-        }
         const scope = stats.filepath.includes('/')
             ? stats.filepath.split('/')[0]
             : '(root)';
