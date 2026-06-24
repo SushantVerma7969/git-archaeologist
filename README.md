@@ -4,7 +4,7 @@
 
 **Find maintenance risk in your git history before it turns into a handoff problem.**
 
-git-archaeologist reads commit history and shows where maintenance knowledge is concentrated: which folders have a low bus factor, which contributor owns most of the history, and whether that contributor is still active. A directory that's 70% touched by someone who committed last week is different from one that's 70% touched by someone who hasn't committed in two years.
+git-archaeologist reads commit history and shows where maintenance knowledge is concentrated: which folders have a low bus factor, which contributor owns most of the history, and whether that contributor is still around. A directory that's 70% written by someone who committed last week is a very different situation from one that's 70% written by someone who hasn't touched the repo in two years. Both look identical if you only count commits. This tool tells them apart.
 
 [Quick Start](#quick-start) · [Example output](#example-output) · [Concepts](#concepts) · [Commands](#commands) · [Research](RESEARCH.md) · [Benchmarks](BENCHMARKS.md)
 
@@ -24,7 +24,7 @@ Run it from the root of any git repository. No install required.
 $ npx git-archaeologist risk ./express
 
 ⛏  git-arch risk — express
-  Maintenance risk map — not an ownership leaderboard
+  Maintenance risk map, not an ownership leaderboard
   Analysis window: all available history
 ──────────────────────────────────────────────────────────────────────
 
@@ -53,72 +53,59 @@ $ npx git-archaeologist risk ./express
   Latest analyzed activity: 12 years ago
 ```
 
-> Numbers above are from a June 2026 run against the full history of `expressjs/express`; reproduce with `npx git-archaeologist risk .` on any clone. Exact figures shift as history grows.
+> Numbers above are from a June 2026 run against the full history of `expressjs/express`. Reproduce with `npx git-archaeologist risk .` on any clone. Exact figures shift as history grows.
 
 ## Why owner activity matters
 
-We ran `git-arch risk` on two well-known projects and found similar concentration numbers — with completely different stories underneath.
+This is the idea the whole tool is built around, so it's worth one concrete example.
 
-**Express — `support/`**
+We ran `git-arch risk` on two well-known projects and got similar concentration numbers with completely different stories underneath.
+
+**Express, the `support/` folder**
 - 97.2% of changes attributed to one contributor (TJ Holowaychuk, the original author)
 - 389 contributors total across the repo
 - That contributor's most recent commit anywhere in the repo was **12 years ago**
-- Express has since moved under the OpenJS Foundation and is maintained by other people — but the *historical* concentration in this area still sits with someone long gone
+- Express has since moved under the OpenJS Foundation and is maintained by other people, but the historical concentration in this area still sits with someone long gone
 
-**React — a core reconciler scope**
+**React, a core reconciler scope**
 - 63.6% of changes attributed to one contributor (Andrew Clark)
 - Bus factor 1, similar single-owner concentration
 - That contributor committed **2 months ago** and is still active
 
-Both are bus-factor-1, single-owner scopes. One owner has been gone for over a decade; the other is committing this quarter. The concentration number alone can't tell you which — owner activity is what separates *abandoned* concentration from *active* concentration, and it's the distinction this tool is built around.
+Both are bus-factor-1, single-owner scopes. One owner has been gone for over a decade; the other is committing this quarter. The concentration number alone can't tell you which one you're looking at. Owner activity is what separates abandoned concentration from active concentration, and surfacing that difference is the point of this tool.
 
-> Figures from a June 2026 run against the full history of each repo. Reproduce with `git-arch risk <repo> --all`. They will drift over time — that drift is the point.
+> Figures from a June 2026 run against the full history of each repo. Reproduce with `git-arch risk <repo> --all`. They drift over time, and that drift is the point.
 
 ## Concepts
 
-**Ownership Concentration** — percent of a folder's commit touches from its biggest contributor. High concentration is not inherently bad; it depends on recency and redundancy.
+**Ownership concentration** is the percent of a folder's commit touches that come from its single biggest contributor. High concentration isn't automatically bad; whether it matters depends on recency and redundancy.
 
-**Bus Factor** — computed per folder, not only per repo. A repo-wide bus factor of 5 can still hide a critical module with bus factor 1.
+**Bus factor** is computed per folder, not just per repo. A repo-wide bus factor of 5 can still hide a critical module owned entirely by one person.
 
-**Owner Activity** — when the dominant contributor last committed anywhere in the repo. This separates active concentration from abandoned concentration.
+**Owner activity** is when the dominant contributor last committed anywhere in the repo. This is what separates active concentration from abandoned concentration.
 
-**HIGH / MEDIUM / LOW** — classified from ownership concentration and bus factor. Owner activity is shown as context so you can tell active concentration from abandoned concentration. Run `--all` to see every scope.
+**HIGH / MEDIUM / LOW** is classified from ownership concentration and bus factor. Owner activity is shown alongside as context, so you can tell an active owner from a departed one. Run `--all` to see every scope, including LOW.
 
-**Explainable Risk Output** — `git-arch risk` explains each scope with structured reasons and a short interpretation. The explanations reuse the same bus-factor and concentration values used by the risk command; they do not run additional analysis or change the thresholds.
+**Explainable output**: `git-arch risk` explains each scope with structured reasons and a short interpretation. The explanations reuse the same bus-factor and concentration values the risk command already computed. They don't run extra analysis or move the thresholds.
 
 ## Temporal classification
 
-`git-arch risk --temporal` compares lifetime risk with the last 12 months. This helps separate old concentration that has spread out from new concentration that is only visible recently.
+`git-arch risk --temporal` compares lifetime risk against the last 12 months. This helps you separate old concentration that has since spread out from new concentration that only became visible recently.
 
-- **Persistent concentration** — concentrated over lifetime history and still concentrated recently
-- **Historical concentration** — concentrated over lifetime history, but distributed recently
-- **Emerging concentration** — distributed over lifetime history, but concentrated recently
-- **Persistently distributed** — distributed in both windows
-- **No recent activity** — lifetime history exists, but there are no recent non-bot touches
-- **Insufficient recent evidence** — fewer than 10 recent non-bot touches
+- **Persistent concentration**: concentrated over lifetime history and still concentrated recently
+- **Historical concentration**: concentrated over lifetime history, but distributed recently
+- **Emerging concentration**: distributed over lifetime history, but concentrated recently
+- **Persistently distributed**: distributed in both windows
+- **No recent activity**: lifetime history exists, but there are no recent non-bot touches
+- **Insufficient recent evidence**: fewer than 10 recent non-bot touches
 
-For this comparison, HIGH and MEDIUM are treated as concentrated; LOW is treated as distributed.
+For this comparison, HIGH and MEDIUM count as concentrated and LOW counts as distributed.
 
 ## Hotspots
 
-`git-arch risk --hotspots` ranks scopes by how many independent maintenance-risk signals fired for them: bus factor of 1, high contributor churn, an inactive dominant contributor, recently rising concentration, and ownership transitions. It does not invent a new weighted score — each fired signal carries its own evidence line, and scopes are ranked by signal count (concentration breaks ties). A scope where four independent signals agree is a stronger investigation candidate than one where only a single number looks high.
+`git-arch risk --hotspots` ranks scopes by how many independent maintenance-risk signals fired for them: bus factor of 1, high contributor churn, an inactive dominant contributor, recently rising concentration, and ownership transitions. There's no new weighted score behind it. Each fired signal carries its own evidence line, and scopes are ranked by how many signals fired, with concentration breaking ties. A scope where four independent signals agree is a far stronger thing to investigate than one where a single number happens to look high.
 
-By default it shows scopes with two or more signals; `--all` lowers that to one, and `--json` emits machine-readable output. As with every other view, these are investigation signals, not claims about ownership or maintainership.
-
-## Known Limitations
-
-- Commit authorship is not the same as knowledge ownership.
-- Multiple Git identities may affect ownership calculations.
-- PR reviews and approvals are not currently analyzed.
-- Results should be used as investigation signals, not final judgments.
-
-## Install
-
-For repeated use:
-
-```bash
-npm install -g git-archaeologist
-```
+By default it shows scopes with two or more signals. `--all` lowers that to one, and `--json` emits machine-readable output. As everywhere else, these are signals to investigate, not verdicts about ownership or maintainership.
 
 ## Commands
 
@@ -152,9 +139,15 @@ git-arch blast lib/response.js /path/to/repo   # show files coupled to this file
 git-arch pr-risk /path/to/repo                 # score local changes before pushing
 ```
 
-## Deeper analysis: curse score & coupling
+For repeated use, install it globally:
 
-`git-arch analyze` goes beyond the risk map — it ranks individual files by **curse score** (a combination of recency, author churn, and acceleration) and detects **implicit coupling** (files that always change together despite no code-level connection).
+```bash
+npm install -g git-archaeologist
+```
+
+## Deeper analysis: curse score and coupling
+
+`git-arch analyze` goes past the risk map. It ranks individual files by **curse score**, a combination of recency, author churn, and acceleration, and it detects **implicit coupling**: files that keep changing together even though nothing connects them at the code level.
 
 ```
 $ git-arch analyze ./express
@@ -170,25 +163,25 @@ IMPLICIT COUPLING
   lib/response.js ↔ test/res.send.js   co-changes: 31
 ```
 
-> Curse scores are a within-repo ranking, not an absolute scale — a score of 23,507 is only meaningful relative to other files in the same repository. Numbers from a June 2026 run; reproduce with `git-arch analyze .`.
+> Curse scores are a within-repo ranking, not an absolute scale. A score of 23,507 is only meaningful next to the other files in the same repository. Numbers from a June 2026 run; reproduce with `git-arch analyze .`.
 
-> Run time: Express (~900 files) under 1 second · large repos like Kubernetes (~100k files) a few minutes. Most of the cost is `git log`; the analysis itself is linear in commits.
+> Run time: Express (~900 files) takes under a second. Large repos like Kubernetes (~100k files) take a few minutes. Most of the cost is `git log`; the analysis itself is linear in commits.
 
-## How scoring works
+### How the score is computed
 
 ```
 curse_score = changes x log2(authors+1) x exp(-0.5 x age_years) x log2(churn_rate+2) x acceleration
 ```
 
-The exponential decay on age means old chaos that stabilized doesn't show up. The acceleration multiplier means files getting worse recently score higher than ones with similar totals that have stabilized. Changelogs, lockfiles, and CI config are automatically excluded.
+The exponential decay on age means old chaos that has since stabilized stays quiet. The acceleration multiplier pushes files that are getting worse lately above files with similar totals that have settled down. Changelogs, lockfiles, and CI config are excluded automatically.
 
-## Why not `git log` or ownership-only tools?
+## Why not just `git log` or an ownership tool?
 
-`git log` tells you what happened. Ownership-only tools tell you who touched code most. `git-archaeologist` adds bus factor, owner activity, temporal classification, and file-level history signals.
+`git log` tells you what happened. Ownership tools tell you who touched code most. git-archaeologist adds the layer those leave out: bus factor, owner activity, temporal classification, and file-level history signals.
 
 - Finds bus-factor-1 modules automatically across every folder
-- Pairs ownership concentration with owner activity to distinguish healthy concentration from abandonment
-- Surfaces files becoming more dangerous over time
+- Pairs ownership concentration with owner activity, so you can tell healthy concentration from abandonment
+- Surfaces files that are getting more dangerous over time
 - Discovers hidden coupling through commit co-occurrence
 - Generates interactive HTML reports for large repositories
 
@@ -202,13 +195,13 @@ git-arch mcp
 
 It exposes five tools, each returning structured JSON:
 
-- **`analyze_repo`** — overview: commit/contributor totals, bus-factor-1 scopes, top cursed files, merged identities
-- **`who_owns`** — who has historically owned a specific file, and how recently they were active
-- **`get_bus_factor`** — per-folder single-point-of-failure map
-- **`find_coupled_files`** — files that have historically changed together
-- **`get_risk_hotspots`** — scopes where multiple independent risk signals agree
+- **`analyze_repo`**: overview with commit and contributor totals, bus-factor-1 scopes, top cursed files, and merged identities
+- **`who_owns`**: who has historically owned a specific file, and how recently they were active
+- **`get_bus_factor`**: per-folder single-point-of-failure map
+- **`find_coupled_files`**: files that have historically changed together
+- **`get_risk_hotspots`**: scopes where several independent risk signals agree
 
-All tools take an optional `repoPath` (defaulting to the working directory). Example client configuration:
+All tools take an optional `repoPath`, defaulting to the working directory. Example client configuration:
 
 ```json
 {
@@ -221,11 +214,11 @@ All tools take an optional `repoPath` (defaulting to the working directory). Exa
 }
 ```
 
-As with the CLI, these are investigation signals from commit history — not conclusions about ownership or who should be assigned work.
+As with the CLI, these are signals from commit history to investigate, not conclusions about ownership or who should be assigned work.
 
 ## GitHub Action (advanced)
 
-For automatic curse-score analysis on every push or PR. The Action does not currently report `git-arch risk` owner-activity or temporal-risk findings.
+Runs curse-score analysis on every push or PR and comments the result. It reports curse-score findings for risky files; the `git-arch risk` owner-activity and temporal views are CLI-only for now.
 
 ```yaml
 # .github/workflows/git-archaeologist.yml
@@ -250,25 +243,23 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-`fetch-depth: 0` is required — without full history the analysis is incomplete. The Action reports curse-score findings for risky files; risk/owner-activity reporting is CLI-only for now.
+`fetch-depth: 0` is required. Without full history the analysis is incomplete.
 
-## Research & Validation
+## Known limitations
 
-### Does curse score predict bugs?
+Be honest with yourself about what this measures before you act on it.
 
-In a small manual check, the top curse-scored files in Express, React, and Vue were consistently files with heavy public bug-and-fix history. This is a hand-checked correlation on a handful of files, not a controlled study — the curse score is best understood as flagging files that are *socially complex enough that bugs tend to hide there*, not as a bug predictor. The [validation write-up](RESEARCH.md) details the method and its limitations.
+- Commit authorship is not the same as knowledge ownership. Someone who reviewed every PR may not show up at all.
+- Multiple Git identities for one person can skew ownership numbers. The tool merges obvious cases but stays conservative.
+- PR reviews and approvals aren't analyzed, only commits.
+- Treat the output as a place to start asking questions, not as a final judgment about anyone.
 
-- [Curse Score Validation Notes](RESEARCH.md) — method, results, and why this is correlation not prediction
-- [Repository Risk Benchmark 2026](BENCHMARKS.md) — multi-repo analysis of bus-factor-1 modules
+## Does the curse score predict bugs?
 
-### Full Research
+Short answer: it correlates, but don't oversell it. In a small manual check, the top curse-scored files in Express, React, and Vue were consistently files with heavy public bug-and-fix history. That's a hand-checked correlation on a handful of files, not a controlled study. The honest framing is that a high curse score flags files that are *socially complex enough that bugs tend to hide there*, rather than predicting bugs directly. The [validation write-up](RESEARCH.md) walks through the method and where it breaks down.
 
-Extensive analysis of git history patterns, temporal ownership dynamics, and methodology:
-
-- [Recency Study Phase 1](research/recency-study/) — Temporal risk classification across 25+ repositories
-- [Raw Analysis Data](research/) — Complete git-arch outputs for 25 major OSS projects (JSON + CSV)
-- [Study Protocol](research/recency-study-protocol.md) — Reproducible methodology and limitations
-- [Methodology Audit](research/ownership-metric-audit.md) — Known issues and potential biases
+- [Curse Score Validation Notes](RESEARCH.md): method, results, and why this is correlation rather than prediction
+- [Repository Risk Benchmark 2026](BENCHMARKS.md): multi-repo analysis of bus-factor-1 modules
 
 ## Requirements
 
@@ -276,14 +267,8 @@ Node.js >= 18 and git >= 2.30. Works on Linux, macOS, and Windows (WSL).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for:
-- Development setup (clone, build, test)
-- Code structure overview
-- How to make changes and submit PRs
-- Testing standards
-- Research contribution guidelines
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, a tour of the code structure, how to submit PRs, and the testing standards.
 
-Quick start:
 ```bash
 git clone https://github.com/SushantVerma7969/git-archaeologist.git
 cd git-archaeologist
