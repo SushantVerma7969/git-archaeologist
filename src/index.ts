@@ -133,4 +133,17 @@ registerBlastCommand(program);
 registerOwnershipCommand(program);
 registerPrRiskCommand(program);
 registerRiskCommand(program);
+
+program
+  .command('mcp')
+  .description(
+    'Start an MCP server (stdio) exposing the analysis as tools an AI agent can call',
+  )
+  .action(async () => {
+    // Imported lazily so the MCP SDK is only loaded when this command runs,
+    // keeping normal CLI invocations fast and dependency-light at runtime.
+    const { startMcpServer } = await import('./mcp/server');
+    await startMcpServer();
+  });
+
 program.parse(process.argv);

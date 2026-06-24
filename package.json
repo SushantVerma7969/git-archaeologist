@@ -1,6 +1,6 @@
 {
   "name": "git-archaeologist",
-  "version": "1.30.0",
+  "version": "1.31.0",
   "description": "Find the most dangerous files in any git repo — curse scores, bus factor, hidden coupling",
   "main": "dist/index.js",
   "bin": {
@@ -27,7 +27,10 @@
     "ownership",
     "coupling",
     "blame",
-    "git-analysis"
+    "git-analysis",
+    "mcp",
+    "ai-agent",
+    "model-context-protocol"
   ],
   "author": "Sushant Verma",
   "license": "MIT",
@@ -42,10 +45,12 @@
     "typescript-eslint": "^8.62.0"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "chalk": "^4.1.2",
     "cli-table3": "^0.6.5",
     "commander": "^9.5.0",
-    "ora": "^5.4.1"
+    "ora": "^5.4.1",
+    "zod": "^4.4.3"
   },
   "homepage": "https://github.com/SushantVerma7969/git-archaeologist",
   "repository": {

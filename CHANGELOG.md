@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.31.0] - 2026-06-24
+- Added an MCP (Model Context Protocol) server so AI coding agents can query a repository's git history directly. Run `git-arch mcp` to start it over stdio. It exposes five structured-JSON tools — analyze_repo, who_owns, get_bus_factor, find_coupled_files, and get_risk_hotspots — each defaulting to the working directory. The MCP SDK is loaded lazily, so normal CLI usage is unaffected.
+
+
 ## [1.29.1] - 2026-06-24
 - Corrected all example numbers in README, BENCHMARKS, and RESEARCH to match current tool output. The previous figures predated the contributor-filtering fix (v1.29.0) and the curse-score scale, and no longer reflected reality — e.g. the README's Express ownership example and the "11 out of 11" validation claim. Numbers are now regenerated against full repo history, marked with their run date, and the validation write-up is reframed as a hand-checked correlation rather than bug prediction.
 

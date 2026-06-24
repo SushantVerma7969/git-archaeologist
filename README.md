@@ -192,6 +192,37 @@ The exponential decay on age means old chaos that stabilized doesn't show up. Th
 - Discovers hidden coupling through commit co-occurrence
 - Generates interactive HTML reports for large repositories
 
+## MCP server (for AI agents)
+
+git-archaeologist ships an [MCP](https://modelcontextprotocol.io) server, so an AI coding agent can query a repository's history directly instead of parsing CLI output. Start it over stdio:
+
+```bash
+git-arch mcp
+```
+
+It exposes five tools, each returning structured JSON:
+
+- **`analyze_repo`** — overview: commit/contributor totals, bus-factor-1 scopes, top cursed files, merged identities
+- **`who_owns`** — who has historically owned a specific file, and how recently they were active
+- **`get_bus_factor`** — per-folder single-point-of-failure map
+- **`find_coupled_files`** — files that have historically changed together
+- **`get_risk_hotspots`** — scopes where multiple independent risk signals agree
+
+All tools take an optional `repoPath` (defaulting to the working directory). Example client configuration:
+
+```json
+{
+  "mcpServers": {
+    "git-archaeologist": {
+      "command": "npx",
+      "args": ["git-archaeologist", "mcp"]
+    }
+  }
+}
+```
+
+As with the CLI, these are investigation signals from commit history — not conclusions about ownership or who should be assigned work.
+
 ## GitHub Action (advanced)
 
 For automatic curse-score analysis on every push or PR. The Action does not currently report `git-arch risk` owner-activity or temporal-risk findings.
