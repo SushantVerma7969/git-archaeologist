@@ -6,6 +6,12 @@ export interface CommitRecord {
   authorName: string;
   timestamp: number;
   filesChanged: string[];
+  // Co-authors declared via "Co-authored-by: Name <email>" trailers. Empty for
+  // the common single-author commit. Each co-author shares ownership credit for
+  // the files in this commit but does NOT add to the commit/change count — see
+  // buildFileStats. This de-biases ownership on squash-merge and pair-programmed
+  // workflows where one committer is otherwise credited for several people's work.
+  coAuthors?: Array<{ email: string; name: string }>;
 }
 
 export interface FileStats {

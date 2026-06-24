@@ -2,8 +2,10 @@ import { AnalysisResult, ContributorChurn, AbandonedScope, ScopeRisk } from '../
 import { isSourceScope } from '../utils/scopeFilter';
 import { buildNonBotEmailSet } from './shared';
 
-export function buildContributorChurn(result: AnalysisResult): ContributorChurn[] {
-  const now = Date.now() / 1000;
+export function buildContributorChurn(
+  result: AnalysisResult,
+  now: number = Date.now() / 1000,
+): ContributorChurn[] {
   const twelveMonths = 365 * 24 * 60 * 60;
 
   const nonBotEmails = buildNonBotEmailSet(result);

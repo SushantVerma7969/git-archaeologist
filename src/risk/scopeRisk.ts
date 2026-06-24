@@ -55,6 +55,7 @@ interface ScopeRiskOptions {
 export function buildScopeRisks(
   result: AnalysisResult,
   options: ScopeRiskOptions = {},
+  now: number = Date.now() / 1000,
 ): ScopeRisk[] {
   const minFilesAtRisk = options.minFilesAtRisk ?? 3;
   const nonBotEmails = buildNonBotEmailSet(result);
@@ -111,7 +112,7 @@ export function buildScopeRisks(
     if (lastActiveTs !== undefined) {
       lastActive = formatTimeAgo(lastActiveTs);
 
-      lastActiveDays = Math.floor((Date.now() / 1000 - lastActiveTs) / 86400);
+      lastActiveDays = Math.floor((now - lastActiveTs) / 86400);
     }
     const recommendations = buildRiskRecommendations(level, bf.busFactor, lastActive);
 

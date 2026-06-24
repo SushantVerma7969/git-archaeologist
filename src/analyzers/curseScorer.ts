@@ -2,8 +2,7 @@ import { FileStats, CursedFile } from '../types';
 
 const ONE_YEAR_SECS = 365 * 24 * 60 * 60;
 
-function recencyWeight(lastChangedTimestamp: number): number {
-  const now = Date.now() / 1000;
+function recencyWeight(lastChangedTimestamp: number, now: number): number {
   const ageInYears = (now - lastChangedTimestamp) / ONE_YEAR_SECS;
   // Files touched recently score higher — exponential decay
   return Math.exp(-0.5 * ageInYears);
@@ -39,10 +38,9 @@ function isNoise(filepath: string): boolean {
   return NOISE_PATTERNS.some((p) => p.test(filename) || p.test(filepath));
 }
 
-function accelerationScore(timeline: number[]): number {
+function accelerationScore(timeline: number[], now: number): number {
   if (timeline.length < 4) return 1.0;
   const sorted = [...timeline].sort((a, b) => a - b);
-  const now = Date.now() / 1000;
   const oneYearAgo = now - ONE_YEAR_SECS;
   const sixMonthsAgo = now - ONE_YEAR_SECS / 2;
 
@@ -59,14 +57,15 @@ function accelerationScore(timeline: number[]): number {
 export function scoreCursedFiles(
   fileStatsMap: Map<string, FileStats>,
   topN: number = 20,
+  now: number = Date.now() / 1000,
 ): CursedFile[] {
   const results: CursedFile[] = [];
 
   for (const [, stats] of fileStatsMap) {
     const authorCount = stats.uniqueAuthors.size;
-    const recency = recencyWeight(stats.lastChanged);
+    const recency = recencyWeight(stats.lastChanged, now);
     const churn = churnRate(stats.changeTimeline);
-    const acceleration = accelerationScore(stats.changeTimeline);
+    const acceleration = accelerationScore(stats.changeTimeline, now);
 
     // Curse score formula:
     // Base = total changes × author count
