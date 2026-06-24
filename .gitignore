@@ -4,9 +4,9 @@ node_modules/
 .DS_Store
 git-arch-report-*.html
 
-!action/node_modules/
 research/kubernetes.json
 research/vscode.json
 research/elasticsearch.json
 research/recency-study/runs/
 research/
+action/node_modules/
