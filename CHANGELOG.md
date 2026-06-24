@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.32.0] - 2026-06-24
+
+### Fixed
+- **pr-risk scores by the worst file, not the average.** A single dangerous file in a large PR is no longer diluted to LOW by trivial files; the headline is the most dangerous file. Also suppresses the blast-radius signal for files with fewer than 3 prior commits (born-together co-change is an artifact, not a dependency). [behavior change]
+- **cursed --top N now honors N above 20.** The ranking was capped at 20 in analysis and truncated to 15 in the renderer regardless of --top; both caps are removed.
+- **ownership runs the canonical pipeline.** It now merges contributor identities and filters bots (consistent with analyze/risk), and adds --json. The legacy contributor leaderboard and "unowned files" metric were removed. [behavior change]
+
+### Changed
+- Command wording tightened to avoid over-claiming what git history measures: blast ("co-change, not a guaranteed dependency"), trend ("more active recently"), and hotspots/MCP/README ("distinct" rather than "independent" signals).
+
 ## [1.31.3] - 2026-06-24
 - Cleared all dependency vulnerabilities in the GitHub Action by upgrading `@actions/github` and pinning a patched `undici`. The action was rebundled and re-verified end-to-end.
 - Trimmed the published npm package: source maps (`.js.map`, `.d.ts.map`) are no longer shipped, cutting the unpacked size from ~376 KB to ~221 KB. Maps are still produced locally for development.
