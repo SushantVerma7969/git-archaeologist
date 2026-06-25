@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.32.4] - 2026-06-24
+
+### Fixed
+- **Documentation/ADR folders no longer surface as risk or ownership scopes.** A top-level folder of pure markdown (e.g. msw's `decisions/` architecture-decision records, or a `patches/` directory) could form a phantom bus-factor scope and be reported as a maintenance risk, because the scope-level analyzer grouped files by folder before the file-level non-source filter applied. Added `decisions`, `patches`, `adr`, `adrs`, `rfc`, `rfcs` to the shared `NON_SOURCE_SCOPES` set used by risk, ownership, and bus-factor. Display/classification only; curse scores unchanged.
+
+### Notes
+- Found via continued hostile testing on p-queue, unbuild, jotai, and msw. The leak was confirmed reproducible only for the ADR/patches case; an earlier hostile pass over-reported related scopes (`cli`, `helpers`) that turned out to be legitimate single-owner source, not false positives. This release fixes only the genuine docs-folder leak.
+- Known limitation: this is a denylist of folder names, so a docs-style folder under an unlisted name could still leak. A more durable fix (applying the file-level source filter inside the bus-factor analyzer) is deferred to avoid touching analyzer logic in a patch release.
+
 ## [1.32.3] - 2026-06-24
 
 ### Fixed
