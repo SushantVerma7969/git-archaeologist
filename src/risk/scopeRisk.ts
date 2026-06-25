@@ -166,7 +166,5 @@ export function buildScopeRisks(
   // from being dominated by sheer size while still demoting trivial directories.
   const weight = (r: { concentration: number; totalFileTouches: number }) =>
     r.concentration * Math.log2(r.totalFileTouches + 2);
-  return risks.sort(
-    (a, b) => order[a.level] - order[b.level] || weight(b) - weight(a),
-  );
+  return risks.sort((a, b) => order[a.level] - order[b.level] || weight(b) - weight(a));
 }
