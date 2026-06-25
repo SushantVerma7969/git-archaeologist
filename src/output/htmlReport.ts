@@ -68,7 +68,9 @@ export function generateHtmlReport(
   const from = result.dateRange.from.toISOString().split('T')[0];
   const to = result.dateRange.to.toISOString().split('T')[0];
   const maxS = Math.max(1, ...result.cursedFiles.map((f) => f.curseScore));
-  const treeJSON = JSON.stringify(buildTree(result));
+  // Escape `<` so a file/folder path containing "</script>" cannot break out
+  // of the <script> block this JSON is embedded in (stored-XSS on untrusted repos).
+  const treeJSON = JSON.stringify(buildTree(result)).replace(/</g, '\\u003c');
 
   const cursedRows = result.cursedFiles
     .slice(0, 20)

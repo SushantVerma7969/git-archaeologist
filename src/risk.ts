@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
 import { analyze } from './core/orchestrator';
+import { parseSince } from './utils/timeRange';
 import {
   buildScopeRisks,
   buildTemporalScopeRisks,
@@ -13,20 +14,6 @@ import {
   buildContributorChurn,
   buildHotspots,
 } from './riskExplanation';
-
-function parseSince(input: string): string {
-  const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
-  if (match) {
-    const n = parseInt(match[1], 10);
-    const unit = match[2].toLowerCase();
-    const date = new Date();
-    if (unit.startsWith('d')) date.setDate(date.getDate() - n);
-    else if (unit.startsWith('m')) date.setMonth(date.getMonth() - n);
-    else if (unit.startsWith('y')) date.setFullYear(date.getFullYear() - n);
-    return date.toISOString().split('T')[0];
-  }
-  return input;
-}
 
 export function registerRiskCommand(program: Command): void {
   program

@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.32.5] - 2026-06-25
+
+### Security
+- **`pr-risk` no longer passes the `--base` value through a shell.** Git diff commands now use argument arrays (`execFileSync`), closing a command-injection vector via a crafted `--base`. No behavior change for normal use.
+- **HTML reports escape `<` in embedded path data.** A maliciously named file or folder in an analyzed repo can no longer break out of the report's `<script>` block. Relevant when generating reports from untrusted repositories.
+
+### Fixed
+- **Empty repositories now fail with a clear message** ("Repository has no commits yet") instead of a raw `git rev-list` error.
+- **MCP `get_risk_hotspots` recent window now matches the CLI.** The 12-month window is resolved to a concrete date (as the CLI does) rather than handed to git as the literal `12m`, so MCP hotspot/temporal output matches `git-arch risk --hotspots`.
+- **`git-arch blame` normalizes Windows backslash paths correctly** (a regex bug previously left native-Windows paths unmatched, returning no history).
+
+### Internal
+- Consolidated the duplicated `--since` parsing into a single `src/utils/timeRange.ts` (`parseSince`), used by the CLI and the MCP server.
+- Added regression tests for the `pr-risk` injection, HTML report escaping, empty-repo handling, and time-range parsing.
+
+### Notes
+- Display/security/robustness only. The curse-score model, identity resolution, and published validation results are unchanged.
+
 ## [1.32.4] - 2026-06-24
 
 ### Fixed

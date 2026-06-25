@@ -148,23 +148,19 @@ Then open a pull request on GitHub with:
 
 ## Research Contribution Guidelines
 
-The recency study is frozen (Phase 1 complete). Research contributions should:
+The curse-score validation study is frozen. It lives in `research/`
+(`validate.mjs`, the leakage-free SZZ-style harness, and `results.txt`, its raw
+multi-repo output) and is written up in [RESEARCH.md](RESEARCH.md). Research
+contributions should:
 
-1. **Not modify existing data** — research/recency-study/ is immutable
-2. **Extend in new directions** — Add research/phase2/, research/temporal-window-extended/, etc.
-3. **Be clearly scoped** — Document methodology, sample size, limitations upfront
-4. **Include reproducibility** — Provide scripts, data, and methodology for peers to verify
-5. **Link back** — Document findings in research/README.md with metadata
-
-Example new research folder:
-```
-research/phase2-founder-pattern/
-├── README.md              # What, why, methodology
-├── analysis.md            # Detailed findings
-├── data.json              # Raw results
-└── scripts/
-    └── analyze.js         # Reproducible analysis script
-```
+1. **Not modify the frozen study** — `research/validate.mjs` and
+   `research/results.txt` back the published claims; leave them intact.
+2. **Extend in new directions** — add a new script and result file rather than
+   editing the existing ones.
+3. **Be clearly scoped** — document methodology, sample size, and limitations
+   upfront, in the same honest style as RESEARCH.md.
+4. **Include reproducibility** — ship the script, the cutoffs, and the raw
+   output so a reviewer can re-run every number.
 
 ## Release Process
 
@@ -180,8 +176,10 @@ Once your changes are merged:
 
 ### Minimum Test Coverage
 
-Currently: 1 test file (riskExplanation.test.js)  
-Target: 80% code coverage for critical paths
+The suite (`test/`, run with `npm test`) covers git parsing, identity
+resolution, bus factor, ownership, curse scoring, risk classification, rename
+following, co-author handling, the MCP server, and HTML report generation. New
+code should ship with regression tests for the behavior it changes.
 
 - Core algorithms (curse score, bus factor) — required
 - Error handling (invalid repos, edge cases) — required

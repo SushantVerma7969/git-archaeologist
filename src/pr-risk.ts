@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { parseCommits, validateRepo, buildFileStats } from './core/gitParser';
 import { buildAuthorNameMap } from './analyzers/ownershipAnalyzer';
 import { scoreCursedFiles } from './analyzers/curseScorer';
@@ -24,11 +24,17 @@ export function registerPrRiskCommand(program: Command): void {
         try {
           validateRepo(resolvedPath);
 
-          // Get changed files vs base branch
+          // Get changed files vs base branch. Args are passed as an array to
+          // execFileSync (never a shell string) so `base` — a user-supplied
+          // flag — cannot be interpolated into a shell command.
           let changedFiles: string[] = [];
-          const tryCmd = (cmd: string): string => {
+          const tryArgs = (args: string[]): string => {
             try {
-              return execSync(cmd, { encoding: 'utf8', cwd: resolvedPath }).trim();
+              return execFileSync('git', args, {
+                encoding: 'utf8',
+                cwd: resolvedPath,
+                stdio: 'pipe',
+              }).trim();
             } catch {
               return '';
             }
@@ -36,15 +42,15 @@ export function registerPrRiskCommand(program: Command): void {
 
           // Try various strategies to get changed files
           const strategies = [
-            `git diff --name-only ${options.base}...HEAD`,
-            `git diff --name-only origin/${options.base}...HEAD`,
-            `git diff --name-only HEAD~1..HEAD`,
-            `git diff --name-only --cached`,
-            `git diff --name-only`,
+            ['diff', '--name-only', `${options.base}...HEAD`],
+            ['diff', '--name-only', `origin/${options.base}...HEAD`],
+            ['diff', '--name-only', 'HEAD~1..HEAD'],
+            ['diff', '--name-only', '--cached'],
+            ['diff', '--name-only'],
           ];
 
           for (const strategy of strategies) {
-            const result = tryCmd(strategy);
+            const result = tryArgs(strategy);
             if (result) {
               changedFiles = result.split('\n').filter(Boolean);
               break;

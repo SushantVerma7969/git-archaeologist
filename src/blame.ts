@@ -14,7 +14,7 @@ export function registerBlameCommand(program: Command): void {
       try {
         validateRepo(resolvedPath);
         const commits = parseCommits(resolvedPath);
-        const normalizedTarget = filepath.replace(/\\\\/g, '/').replace(/^\.\//, '');
+        const normalizedTarget = filepath.replace(/\\/g, '/').replace(/^\.\//, '');
 
         // Filter to only commits touching this file
         const fileCommits = commits.filter((c) =>

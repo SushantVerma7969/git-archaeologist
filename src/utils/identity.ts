@@ -15,6 +15,13 @@ import { isBot } from './botFilter';
 // detection, which a bad merge would distort. So we only merge on strong,
 // unambiguous signals and never on a shared common name alone. Anything the
 // heuristic gets wrong can be corrected with a .git-arch-identities file.
+//
+// One narrow extension (Rule 2b) also merges name *variants* — "Daishi Kato"
+// and "daishi" — but only when the normalized email local-parts match too, so
+// it never merges on a name relationship alone. It can, in principle, still
+// merge two different people who share both a common first name and a common
+// local-part across different domains; that residual is the documented price of
+// catching the common variant case, and is correctable via .git-arch-identities.
 
 export interface IdentityInput {
   email: string;

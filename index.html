@@ -608,8 +608,7 @@ footer a:hover { color: var(--ink2); }
     <div class="pub-line">
       <span class="redbar"></span>
       <span>Ownership Concentration Analysis · June 2026</span>
-      <span>git-archaeologist v1.32.2</span>
-      <span>June 2026</span>
+      <span>git-archaeologist v1.32.5</span>
     </div>
     <h1>More contributors<br>doesn't mean<br><em>fewer single-owner modules</em></h1>
     <p class="deck">git-archaeologist is an open-source CLI that flags single-owner and high-churn files in any git repository. For this report we ran it across 26 of the most widely used open-source projects — 438,904 files, hundreds of thousands of commits — looking for modules where a single contributor dominates the change history.</p>
@@ -872,14 +871,14 @@ footer a:hover { color: var(--ink2); }
       <div class="sec-label">Methodology</div>
       <h2>How this was measured</h2>
     </div>
-    <p class="narrow">Analysis was run with git-archaeologist (<code>git-arch analyze &lt;repo&gt; --json</code>) against local clones in June 2026; this report reflects the current release, v1.32.2. Commit SHAs at time of analysis are published in the <a href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank" style="color:var(--red)">research/ folder</a>.</p>
+    <p class="narrow">Analysis was run with git-archaeologist (<code>git-arch analyze &lt;repo&gt; --json</code>) against local clones in June 2026; this report reflects the current release, v1.32.5. Commit SHAs at time of analysis are published in the <a href="https://github.com/SushantVerma7969/git-archaeologist/tree/main/research" target="_blank" style="color:var(--red)">research/ folder</a>.</p>
 
     <h3>Bus factor definition</h3>
     <p class="narrow">A module is BF-1 when a single contributor accounts for more than 50% of all non-merge commits touching that file. This measures <strong>historical maintenance activity concentration</strong> — not who understands the code, who has reviewed it, or who could maintain it if needed. A stable, rarely-changed module will appear concentrated even if it is widely understood. The metric is objective and reproducible; what it cannot capture is tacit knowledge.</p>
 
     <h3>Curse score formula</h3>
     <p class="narrow">Implemented in <code>src/analyzers/curseScorer.ts</code>:</p>
-    <div class="formula">curseScore = totalChanges × log₂(authors+1) × exp(−0.5 × ageInYears) × log₂(churn+2) × acceleration × 100
+    <div class="formula">curseScore = totalChanges × log₂(authors+1) × exp(−0.5 × ageInYears) × log₂(churn+2) × acceleration
 
   totalChanges  =  non-merge commits touching the file
   authors       =  unique commit authors on that file
@@ -1011,7 +1010,7 @@ git-arch analyze /path/to/repo --json</div>
 
 <footer>
   <div class="foot-inner">
-    <p>Ownership Concentration in 26 Major OSS Projects · git-archaeologist v1.32.2 · Analysis run June 2026</p>
+    <p>Ownership Concentration in 26 Major OSS Projects · git-archaeologist v1.32.5 · Analysis run June 2026</p>
     <p><a href="https://github.com/SushantVerma7969/git-archaeologist" target="_blank">github.com/SushantVerma7969/git-archaeologist</a></p>
   </div>
 </footer>

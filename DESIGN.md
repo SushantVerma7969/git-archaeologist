@@ -122,7 +122,10 @@ score's validated input intact.
 
 The default is deliberately conservative — it merges only on strong, unambiguous
 signals (a shared GitHub noreply handle, or the same non-generic name *and* email
-local-part) and never on a shared common name alone. The reasoning: a false
+local-part) and never on a shared common name alone. One narrow extension (Rule
+2b, added in 1.32.0) also merges name *variants* — e.g. `Daishi Kato` and
+`daishi` — but only when the email local-parts also match after separator
+normalization, so it never merges on a name relationship alone. The reasoning: a false
 *split* (two rows for one person) is visible and recoverable, while a false
 *merge* silently corrupts every downstream metric, and the tool's headline signal
 is single-point-of-failure detection that a bad merge would distort. The full
@@ -150,6 +153,7 @@ Recency, acceleration, and activity calculations depend on "now," which makes ra
 output time-dependent (a file's recency weight decays continuously). The scoring
 path accepts an injectable `now` (defaulting to the wall clock) so analyses can be
 pinned to a fixed point — which is what makes the validation study in RESEARCH.md
-reproducible, and what enables "as-of" historical analysis. Day-to-day CLI use
-still uses the current time by default, because for a maintenance tool, recency
-*should* move.
+reproducible. This is a library-level hook used by the research harness; the CLI
+does not currently expose a flag for it, so day-to-day CLI use always runs against
+the current time — which is the right default anyway, because for a maintenance
+tool, recency *should* move.

@@ -13,22 +13,7 @@ import { registerBlastCommand } from './blast';
 import { registerOwnershipCommand } from './ownership';
 import { registerPrRiskCommand } from './pr-risk';
 import { registerRiskCommand } from './risk';
-
-function parseSince(input: string): string {
-  // Accept: 90d, 30days, 6months, 1year, or ISO date like 2024-01-01
-  const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
-  if (match) {
-    const n = parseInt(match[1], 10);
-    const unit = match[2].toLowerCase();
-    const date = new Date();
-    if (unit.startsWith('d')) date.setDate(date.getDate() - n);
-    else if (unit.startsWith('m')) date.setMonth(date.getMonth() - n);
-    else if (unit.startsWith('y')) date.setFullYear(date.getFullYear() - n);
-    return date.toISOString().split('T')[0];
-  }
-  // Already a date string
-  return input;
-}
+import { parseSince } from './utils/timeRange';
 
 const program = new Command();
 

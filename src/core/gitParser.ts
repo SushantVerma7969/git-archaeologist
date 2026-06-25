@@ -11,6 +11,17 @@ export function validateRepo(repoPath: string): void {
   } catch {
     throw new Error(`Not a valid git repository: ${repoPath}`);
   }
+  // A freshly `git init`'d repo passes the check above but has no commits, so
+  // every later `HEAD`-based git call would fail with a cryptic message. Detect
+  // it here and fail with a clear, actionable error instead.
+  try {
+    execFileSync('git', ['rev-parse', '--verify', '--quiet', 'HEAD'], {
+      cwd: repoPath,
+      stdio: 'pipe',
+    });
+  } catch {
+    throw new Error(`Repository has no commits yet: ${repoPath}`);
+  }
 }
 
 export function getRepoName(repoPath: string): string {

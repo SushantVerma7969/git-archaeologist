@@ -3,6 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import * as path from 'path';
 import { analyze } from '../core/orchestrator';
+import { parseSince } from '../utils/timeRange';
 import {
   buildScopeRisks,
   buildContributorChurn,
@@ -282,8 +283,10 @@ export function createServer(): McpServer {
       try {
         const repo = resolveRepo(repoPath);
         // Hotspots need both a lifetime view and a recent (12-month) view.
+        // Resolve "12m" to a concrete date the same way the CLI does, so the
+        // MCP recent window matches `git-arch risk --hotspots`/`--temporal`.
         const lifetime = await runAnalysis(repo);
-        const recent = await runAnalysis(repo, '12m');
+        const recent = await runAnalysis(repo, parseSince('12m'));
         const scopeRisks = buildScopeRisks(lifetime);
         const churn = buildContributorChurn(lifetime);
         const abandoned = buildAbandonedScopes(scopeRisks, churn);

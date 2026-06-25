@@ -3,20 +3,7 @@ import chalk from 'chalk';
 import * as path from 'path';
 import { analyze } from './core/orchestrator';
 import { buildOwnershipReport } from './ownership-core';
-
-function parseSince(input: string): string {
-  const match = input.match(/^(\d+)\s*(d|day|days|m|month|months|y|year|years)$/i);
-  if (match) {
-    const n = parseInt(match[1], 10);
-    const unit = match[2].toLowerCase();
-    const date = new Date();
-    if (unit.startsWith('d')) date.setDate(date.getDate() - n);
-    else if (unit.startsWith('m')) date.setMonth(date.getMonth() - n);
-    else if (unit.startsWith('y')) date.setFullYear(date.getFullYear() - n);
-    return date.toISOString().split('T')[0];
-  }
-  return input;
-}
+import { parseSince } from './utils/timeRange';
 
 export function registerOwnershipCommand(program: Command): void {
   program
