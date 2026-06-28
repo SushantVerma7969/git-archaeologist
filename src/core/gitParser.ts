@@ -168,6 +168,7 @@ export async function parseCommits(
   repoPath: string,
   since?: string,
   followRenames: boolean = true,
+  targetFile?: string,
 ): Promise<CommitRecord[]> {
   const DELIMITER = '||GITARCH||';
   const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
@@ -194,6 +195,7 @@ export async function parseCommits(
     '-z',
   ];
   if (since) args.push(`--since=${since}`);
+  if (targetFile) args.push('--', targetFile);
 
   const { stdout } = await execFileAsync('git', args, {
     cwd: repoPath,

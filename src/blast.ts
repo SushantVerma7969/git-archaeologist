@@ -22,8 +22,13 @@ export function registerBlastCommand(program: Command): void {
         try {
           validateRepo(resolvedPath);
 
-          const commits = await parseCommits(resolvedPath, options.since);
           const normalizedTarget = filepath.replace(/\\/g, '/').replace(/^\.\//, '');
+          const commits = await parseCommits(
+            resolvedPath,
+            options.since,
+            true,
+            normalizedTarget,
+          );
 
           // Find all commits that touched this file
           const targetCommits = commits.filter((c) =>

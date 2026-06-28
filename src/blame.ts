@@ -13,8 +13,13 @@ export function registerBlameCommand(program: Command): void {
       const resolvedPath = resolvedRepo;
       try {
         validateRepo(resolvedPath);
-        const commits = await parseCommits(resolvedPath);
         const normalizedTarget = filepath.replace(/\\/g, '/').replace(/^\.\//, '');
+        const commits = await parseCommits(
+          resolvedPath,
+          undefined,
+          true,
+          normalizedTarget,
+        );
 
         // Filter to only commits touching this file
         const fileCommits = commits.filter((c) =>
