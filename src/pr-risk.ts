@@ -15,20 +15,28 @@ export function registerPrRiskCommand(program: Command): void {
     .description(
       'Score the risk of your current uncommitted/staged changes before pushing',
     )
-    .option('-b, --base <branch>', 'Base branch to compare against', 'main')
+    .option('-b, --base <branch>', 'Base branch to compare against')
     .option('-s, --since <date>', 'Limit historical analysis to commits after this date')
     .action(
-      async (repoPath: string | undefined, options: { base: string; since?: string }) => {
+      async (
+        repoPath: string | undefined,
+        options: { base?: string; since?: string },
+      ) => {
         const resolvedPath = path.resolve(repoPath ?? '.');
 
         try {
           validateRepo(resolvedPath);
 
+          const isExplicitBase = !!options.base;
+          const baseBranch = options.base ?? 'main';
+
           // Get changed files vs base branch. Args are passed as an array to
           // execFileSync (never a shell string) so `base` — a user-supplied
           // flag — cannot be interpolated into a shell command.
           let changedFiles: string[] = [];
-          const tryArgs = (args: string[]): string => {
+          let strategySuccess = false;
+
+          const tryArgs = (args: string[]): string | null => {
             try {
               return execFileSync('git', args, {
                 encoding: 'utf8',
@@ -36,30 +44,40 @@ export function registerPrRiskCommand(program: Command): void {
                 stdio: 'pipe',
               }).trim();
             } catch {
-              return '';
+              return null;
             }
           };
 
           // Try various strategies to get changed files
           const strategies = [
-            ['diff', '--name-only', `${options.base}...HEAD`],
-            ['diff', '--name-only', `origin/${options.base}...HEAD`],
-            ['diff', '--name-only', 'HEAD~1..HEAD'],
-            ['diff', '--name-only', '--cached'],
-            ['diff', '--name-only'],
+            ['diff', '--name-only', `${baseBranch}...HEAD`],
+            ['diff', '--name-only', `origin/${baseBranch}...HEAD`],
           ];
+
+          if (!isExplicitBase) {
+            strategies.push(
+              ['diff', '--name-only', 'HEAD~1..HEAD'],
+              ['diff', '--name-only', '--cached'],
+              ['diff', '--name-only'],
+            );
+          }
 
           for (const strategy of strategies) {
             const result = tryArgs(strategy);
-            if (result) {
+            if (result !== null) {
               changedFiles = result.split('\n').filter(Boolean);
+              strategySuccess = true;
               break;
             }
           }
 
+          if (isExplicitBase && !strategySuccess) {
+            throw new Error(`Base branch '${baseBranch}' could not be resolved.`);
+          }
+
           if (changedFiles.length === 0) {
             console.log(
-              chalk.grey('\n  No changed files detected vs ' + options.base + '.'),
+              chalk.grey('\n  No changed files detected vs ' + baseBranch + '.'),
             );
             console.log(chalk.grey('  Make sure you have commits or staged changes.\n'));
             return;
@@ -88,7 +106,7 @@ export function registerPrRiskCommand(program: Command): void {
 
           console.log('\n' + chalk.hex('#A78BFA')('─'.repeat(70)));
           console.log(
-            ` ${chalk.bold.white('⛏  git-arch pr-risk')} — ${chalk.grey(options.base + '...HEAD')}`,
+            ` ${chalk.bold.white('⛏  git-arch pr-risk')} — ${chalk.grey(baseBranch + '...HEAD')}`,
           );
           console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
           console.log();
