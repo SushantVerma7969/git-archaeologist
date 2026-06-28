@@ -39,3 +39,21 @@ test('validateRepo accepts a repo with at least one commit', () => {
   assert.doesNotThrow(() => validateRepo(dir));
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+test('validateRepo rejects a shallow clone', () => {
+  const dir = tmpDir('ga-shallow-');
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['config', 'user.email', 'a@b.com'], { cwd: dir });
+  execFileSync('git', ['config', 'user.name', 'T'], { cwd: dir });
+  fs.writeFileSync(path.join(dir, 'f.txt'), 'x');
+  execFileSync('git', ['add', '-A'], { cwd: dir });
+  execFileSync('git', ['commit', '-qm', 'c1'], { cwd: dir });
+
+  const hash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir }).toString().trim();
+
+  // Fake a shallow clone by writing a valid hash to .git/shallow
+  fs.writeFileSync(path.join(dir, '.git', 'shallow'), hash + '\n');
+
+  assert.throws(() => validateRepo(dir), /shallow clone/i);
+  fs.rmSync(dir, { recursive: true, force: true });
+});

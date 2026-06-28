@@ -22,6 +22,23 @@ export function validateRepo(repoPath: string): void {
   } catch {
     throw new Error(`Repository has no commits yet: ${repoPath}`);
   }
+  let isShallow = 'false';
+  try {
+    isShallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'], {
+      cwd: repoPath,
+      stdio: 'pipe',
+    })
+      .toString()
+      .trim();
+  } catch {
+    // Ignore errors from old git versions that lack this flag
+  }
+
+  if (isShallow === 'true') {
+    throw new Error(
+      `Repository is a shallow clone (e.g. fetch-depth: 1). Git Archaeologist requires full history to analyze risk. Please run: git fetch --unshallow`,
+    );
+  }
 }
 
 export function getRepoName(repoPath: string): string {
