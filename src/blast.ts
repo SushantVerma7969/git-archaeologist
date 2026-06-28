@@ -22,7 +22,7 @@ export function registerBlastCommand(program: Command): void {
         try {
           validateRepo(resolvedPath);
 
-          const commits = parseCommits(resolvedPath, options.since);
+          const commits = await parseCommits(resolvedPath, options.since);
           const normalizedTarget = filepath.replace(/\\/g, '/').replace(/^\.\//, '');
 
           // Find all commits that touched this file

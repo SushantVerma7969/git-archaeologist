@@ -8,12 +8,12 @@ export function registerBlameCommand(program: Command): void {
     .command('blame <filepath> [repoPath]')
     .alias('b')
     .description('Deep dive on a single file — full author history and timeline')
-    .action((filepath: string, repoPath: string | undefined) => {
+    .action(async (filepath: string, repoPath: string | undefined) => {
       const resolvedRepo = repoPath ? path.resolve(repoPath) : process.cwd();
       const resolvedPath = resolvedRepo;
       try {
         validateRepo(resolvedPath);
-        const commits = parseCommits(resolvedPath);
+        const commits = await parseCommits(resolvedPath);
         const normalizedTarget = filepath.replace(/\\/g, '/').replace(/^\.\//, '');
 
         // Filter to only commits touching this file

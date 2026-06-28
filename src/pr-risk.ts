@@ -66,7 +66,7 @@ export function registerPrRiskCommand(program: Command): void {
           }
 
           // Run historical analysis
-          const commits = parseCommits(resolvedPath, options.since);
+          const commits = await parseCommits(resolvedPath, options.since);
           const fileStats = buildFileStats(commits);
           const cursedFiles = scoreCursedFiles(fileStats, 100);
           const authorNameMap = buildAuthorNameMap(commits);

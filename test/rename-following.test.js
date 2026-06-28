@@ -23,7 +23,7 @@ function write(dir, file, content) {
   fs.writeFileSync(path.join(dir, file), content);
 }
 
-test('a renamed file folds its full history onto the final path', () => {
+test('a renamed file folds its full history onto the final path', async () => {
   const { dir, git } = makeRepo();
   write(dir, 'old.js', 'v1');
   git(['add', '-A']);
@@ -37,13 +37,13 @@ test('a renamed file folds its full history onto the final path', () => {
   write(dir, 'new.js', 'v4');
   git(['commit', '-qam', 'edit']);
 
-  const follow = buildFileStats(parseCommits(dir));
+  const follow = buildFileStats(await parseCommits(dir));
   assert.equal(follow.get('old.js'), undefined, 'old path should be folded away');
   // 3 edits as old.js + the rename commit + 1 edit as new.js = 5
   assert.equal(follow.get('new.js').totalChanges, 5, 'history not fully folded');
 });
 
-test('followRenames=false preserves the old split-history behavior', () => {
+test('followRenames=false preserves the old split-history behavior', async () => {
   const { dir, git } = makeRepo();
   write(dir, 'old.js', 'v1');
   git(['add', '-A']);
@@ -55,12 +55,12 @@ test('followRenames=false preserves the old split-history behavior', () => {
   write(dir, 'new.js', 'v3');
   git(['commit', '-qam', 'edit']);
 
-  const split = buildFileStats(parseCommits(dir, undefined, false));
+  const split = buildFileStats(await parseCommits(dir, undefined, false));
   assert.ok(split.get('old.js'), 'old.js should still exist when not following renames');
   assert.ok(split.get('new.js'), 'new.js should exist separately');
 });
 
-test('a rename chain a->b->c resolves all the way to c', () => {
+test('a rename chain a->b->c resolves all the way to c', async () => {
   const { dir, git } = makeRepo();
   write(dir, 'a.js', 'x');
   git(['add', '-A']);
@@ -72,11 +72,11 @@ test('a rename chain a->b->c resolves all the way to c', () => {
   write(dir, 'c.js', 'y');
   git(['commit', '-qam', 'edit c']);
 
-  const map = buildRenameMap(dir);
+  const map = await buildRenameMap(dir);
   assert.equal(map.get('a.js'), 'c.js', 'chain a->b->c should resolve a to c');
   assert.equal(map.get('b.js'), 'c.js', 'chain a->b->c should resolve b to c');
 
-  const stats = buildFileStats(parseCommits(dir));
+  const stats = buildFileStats(await parseCommits(dir));
   assert.equal(stats.get('a.js'), undefined);
   assert.equal(stats.get('b.js'), undefined);
   // create + 2 renames + 1 edit = 4, all on c.js
@@ -87,7 +87,7 @@ test('a rename chain a->b->c resolves all the way to c', () => {
   );
 });
 
-test('buildRenameMap returns empty on a repo with no renames', () => {
+test('buildRenameMap returns empty on a repo with no renames', async () => {
   const { dir, git } = makeRepo();
   write(dir, 'stable.js', 'x');
   git(['add', '-A']);
@@ -95,6 +95,6 @@ test('buildRenameMap returns empty on a repo with no renames', () => {
   write(dir, 'stable.js', 'y');
   git(['commit', '-qam', 'edit']);
 
-  const map = buildRenameMap(dir);
+  const map = await buildRenameMap(dir);
   assert.equal(map.size, 0, 'no renames should produce an empty map');
 });

@@ -34,7 +34,7 @@ export async function analyze(
     }
 
     // Step 2 — parse all commits
-    const commits = parseCommits(repoPath, since);
+    const commits = await parseCommits(repoPath, since);
 
     // Step 2b — canonicalize contributor identities. One person who commits
     // under several emails (joe@fb.com, joe@meta.com, the GitHub noreply form)

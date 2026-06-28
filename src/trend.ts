@@ -26,15 +26,19 @@ export function registerTrendCommand(program: Command): void {
           return d.toISOString().split('T')[0];
         }
 
-        // Period A: 180 to 90 days ago (older)
-        const olderCommits = parseCommits(resolvedPath, dateStr(180)).filter((c) => {
-          const cutoff = new Date();
-          cutoff.setDate(cutoff.getDate() - 90);
-          return c.timestamp < cutoff.getTime() / 1000;
-        });
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        const cutoffTimestamp = ninetyDaysAgo.getTime() / 1000;
 
-        // Period B: last 90 days (recent)
-        const recentCommits = parseCommits(resolvedPath, dateStr(90));
+        // Period A: 180 to 90 days ago (older)
+        const olderCommits = (await parseCommits(resolvedPath, dateStr(180))).filter(
+          (c) => {
+            return c.timestamp < cutoffTimestamp;
+          },
+        );
+
+        // 3. parse last 90 days
+        const recentCommits = await parseCommits(resolvedPath, dateStr(90));
 
         if (recentCommits.length === 0) {
           console.log(chalk.grey('\n  No commits in the last 90 days.\n'));

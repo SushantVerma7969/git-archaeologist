@@ -1,4 +1,7 @@
-import { execFileSync } from 'child_process';
+import { execFileSync, execFile } from 'child_process';
+import { promisify } from 'util';
+
+const execFileAsync = promisify(execFile);
 import * as path from 'path';
 import { CommitRecord, FileStats } from '../types';
 
@@ -103,17 +106,20 @@ function parseCoAuthors(
 // This is a SEPARATE, additive parse (`--name-status -M`) so the main
 // parseCommits path — and its co-author logic — is untouched. The map is then
 // applied as a path transform after the normal parse.
-export function buildRenameMap(repoPath: string, since?: string): Map<string, string> {
+export async function buildRenameMap(
+  repoPath: string,
+  since?: string,
+): Promise<Map<string, string>> {
   const args = ['log', '-M', '--name-status', '-z', '--pretty=format:'];
   if (since) args.push(`--since=${since}`);
 
   let raw: string;
   try {
-    raw = execFileSync('git', args, {
+    const { stdout } = await execFileAsync('git', args, {
       cwd: repoPath,
-      stdio: 'pipe',
       maxBuffer: 512 * 1024 * 1024,
-    }).toString();
+    });
+    raw = stdout.toString();
   } catch {
     return new Map(); // rename detection is best-effort; never break analysis over it
   }
@@ -158,17 +164,17 @@ export function buildRenameMap(repoPath: string, since?: string): Map<string, st
   return finalMap;
 }
 
-export function parseCommits(
+export async function parseCommits(
   repoPath: string,
   since?: string,
   followRenames: boolean = true,
-): CommitRecord[] {
+): Promise<CommitRecord[]> {
   const DELIMITER = '||GITARCH||';
   const BEGIN_MARKER = 'BEGINCOMMIT' + DELIMITER;
 
   // Map every historical path to its final name so a renamed file's history is
   // folded onto one path instead of split across two. Built once, applied below.
-  const renameMap = followRenames ? buildRenameMap(repoPath, since) : new Map();
+  const renameMap = followRenames ? await buildRenameMap(repoPath, since) : new Map();
 
   // NUL-terminated output (`-z`) makes parsing unambiguous: git separates
   // each pathname with a NUL and each commit's path list ends with an extra
@@ -189,11 +195,11 @@ export function parseCommits(
   ];
   if (since) args.push(`--since=${since}`);
 
-  const raw = execFileSync('git', args, {
+  const { stdout } = await execFileAsync('git', args, {
     cwd: repoPath,
-    stdio: 'pipe',
     maxBuffer: 512 * 1024 * 1024,
-  }).toString();
+  });
+  const raw = stdout.toString();
 
   const commits: CommitRecord[] = [];
 
