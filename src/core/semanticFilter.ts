@@ -5,7 +5,7 @@ import { CommitRecord } from '../types';
  */
 function get95thPercentile(commits: CommitRecord[]): number {
   if (commits.length === 0) return 15;
-  const sizes = commits.map(c => c.filesChanged.length).sort((a, b) => a - b);
+  const sizes = commits.map((c) => c.filesChanged.length).sort((a, b) => a - b);
   const idx = Math.floor(sizes.length * 0.95);
   // Cap at 100 to prevent massive repos from allowing 3000-file commits
   return Math.min(Math.max(sizes[idx], 5), 100);
@@ -22,9 +22,19 @@ function isMechanicalCommit(commit: CommitRecord, threshold95: number): boolean 
 
   // 2. Lexical Filter (Conventional Commits)
   const mechanicalPrefixes = [
-    'chore', 'style', 'docs', 'build', 'ci', 'test', 'release', 'lint', 'format'
+    'chore',
+    'style',
+    'docs',
+    'build',
+    'ci',
+    'test',
+    'release',
+    'lint',
+    'format',
   ];
-  if (mechanicalPrefixes.some(p => msg.startsWith(p + ':') || msg.startsWith(p + '('))) {
+  if (
+    mechanicalPrefixes.some((p) => msg.startsWith(p + ':') || msg.startsWith(p + '('))
+  ) {
     return true;
   }
 
@@ -46,7 +56,11 @@ function isMechanicalCommit(commit: CommitRecord, threshold95: number): boolean 
   }
 
   // 5. Formatting fallback
-  if (msg.includes('prettier') || msg.includes('eslint --fix') || msg.startsWith('format:')) {
+  if (
+    msg.includes('prettier') ||
+    msg.includes('eslint --fix') ||
+    msg.startsWith('format:')
+  ) {
     return true;
   }
 
@@ -60,19 +74,22 @@ function isMechanicalCommit(commit: CommitRecord, threshold95: number): boolean 
 function applyTemporalGrouping(commits: CommitRecord[]): CommitRecord[] {
   // Sort chronologically
   const sorted = [...commits].sort((a, b) => a.timestamp - b.timestamp);
-  
+
   const grouped: CommitRecord[] = [];
-  
+
   for (const commit of sorted) {
     if (grouped.length === 0) {
       grouped.push({ ...commit });
       continue;
     }
-    
+
     const last = grouped[grouped.length - 1];
-    
+
     // If same author and within 2 hours
-    if (last.authorEmail === commit.authorEmail && (commit.timestamp - last.timestamp) <= 7200) {
+    if (
+      last.authorEmail === commit.authorEmail &&
+      commit.timestamp - last.timestamp <= 7200
+    ) {
       // Merge files (unique)
       const mergedFiles = new Set([...last.filesChanged, ...commit.filesChanged]);
       last.filesChanged = Array.from(mergedFiles);
@@ -84,7 +101,7 @@ function applyTemporalGrouping(commits: CommitRecord[]): CommitRecord[] {
       grouped.push({ ...commit });
     }
   }
-  
+
   return grouped;
 }
 
@@ -93,29 +110,29 @@ function applyTemporalGrouping(commits: CommitRecord[]): CommitRecord[] {
  */
 export function applySemanticFiltering(commits: CommitRecord[]): CommitRecord[] {
   const threshold95 = get95thPercentile(commits);
-  
+
   // 1. Group commits temporally
   const grouped = applyTemporalGrouping(commits);
-  
+
   // 2. Filter out mechanical commits
-  const filtered = grouped.filter(c => !isMechanicalCommit(c, threshold95));
-  
+  const filtered = grouped.filter((c) => !isMechanicalCommit(c, threshold95));
+
   return filtered;
 }
 
 /**
  * Applies a TF-IDF style penalty to co-changes to suppress repository "stop-words"
  * like package.json or global lockfiles.
- * 
+ *
  * @param coChanges Map of file -> co-change count
  * @param globalCommits The fully filtered list of all commits in the repo
  */
 export function applyTfIdfPenalty(
-  coChanges: Map<string, number>, 
-  globalCommits: CommitRecord[]
+  coChanges: Map<string, number>,
+  globalCommits: CommitRecord[],
 ): Map<string, number> {
   const totalCommits = globalCommits.length;
-  
+
   // Calculate global document frequency for each file
   const docFrequency = new Map<string, number>();
   for (const c of globalCommits) {
@@ -125,13 +142,13 @@ export function applyTfIdfPenalty(
   }
 
   const penalizedCoChanges = new Map<string, number>();
-  
+
   for (const [file, rawCoChangeCount] of coChanges.entries()) {
     const df = docFrequency.get(file) ?? rawCoChangeCount;
     // IDF: log(Total Commits / Document Frequency)
     // We add 1 to prevent division by zero or negative logs.
     const idf = Math.log10(totalCommits / (df + 1));
-    
+
     // The raw co-change probability is rawCoChangeCount / targetCommits.length.
     // We penalize files with very low IDF (high global frequency).
     // An average file changing in 1% of commits has high IDF.
@@ -139,14 +156,14 @@ export function applyTfIdfPenalty(
     // Let's create a multiplier based on expected baseline IDF.
     // Assume a "normal" file changes in 1% of commits:
     const normalIdf = Math.log10(totalCommits / (totalCommits * 0.01 + 1));
-    
+
     // Cap multiplier at 1.0 so we don't accidentally inflate true couplings,
     // we only penalize high-frequency files.
     const penaltyMultiplier = Math.min(1.0, idf / normalIdf);
-    
+
     const weightedCount = rawCoChangeCount * penaltyMultiplier;
     penalizedCoChanges.set(file, weightedCount);
   }
-  
+
   return penalizedCoChanges;
 }

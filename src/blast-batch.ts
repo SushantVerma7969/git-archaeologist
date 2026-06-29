@@ -12,12 +12,21 @@ export function registerBlastBatchCommand(program: Command): void {
     .option('--from-file <filepath>', 'Read target files from a text file (one per line)')
     .option('--files <fileList...>', 'List of files to analyze')
     .option('-s, --since <date>', 'Limit to commits after this date')
-    .option('--semantic', 'Apply semantic filtering to ignore mechanical/sweeping commits')
+    .option(
+      '--semantic',
+      'Apply semantic filtering to ignore mechanical/sweeping commits',
+    )
     .option('--json', 'Output raw JSON')
     .action(
       async (
         repoPath: string | undefined,
-        options: { fromFile?: string; files?: string[]; since?: string; semantic?: boolean; json?: boolean },
+        options: {
+          fromFile?: string;
+          files?: string[];
+          since?: string;
+          semantic?: boolean;
+          json?: boolean;
+        },
       ) => {
         const resolvedPath = path.resolve(repoPath ?? '.');
 
@@ -28,21 +37,28 @@ export function registerBlastBatchCommand(program: Command): void {
 
           if (options.fromFile) {
             const content = fs.readFileSync(path.resolve(options.fromFile), 'utf-8');
-            targetFiles = content.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+            targetFiles = content
+              .split('\n')
+              .map((l) => l.trim())
+              .filter((l) => l.length > 0);
           } else if (options.files && options.files.length > 0) {
             targetFiles = options.files;
           } else {
-            console.error(chalk.red('\n  ✖  Error: You must provide files via --files or --from-file\n'));
+            console.error(
+              chalk.red(
+                '\n  ✖  Error: You must provide files via --files or --from-file\n',
+              ),
+            );
             process.exit(1);
           }
 
           if (targetFiles.length === 0) {
-             if (options.json) {
-               console.log(JSON.stringify({ results: {} }, null, 2));
-             } else {
-               console.log('No files to analyze.');
-             }
-             return;
+            if (options.json) {
+              console.log(JSON.stringify({ results: {} }, null, 2));
+            } else {
+              console.log('No files to analyze.');
+            }
+            return;
           }
 
           let commits = await parseCommits(resolvedPath, options.since, true);
@@ -51,7 +67,10 @@ export function registerBlastBatchCommand(program: Command): void {
             commits = applySemanticFiltering(commits);
           }
 
-          const batchResults: Record<string, { file: string; count: number; pct: number }[]> = {};
+          const batchResults: Record<
+            string,
+            { file: string; count: number; pct: number }[]
+          > = {};
 
           for (const filepath of targetFiles) {
             let normalizedTarget = filepath.split('\\\\').join('/');
@@ -93,7 +112,7 @@ export function registerBlastBatchCommand(program: Command): void {
               .filter((r) => r.pct >= 10)
               .sort((a, b) => b.pct - a.pct)
               .slice(0, 15);
-              
+
             batchResults[filepath] = results;
           }
 
@@ -104,18 +123,19 @@ export function registerBlastBatchCommand(program: Command): void {
 
           // Text output
           for (const [filepath, results] of Object.entries(batchResults)) {
-             console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
-             console.log(` ${chalk.bold.white('⛏  git-arch blast')} — ${chalk.cyan(filepath)}`);
-             if (results.length === 0) {
-               console.log(chalk.green('  ✓ No coupled files found.'));
-             } else {
-               for (const r of results) {
-                  console.log(`  - ${chalk.yellow(r.pct + '%')} ${chalk.white(r.file)}`);
-               }
-             }
-             console.log();
+            console.log(chalk.hex('#A78BFA')('─'.repeat(70)));
+            console.log(
+              ` ${chalk.bold.white('⛏  git-arch blast')} — ${chalk.cyan(filepath)}`,
+            );
+            if (results.length === 0) {
+              console.log(chalk.green('  ✓ No coupled files found.'));
+            } else {
+              for (const r of results) {
+                console.log(`  - ${chalk.yellow(r.pct + '%')} ${chalk.white(r.file)}`);
+              }
+            }
+            console.log();
           }
-
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : String(err);
           console.error(chalk.red('\n  ✖  Error: ') + message);

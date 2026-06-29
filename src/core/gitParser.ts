@@ -253,7 +253,15 @@ export async function parseCommits(
           !f.endsWith('.d.ts'),
       );
 
-    commits.push({ hash, authorEmail, authorName, timestamp, filesChanged, coAuthors, message: body });
+    commits.push({
+      hash,
+      authorEmail,
+      authorName,
+      timestamp,
+      filesChanged,
+      coAuthors,
+      message: body,
+    });
   }
 
   return commits;

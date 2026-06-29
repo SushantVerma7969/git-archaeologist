@@ -11,7 +11,10 @@ export function registerBlastCommand(program: Command): void {
       'Show what historically changed together with this file (co-change, not a guaranteed dependency)',
     )
     .option('-s, --since <date>', 'Limit to commits after this date')
-    .option('--semantic', 'Apply semantic filtering to ignore mechanical/sweeping commits')
+    .option(
+      '--semantic',
+      'Apply semantic filtering to ignore mechanical/sweeping commits',
+    )
     .action(
       async (
         filepath: string,
@@ -30,7 +33,7 @@ export function registerBlastCommand(program: Command): void {
           let commits = await parseCommits(
             resolvedPath,
             options.since,
-            true
+            true,
             // We do not pass normalizedTarget to parseCommits because TF-IDF and filtering
             // requires seeing the global context of commits to calculate 95th percentile
             // and global document frequencies.
