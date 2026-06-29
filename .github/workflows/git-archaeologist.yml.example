@@ -1,22 +1,22 @@
 name: Git Archaeologist
 
 on:
-  push:
-    branches: [main, master]
   pull_request:
     branches: [main, master]
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
+          # Optional: The action will automatically detect shallow clones 
+          # and run git fetch --unshallow, but setting it here is faster.
           fetch-depth: 0
 
-      - name: Run Git Archaeologist
+      - name: Run Git Archaeologist PR Reviewer
         uses: SushantVerma7969/git-archaeologist@v1
         with:
-          top: '10'
-          since: '1y'
           github-token: ${{ secrets.GITHUB_TOKEN }}

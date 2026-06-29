@@ -1,34 +1,103 @@
-name: 'Git Archaeologist'
-description: 'Analyze git history for maintenance risk — curse-score hotspots and bus-factor-1 scopes — and comment on pull requests.'
+name: 'Git Archaeologist PR Reviewer'
+description: 'Intercepts PRs, analyzes structural maintenance risk, and posts a clean Markdown summary.'
 author: 'Sushant Verma'
 branding:
   icon: 'git-branch'
   color: 'orange'
 
 inputs:
-  top:
-    description: 'How many of the highest-risk ("cursed") files to report.'
-    required: false
-    default: '10'
-  since:
-    description: 'Only analyze commits after this point (e.g. "1y", "90d", "2024-01-01"). Empty means full history.'
-    required: false
-    default: ''
-  fail-on-curse-score:
-    description: 'Fail the job if the top cursed file scores at or above this value. 0 disables the gate.'
-    required: false
-    default: '0'
   github-token:
-    description: 'Token used to post the analysis as a pull-request comment. Usually ${{ secrets.GITHUB_TOKEN }}.'
-    required: false
+    description: 'Token used to post the PR comment. Must have pull-requests: write.'
+    required: true
     default: ${{ github.token }}
 
-outputs:
-  top-cursed-file:
-    description: 'Path of the highest-curse-score file found.'
-  top-curse-score:
-    description: 'Curse score of that file.'
-
 runs:
-  using: 'node20'
-  main: 'action/dist/index.js'
+  using: "composite"
+  steps:
+    - name: Detect and fix shallow clones
+      shell: bash
+      run: |
+        if [ -f "$(git rev-parse --git-dir)/shallow" ]; then
+          echo "⚠️ Shallow clone detected. Git Archaeologist requires full history to calculate temporal ownership and blast radius."
+          echo "Fetching full history automatically..."
+          git fetch --unshallow || git fetch --all
+        else
+          echo "✅ Full git history verified."
+        fi
+
+    - name: Install dependencies
+      shell: bash
+      run: npm install -g git-archaeologist@latest
+
+    - name: Run Analysis & Generate Comment
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        if [ "${{ github.event_name }}" != "pull_request" ]; then
+          echo "Not a pull request. Skipping PR comment generation."
+          exit 0
+        fi
+        
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        REPO="${{ github.repository }}"
+        
+        echo "Extracting PR files..."
+        gh pr view $PR_NUMBER --repo $REPO --json files -q '.files[].path' > pr_files.txt
+        
+        echo "Running macro analysis..."
+        git-arch analyze . --json > macro.json
+        
+        # Build Markdown Comment
+        COMMENT="## ⛏ Git Archaeologist Review\n\n"
+        COMMENT+="> *Automated structural risk assessment based on commit history.*\n\n"
+        
+        COMMENT+="### 📊 Repository Risk Summary\n"
+        TOTAL_FILES=$(grep -c "^" pr_files.txt || true)
+        COMMENT+="**Files analyzed in this PR:** $TOTAL_FILES\n\n"
+        
+        COMMENT+="### ⚠️ High-Risk Files\n"
+        RISK_FOUND=false
+        while IFS= read -r file; do
+          SCORE=$(jq -r ".cursedFiles[] | select(.filepath == \"$file\") | .curseScore" macro.json || true)
+          if [ ! -z "$SCORE" ] && [ "$SCORE" != "null" ]; then
+            RISK_FOUND=true
+            ROUNDED=$(printf "%.0f" $SCORE)
+            COMMENT+="- \`$file\` (Curse Score: **$ROUNDED**)\n"
+          fi
+        done < pr_files.txt
+        
+        if [ "$RISK_FOUND" = false ]; then
+          COMMENT+="✅ No structurally decaying files modified.\n\n"
+        else
+          COMMENT+="\n"
+        fi
+        
+        COMMENT+="### 🔗 Coupling Warnings (Blast Radius)\n"
+        COUPLED=false
+        while IFS= read -r file; do
+          git-arch blast "$file" . > blast.txt 2>/dev/null || true
+          if grep -q "IMPLICIT COUPLING" blast.txt; then
+            COUPLED=true
+            COMMENT+="**$file** historically changes alongside:\n"
+            grep "↔" blast.txt | while IFS= read -r line; do
+              COMMENT+="- $line\n"
+            done
+          fi
+        done < pr_files.txt
+        
+        if [ "$COUPLED" = false ]; then
+          COMMENT+="✅ No hidden dependencies detected.\n\n"
+        else
+          COMMENT+="\n"
+        fi
+        
+        COMMENT+="### 🚌 Ownership Suggestions\n"
+        COMMENT+="If this PR modifies core architecture, ensure it is reviewed by the historical owners, not just random assignees.\n\n"
+        
+        COMMENT+="---\n*[Git Archaeologist](https://github.com/SushantVerma7969/git-archaeologist)* | *Stop guessing the blast radius.*"
+        
+        echo -e "$COMMENT" > pr_comment.md
+        
+        echo "Posting PR comment..."
+        gh pr comment $PR_NUMBER --repo $REPO --body-file pr_comment.md

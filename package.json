@@ -4,7 +4,8 @@
   "description": "Find the most dangerous files in any git repo — curse scores, bus factor, hidden coupling",
   "main": "dist/index.js",
   "bin": {
-    "git-arch": "dist/index.js"
+    "git-arch": "dist/index.js",
+    "git-archaeologist": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
