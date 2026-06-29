@@ -25,8 +25,9 @@ When you decouple legacy code, you can't `grep` for hidden dependencies. `blast`
 
 **Command:**
 ```bash
-npx git-archaeologist blast lib/rules/index.js .
+npx git-archaeologist blast lib/rules/index.js . --semantic
 ```
+*(The `--semantic` flag enables the Semantic Filtering Engine. It filters out mechanical refactors, lockfiles, and formatting sweeps, ensuring the coupling is a true architectural relationship).*
 **Output:**
 ```
 IMPLICIT COUPLING
@@ -98,12 +99,21 @@ npx git-archaeologist analyze .           # Macro overview, curse scores, coupli
 npx git-archaeologist ownership .         # Ownership concentration maps
 npx git-archaeologist cursed --top 10     # Show the top risky files
 npx git-archaeologist pr-risk .           # Score local changes before pushing
+npx git-archaeologist trend .             # Measure historical code decay and accelerating tech debt
 ```
 
 ## FAQ
 
 **Does the curse score predict bugs?**
 It correlates, but it does not predict. A high curse score flags files that are *socially complex enough that bugs tend to hide there*. 
+
+**How exactly is the Curse Score calculated?**
+The score mathematically isolates code that is highly active and decaying. It prevents 10-year-old stable files from outranking modern, dangerous files using this formula:
+- **Base:** Total Commits × `log2(Unique Authors + 1)`
+- **Recency:** `Math.exp(-0.5 * ageInYears)` (Exponential decay prioritizing recently touched code)
+- **Churn:** `log2(Commits Per Year + 2)`
+- **Acceleration:** The ratio of commits in the last 6 months vs the previous 6 months (capped between 0.5x and 2.0x).
+- **Curse Score:** `Base × Recency × Churn × Acceleration`
 
 **Why not just use CODEOWNERS?**
 CODEOWNERS tells you who *should* review code, usually based on an outdated manual configuration. Git Archaeologist shows you who *actually* wrote the code, based on commit history.

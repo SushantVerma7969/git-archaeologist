@@ -10,6 +10,7 @@ import { generateHtmlReport } from './output/htmlReport';
 import { registerBlameCommand } from './blame';
 import { registerTrendCommand } from './trend';
 import { registerBlastCommand } from './blast';
+import { registerBlastBatchCommand } from './blast-batch';
 import { registerOwnershipCommand } from './ownership';
 import { registerPrRiskCommand } from './pr-risk';
 import { registerRiskCommand } from './risk';
@@ -121,6 +122,7 @@ program.action(async () => {
 registerBlameCommand(program);
 registerTrendCommand(program);
 registerBlastCommand(program);
+registerBlastBatchCommand(program);
 registerOwnershipCommand(program);
 registerPrRiskCommand(program);
 registerRiskCommand(program);

@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import * as path from 'path';
 import { parseCommits, validateRepo, buildFileStats } from './core/gitParser';
-import { analyzeCoupling } from './analyzers/busFactorAnalyzer';
+import { applySemanticFiltering, applyTfIdfPenalty } from './core/semanticFilter';
 
 export function registerBlastCommand(program: Command): void {
   program
@@ -11,24 +11,34 @@ export function registerBlastCommand(program: Command): void {
       'Show what historically changed together with this file (co-change, not a guaranteed dependency)',
     )
     .option('-s, --since <date>', 'Limit to commits after this date')
+    .option('--semantic', 'Apply semantic filtering to ignore mechanical/sweeping commits')
     .action(
       async (
         filepath: string,
         repoPath: string | undefined,
-        options: { since?: string },
+        options: { since?: string; semantic?: boolean },
       ) => {
         const resolvedPath = path.resolve(repoPath ?? '.');
 
         try {
           validateRepo(resolvedPath);
 
-          const normalizedTarget = filepath.replace(/\\/g, '/').replace(/^\.\//, '');
-          const commits = await parseCommits(
+          let normalizedTarget = filepath.split('\\\\').join('/');
+          if (normalizedTarget.startsWith('./')) {
+            normalizedTarget = normalizedTarget.substring(2);
+          }
+          let commits = await parseCommits(
             resolvedPath,
             options.since,
-            true,
-            normalizedTarget,
+            true
+            // We do not pass normalizedTarget to parseCommits because TF-IDF and filtering
+            // requires seeing the global context of commits to calculate 95th percentile
+            // and global document frequencies.
           );
+
+          if (options.semantic) {
+            commits = applySemanticFiltering(commits);
+          }
 
           // Find all commits that touched this file
           const targetCommits = commits.filter((c) =>
@@ -38,12 +48,12 @@ export function registerBlastCommand(program: Command): void {
           );
 
           if (targetCommits.length === 0) {
-            console.error(chalk.red(`\n  No commits found for: ${filepath}\n`));
+            console.error(chalk.red(`\\n  No commits found for: ${filepath}\\n`));
             process.exit(1);
           }
 
           // Count co-changes
-          const coChanges = new Map<string, number>();
+          let coChanges = new Map<string, number>();
           for (const commit of targetCommits) {
             for (const f of commit.filesChanged) {
               const norm = f.replace(/\\/g, '/');
@@ -51,6 +61,10 @@ export function registerBlastCommand(program: Command): void {
                 continue;
               coChanges.set(f, (coChanges.get(f) ?? 0) + 1);
             }
+          }
+
+          if (options.semantic) {
+            coChanges = applyTfIdfPenalty(coChanges, commits);
           }
 
           // Calculate blast radius scores

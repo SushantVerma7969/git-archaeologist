@@ -12,6 +12,8 @@ export interface CommitRecord {
   // buildFileStats. This de-biases ownership on squash-merge and pair-programmed
   // workflows where one committer is otherwise credited for several people's work.
   coAuthors?: Array<{ email: string; name: string }>;
+  // The raw commit message body (optional, added for semantic filtering)
+  message?: string;
 }
 
 export interface FileStats {

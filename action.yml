@@ -33,6 +33,7 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        NODE_OPTIONS: "--max-old-space-size=4096"
       run: |
         if [ "${{ github.event_name }}" != "pull_request" ]; then
           echo "Not a pull request. Skipping PR comment generation."
@@ -75,13 +76,18 @@ runs:
         
         COMMENT+="### 🔗 Coupling Warnings (Blast Radius)\n"
         COUPLED=false
+        
+        echo "Running blast radius analysis..."
+        git-arch blast-batch . --from-file pr_files.txt --json > blast_batch.json 2>/dev/null || true
+        
         while IFS= read -r file; do
-          git-arch blast "$file" . > blast.txt 2>/dev/null || true
-          if grep -q "IMPLICIT COUPLING" blast.txt; then
+          HAS_RESULTS=$(jq -r ".results[\"$file\"] | length" blast_batch.json 2>/dev/null || echo "0")
+          
+          if [ "$HAS_RESULTS" != "0" ] && [ "$HAS_RESULTS" != "null" ]; then
             COUPLED=true
             COMMENT+="**$file** historically changes alongside:\n"
-            grep "↔" blast.txt | while IFS= read -r line; do
-              COMMENT+="- $line\n"
+            jq -r ".results[\"$file\"][] | \"- \\(.pct)% \\(.file)\"" blast_batch.json | while IFS= read -r line; do
+              COMMENT+="$line\n"
             done
           fi
         done < pr_files.txt
