@@ -49,6 +49,9 @@ runs:
         echo "Running macro analysis..."
         git-arch analyze . --json > macro.json
         
+        # Convert pr_files.txt to JSON array
+        jq -R -s 'split("\n") | map(select(length > 0))' pr_files.txt > pr_files_json.json
+        
         # Build Markdown Comment
         COMMENT="## ⛏ Git Archaeologist Review\n\n"
         COMMENT+="> *Automated structural risk assessment based on commit history.*\n\n"
@@ -58,44 +61,24 @@ runs:
         COMMENT+="**Files analyzed in this PR:** $TOTAL_FILES\n\n"
         
         COMMENT+="### ⚠️ High-Risk Files\n"
-        RISK_FOUND=false
-        while IFS= read -r file; do
-          SCORE=$(jq -r --arg f "$file" '.cursedFiles[] | select(.filepath == $f) | .curseScore' macro.json || true)
-          if [ ! -z "$SCORE" ] && [ "$SCORE" != "null" ]; then
-            RISK_FOUND=true
-            ROUNDED=$(printf "%.0f" $SCORE)
-            COMMENT+="- \`$file\` (Curse Score: **$ROUNDED**)\n"
-          fi
-        done < pr_files.txt
+        HIGH_RISK_LIST=$(jq -r --slurpfile pr pr_files_json.json '.cursedFiles[] | select(.filepath as $f | any($pr[0][]; . == $f)) | "- `\(.filepath)` (Curse Score: **\(.curseScore | round)**)"' macro.json || true)
         
-        if [ "$RISK_FOUND" = false ]; then
+        if [ -z "$HIGH_RISK_LIST" ]; then
           COMMENT+="✅ No structurally decaying files modified.\n\n"
         else
-          COMMENT+="\n"
+          COMMENT+="$HIGH_RISK_LIST\n\n"
         fi
         
         COMMENT+="### 🔗 Coupling Warnings (Blast Radius)\n"
-        COUPLED=false
-        
         echo "Running blast radius analysis..."
         git-arch blast-batch . --from-file pr_files.txt --json > blast_batch.json 2>/dev/null || true
         
-        while IFS= read -r file; do
-          HAS_RESULTS=$(jq -r --arg f "$file" '.results[$f] | length' blast_batch.json 2>/dev/null || echo "0")
-          
-          if [ "$HAS_RESULTS" != "0" ] && [ "$HAS_RESULTS" != "null" ]; then
-            COUPLED=true
-            COMMENT+="**$file** historically changes alongside:\n"
-            jq -r --arg f "$file" '.results[$f][] | "- \(.pct)% \(.file)"' blast_batch.json | while IFS= read -r line; do
-              COMMENT+="$line\n"
-            done
-          fi
-        done < pr_files.txt
+        COUPLING_LIST=$(jq -r --slurpfile pr pr_files_json.json '.results | to_entries[] | select(.key as $f | any($pr[0][]; . == $f)) | select(.value | length > 0) | "**\(.key)** historically changes alongside:\n" + (.value[] | "- \(.pct)% \(.file)")' blast_batch.json 2>/dev/null || true)
         
-        if [ "$COUPLED" = false ]; then
+        if [ -z "$COUPLING_LIST" ]; then
           COMMENT+="✅ No hidden dependencies detected.\n\n"
         else
-          COMMENT+="\n"
+          COMMENT+="$COUPLING_LIST\n\n"
         fi
         
         COMMENT+="### 🚌 Ownership Suggestions\n"
