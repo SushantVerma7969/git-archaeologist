@@ -5,20 +5,21 @@ A local, zero-dependency Git metadata analyzer that detects code decay, knowledg
 ---
 
 ```text
-██████████████████████████████████████████████████
+Git Archaeologist Investigation Report
+──────────────────────────────────────
 
-⛏ Git Archaeologist Investigation Report
+✓ Knowledge Silos
+  support/
+  Bus Factor: 1
+  Risk Share: 92%
 
-✔ Knowledge Silos
-  support/  (Bus Factor: 1 | Risk Share: 92%)
+✓ Hidden Coupling
+  router.ts ↔ routes.json
+  79.4% historical co-changes
 
-✔ Hidden Coupling (Blast Radius)
-  router.ts ↔ routes.json  (79.4% co-changes)
-
-✔ Highest Active Decay
-  lib/response.js  (Curse Score: 23,507)
-
-██████████████████████████████████████████████████
+✓ Highest Active Decay
+  lib/response.js
+  Curse Score: 23,507
 ```
 
 ---
