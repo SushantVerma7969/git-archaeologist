@@ -13,19 +13,19 @@ Git Archaeologist is explicitly designed to be safely executed on proprietary, e
 ### What commands does it execute?
 Git Archaeologist is a local Node.js wrapper around the native `git` binary. Under the hood, it executes read-only git log queries. 
 The primary command executed is:
-`git log --name-status --format="%H|%aN|%aE|%at|%P" --no-merges`
+`git log --name-only -z --pretty=format:"..."`
 
 ### What data does it read?
 The tool only reads Git metadata:
 - Commit hashes
 - Author Names and Author Emails
 - Commit timestamps
-- File paths that were added, modified, or deleted
+- Commit message headers and bodies (solely for parsing `Co-authored-by` metadata and identifying conventional commit prefixes like `chore:` or `test:`)
+- File paths that were modified
 
 ### What data does it NEVER read?
 - It **never** reads the contents of your source code files.
 - It **never** parses ASTs.
-- It **never** reads commit messages.
 - It **never** reads passwords, API keys, or environment variables.
 
 ---

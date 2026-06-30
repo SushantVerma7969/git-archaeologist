@@ -76,19 +76,23 @@ function applyTemporalGrouping(commits: CommitRecord[]): CommitRecord[] {
   const sorted = [...commits].sort((a, b) => a.timestamp - b.timestamp);
 
   const grouped: CommitRecord[] = [];
+  const groupStartMap = new Map<string, number>();
 
   for (const commit of sorted) {
+    const author = commit.authorEmail;
     if (grouped.length === 0) {
       grouped.push({ ...commit });
+      groupStartMap.set(author, commit.timestamp);
       continue;
     }
 
     const last = grouped[grouped.length - 1];
+    const groupStart = groupStartMap.get(author) ?? last.timestamp;
 
-    // If same author and within 2 hours
+    // If same author and within 2 hours of the START of the group
     if (
-      last.authorEmail === commit.authorEmail &&
-      commit.timestamp - last.timestamp <= 7200
+      last.authorEmail === author &&
+      commit.timestamp - groupStart <= 7200
     ) {
       // Merge files (unique)
       const mergedFiles = new Set([...last.filesChanged, ...commit.filesChanged]);
@@ -99,6 +103,7 @@ function applyTemporalGrouping(commits: CommitRecord[]): CommitRecord[] {
       last.message = last.message + '\\n' + commit.message;
     } else {
       grouped.push({ ...commit });
+      groupStartMap.set(author, commit.timestamp);
     }
   }
 

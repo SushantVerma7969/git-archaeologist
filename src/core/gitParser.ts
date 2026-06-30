@@ -195,7 +195,9 @@ export async function parseCommits(
     '-z',
   ];
   if (since) args.push(`--since=${since}`);
-  if (targetFile) args.push('--', targetFile);
+  if (targetFile) {
+    args.push('--follow', '--', targetFile);
+  }
 
   const { stdout } = await execFileAsync('git', args, {
     cwd: repoPath,

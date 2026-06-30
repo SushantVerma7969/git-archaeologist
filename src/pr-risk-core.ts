@@ -55,8 +55,10 @@ export function scorePrRisk(input: ScorePrRiskInput): PrRiskReport {
     }
 
     for (const bf of busFactor1) {
-      const scope = bf.scope === '(root)' ? '' : bf.scope + '/';
-      if (file.startsWith(scope)) {
+      const isInScope = bf.scope === '(root)'
+        ? !file.includes('/')
+        : file.startsWith(bf.scope + '/');
+      if (isInScope) {
         fileRisk += 25;
         reasons.push(
           `in bus factor 1 module "${bf.scope}" — owned by ${bf.atRiskAuthors[0]}`,

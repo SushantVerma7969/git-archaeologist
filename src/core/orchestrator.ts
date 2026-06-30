@@ -77,7 +77,7 @@ export async function analyze(
     }
 
     // Step 5 — run all analyzers
-    const cursedFiles = scoreCursedFiles(fileStats, cursedLimit);
+    const cursedFiles = scoreCursedFiles(fileStats, Math.max(cursedLimit, 1000));
 
     if (spinner) {
       spinner.text = 'Analyzing ownership...';

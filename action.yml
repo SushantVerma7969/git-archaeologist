@@ -60,7 +60,7 @@ runs:
         COMMENT+="### ⚠️ High-Risk Files\n"
         RISK_FOUND=false
         while IFS= read -r file; do
-          SCORE=$(jq -r ".cursedFiles[] | select(.filepath == \"$file\") | .curseScore" macro.json || true)
+          SCORE=$(jq -r --arg f "$file" '.cursedFiles[] | select(.filepath == $f) | .curseScore' macro.json || true)
           if [ ! -z "$SCORE" ] && [ "$SCORE" != "null" ]; then
             RISK_FOUND=true
             ROUNDED=$(printf "%.0f" $SCORE)
@@ -81,12 +81,12 @@ runs:
         git-arch blast-batch . --from-file pr_files.txt --json > blast_batch.json 2>/dev/null || true
         
         while IFS= read -r file; do
-          HAS_RESULTS=$(jq -r ".results[\"$file\"] | length" blast_batch.json 2>/dev/null || echo "0")
+          HAS_RESULTS=$(jq -r --arg f "$file" '.results[$f] | length' blast_batch.json 2>/dev/null || echo "0")
           
           if [ "$HAS_RESULTS" != "0" ] && [ "$HAS_RESULTS" != "null" ]; then
             COUPLED=true
             COMMENT+="**$file** historically changes alongside:\n"
-            jq -r ".results[\"$file\"][] | \"- \\(.pct)% \\(.file)\"" blast_batch.json | while IFS= read -r line; do
+            jq -r --arg f "$file" '.results[$f][] | "- \(.pct)% \(.file)"' blast_batch.json | while IFS= read -r line; do
               COMMENT+="$line\n"
             done
           fi

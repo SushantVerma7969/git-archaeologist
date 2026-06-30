@@ -4,9 +4,9 @@ Git Archaeologist is built to run locally on massive enterprise architectures wi
 
 ## Parser Architecture
 The core engine executes a highly optimized `git log` query:
-`git log --name-status --format="%H|%aN|%aE|%at|%P" --no-merges`
+`git log --name-only -z --pretty=format:"..."`
 
-Instead of loading the entire JSON or text output into memory, Git Archaeologist uses a Node.js `Transform` stream. It reads the raw Git stdout buffer chunk by chunk, parses the metadata into lightweight state objects, and instantly discards the text buffer. This stream architecture guarantees that memory consumption remains nearly flat, regardless of whether the repository has 1,000 commits or 100,000 commits.
+Git Archaeologist executes the Git binary and reads its full stdout into an in-memory buffer (capped at 512MB). The raw buffer is converted to a string and parsed into structured models in a single pass. While this uses more memory than a streaming approach (requiring `--max-old-space-size=4096` on extremely large monorepos), it makes the parsing stage exceptionally fast (under 2 seconds for typical projects) and ensures we map atomic rename chains accurately.
 
 ## Big O Complexity
 - **`analyze`:** $O(C)$ where $C$ is the number of commits in the repository. It processes history linearly in a single pass.

@@ -69,8 +69,8 @@ Coupling Score = (Commits containing both A and B) / (Commits containing A)
 ## 5. PR Risk Scoring (Automated Triage)
 The GitHub Action calculates a deterministic PR Risk Score (`0-100`) based on the intersection of the modified files and the repository's macro risk.
 
-- **Curse Penalty:** If a PR modifies a file in the top `N` Cursed Files, it receives up to 50 penalty points (scaled by the file's normalized Curse Score).
-- **Bus Factor Penalty:** If a PR modifies a folder that has a Bus Factor of 1, it receives a flat 20 penalty points.
+- **Curse Penalty:** If a PR modifies a file in the top `N` Cursed Files, it receives up to 40 penalty points (scaled by the file's normalized Curse Score).
+- **Bus Factor Penalty:** If a PR modifies a folder that has a Bus Factor of 1, it receives a flat 25 penalty points.
 
 **Assumptions:** The PR risk score assumes that touching unstable, single-owner code is inherently more dangerous than touching community-owned UI components, regardless of the line count of the PR.
 
