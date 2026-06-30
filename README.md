@@ -2,8 +2,6 @@
 
 A local, zero-dependency Git metadata analyzer that detects code decay, knowledge silos (bus factor), and hidden module coupling.
 
-![Git Archaeologist Report](docs/images/dashboard.jpg)
-
 ---
 
 ```text
