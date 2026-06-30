@@ -2,21 +2,31 @@
 
 A local, zero-dependency Git metadata analyzer that detects code decay, knowledge silos (bus factor), and hidden module coupling.
 
+![Git Archaeologist Dashboard](docs/images/dashboard.jpg)
+
 ---
 
 ```text
-$ git-arch analyze
-✔ Validation complete — 1,402 files scanned
+██████████████████████████████████████████████████
 
-✔ Found 2 Bus Factor 1 directories
-  ├── src/core/router (Owner TJ Holowaychuk: 94.2% share)
-  └── src/store/db     (Owner Dan Abramov:   88.0% share)
+⛏ Git Archaeologist Investigation Report
 
-✔ Hidden dependency discovered (Blast Radius)
-  └── src/core/router.ts ↔ config/routes.json (79.4% historical coupling)
+✔ Knowledge Silos
+  Scope:       support/
+  Bus Factor:  1
+  Owner:       TJ Holowaychuk
+  Risk Share:  92%
 
-✔ Highest decay (Curse Score)
-  └── lib/response.js (Score: 23,507 — high churn, 80 authors, active)
+✔ Hidden Coupling (Blast Radius)
+  File A:      router.ts
+  File B:      routes.json
+  Coupling:    79.4% historical co-changes
+
+✔ Highest Active Decay
+  Filepath:    lib/response.js
+  Curse Score: 23,507
+
+██████████████████████████████████████████████████
 ```
 
 ---
@@ -35,56 +45,34 @@ npm install -g git-archaeologist
 
 ---
 
-## 30-Second Quick Start
+## Three Commands to Start
 
-Analyze active project risk:
+### 1. Repository-wide audit:
 ```bash
 git-arch analyze .
 ```
 
-Discover what historically changes alongside a specific file:
+### 2. Discover hidden coupling:
 ```bash
 git-arch blast src/core/router.ts .
 ```
 
-Find the top decaying files:
+### 3. Rank active code decay:
 ```bash
 git-arch cursed .
 ```
 
 ---
 
-## What You'll Discover
-
-### 1. Folder-Level Silos (`git-arch risk`)
-Locate areas where knowledge is concentrated in a single developer (Bus Factor of 1) and see when that contributor was last active in the project:
-```text
-  support
-  ├── Bus Factor: 1
-  ├── Touch Concentration: 97.2%
-  └── Primary Driver: TJ Holowaychuk (Last active 4 years ago)
-```
-
-### 2. File Churn & Code Decay (`git-arch cursed`)
-Ranks codebase files by active developer friction (Curse Score), prioritizing recently changed files with high contributor churn over stable legacy complexity:
-```text
-  lib/response.js
-  ├── Churn Rate: 392 commits
-  ├── Authors: 80 unique developers
-  └── Curse Score: 23,507 (Accelerating changes)
-```
+## Why It Matters
+* **Friction vs Complexity:** Static analysis flags complex code that is stable. Git Archaeologist targets complex files that developers are *actively* struggling with.
+* **100% Offline Privacy:** Runs completely locally on read-only logs. Your source code never leaves your machine.
+* **Identity Resolution:** Merges multiple developer email aliases and GitHub `noreply` handles automatically.
+* **Noise Exclusions:** Ignores lockfiles, build configurations, and mechanical code formatting refactors.
 
 ---
 
-## Why This Is Different
-* **Offline First:** Zero network calls, zero telemetry. Your source code never leaves your machine.
-* **No AST Overhead:** Language-agnostic. Mines Git metadata instead of parsing syntax, completing analysis in under 2 seconds.
-* **Focuses on Friction:** Cyclomatic complexity flags complex files that are stable. Git Archaeologist targets files that developers are *actively* struggling with.
-* **Identity Merging:** Built-in identity canonicalization merges multiple contributor email aliases and GitHub `noreply` handles automatically.
-
----
-
-## Real Case Studies
+## Case Studies
 Read technical risk reports run against mature repositories:
 * [Express (HTTP response decay)](docs/case-studies/express.md)
 * [ESLint (rules config coupling)](docs/case-studies/eslint.md)
@@ -123,17 +111,15 @@ jobs:
 
 ---
 
-## Documentation
+## Docs
 * [How it Works & Mathematics](docs/how-it-works.md) (Curse Score formula, identity union-find)
 * [Security & Threat Model](docs/security.md) (Read-only queries, data guarantees)
 * [Performance & Monorepos](docs/performance.md) (Complexity bounds, monorepo performance)
 
 ---
 
-## Contributing
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup and development guidelines.
-
----
-
 ## License
-MIT License. Created by Sushant Verma.
+
+Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+© [Sushant Verma](https://github.com/SushantVerma7969)
