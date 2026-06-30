@@ -1,8 +1,8 @@
-# git-archaeologist
+# ⛏ Git Archaeologist
 
 A local, zero-dependency Git metadata analyzer that detects code decay, knowledge silos (bus factor), and hidden module coupling.
 
-![Git Archaeologist Dashboard](docs/images/dashboard.jpg)
+![Git Archaeologist Report](docs/images/dashboard.jpg)
 
 ---
 
@@ -12,19 +12,13 @@ A local, zero-dependency Git metadata analyzer that detects code decay, knowledg
 ⛏ Git Archaeologist Investigation Report
 
 ✔ Knowledge Silos
-  Scope:       support/
-  Bus Factor:  1
-  Owner:       TJ Holowaychuk
-  Risk Share:  92%
+  support/  (Bus Factor: 1 | Risk Share: 92%)
 
 ✔ Hidden Coupling (Blast Radius)
-  File A:      router.ts
-  File B:      routes.json
-  Coupling:    79.4% historical co-changes
+  router.ts ↔ routes.json  (79.4% co-changes)
 
 ✔ Highest Active Decay
-  Filepath:    lib/response.js
-  Curse Score: 23,507
+  lib/response.js  (Curse Score: 23,507)
 
 ██████████████████████████████████████████████████
 ```
@@ -73,10 +67,8 @@ git-arch cursed .
 ---
 
 ## Case Studies
-Read technical risk reports run against mature repositories:
-* [Express (HTTP response decay)](docs/case-studies/express.md)
-* [ESLint (rules config coupling)](docs/case-studies/eslint.md)
-* [OpenSauced (rapid ownership transitions)](docs/case-studies/opensauced.md)
+
+**[Express](docs/case-studies/express.md)** • **[ESLint](docs/case-studies/eslint.md)** • **[OpenSauced](docs/case-studies/opensauced.md)**
 
 ---
 
@@ -104,7 +96,7 @@ jobs:
           fetch-depth: 0 # Full history is required for age-decay analysis
 
       - name: Analyze PR Risk
-        uses: SushantVerma7969/git-archaeologist@v1.32.12
+        uses: SushantVerma7969/git-archaeologist@v1.32.13
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -120,6 +112,4 @@ jobs:
 
 ## License
 
-Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-© [Sushant Verma](https://github.com/SushantVerma7969)
+[MIT](LICENSE)
