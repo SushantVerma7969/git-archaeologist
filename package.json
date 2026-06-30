@@ -1,6 +1,6 @@
 {
   "name": "git-archaeologist",
-  "version": "1.32.15",
+  "version": "1.32.16",
   "description": "Find the most dangerous files in any git repo — curse scores, bus factor, hidden coupling",
   "main": "dist/index.js",
   "bin": {
