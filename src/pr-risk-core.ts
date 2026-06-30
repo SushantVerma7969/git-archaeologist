@@ -55,9 +55,8 @@ export function scorePrRisk(input: ScorePrRiskInput): PrRiskReport {
     }
 
     for (const bf of busFactor1) {
-      const isInScope = bf.scope === '(root)'
-        ? !file.includes('/')
-        : file.startsWith(bf.scope + '/');
+      const isInScope =
+        bf.scope === '(root)' ? !file.includes('/') : file.startsWith(bf.scope + '/');
       if (isInScope) {
         fileRisk += 25;
         reasons.push(

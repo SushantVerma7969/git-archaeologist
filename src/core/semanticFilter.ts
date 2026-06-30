@@ -90,10 +90,7 @@ function applyTemporalGrouping(commits: CommitRecord[]): CommitRecord[] {
     const groupStart = groupStartMap.get(author) ?? last.timestamp;
 
     // If same author and within 2 hours of the START of the group
-    if (
-      last.authorEmail === author &&
-      commit.timestamp - groupStart <= 7200
-    ) {
+    if (last.authorEmail === author && commit.timestamp - groupStart <= 7200) {
       // Merge files (unique)
       const mergedFiles = new Set([...last.filesChanged, ...commit.filesChanged]);
       last.filesChanged = Array.from(mergedFiles);
